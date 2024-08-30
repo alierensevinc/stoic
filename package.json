@@ -12,6 +12,7 @@
     "axios": "^1.7.5",
     "expo": "~51.0.28",
     "expo-dev-client": "~4.0.25",
+    "expo-sharing": "~12.0.1",
     "expo-status-bar": "~1.12.1",
     "moment": "^2.30.1",
     "react": "18.2.0",
@@ -19,6 +20,7 @@
     "react-native-gesture-handler": "^2.18.1",
     "react-native-mmkv": "^2.12.2",
     "react-native-reanimated": "^3.15.1",
+    "react-native-view-shot": "3.8.0",
     "zustand": "^4.5.5"
   },
   "devDependencies": {

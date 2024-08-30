@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useRef, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -24,6 +24,8 @@ import Animated, {
   interpolate,
   Extrapolate,
 } from "react-native-reanimated";
+import ViewShot from "react-native-view-shot";
+import * as Sharing from "expo-sharing";
 
 // Zustand store for quotes
 const useQuoteStore = create((set) => ({
@@ -46,6 +48,8 @@ const HomeScreen = () => {
   const textOpacity = useSharedValue(1);
   const nextQuoteOpacity = useSharedValue(0);
   const screenWidth = Dimensions.get("window").width;
+  const viewShotRef = useRef();
+  const [isCapturing, setIsCapturing] = useState(false);
 
   useEffect(() => {
     const quotesString = storage.getString("quotes");
@@ -99,13 +103,40 @@ const HomeScreen = () => {
     }
   };
 
+  const shareQuote = async () => {
+    if (!(await Sharing.isAvailableAsync())) {
+      alert("Sharing isn't available on your platform");
+      return;
+    }
+
+    try {
+      setIsCapturing(true);
+      // Butonların gizlenmesi için kısa bir gecikme ekleyelim
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      const uri = await viewShotRef.current.capture();
+      setIsCapturing(false);
+      await Sharing.shareAsync("file://" + uri, {
+        mimeType: "image/jpeg",
+        dialogTitle: "Share this quote",
+        UTI: "public.jpeg",
+      });
+    } catch (error) {
+      setIsCapturing(false);
+      console.error("Error sharing quote:", error);
+    }
+  };
+
   const changeQuote = (direction) => {
     if (quotes.length > 1) {
-      if (direction === 'next') {
+      if (direction === "next") {
         const nextQuotes = [...quotes.slice(1), quotes[0]];
         setQuotes(nextQuotes);
-      } else if (direction === 'previous') {
-        const previousQuotes = [quotes[quotes.length - 1], ...quotes.slice(0, -1)];
+      } else if (direction === "previous") {
+        const previousQuotes = [
+          quotes[quotes.length - 1],
+          ...quotes.slice(0, -1),
+        ];
         setQuotes(previousQuotes);
       }
       textOpacity.value = withTiming(1, { duration: 300 });
@@ -120,27 +151,48 @@ const HomeScreen = () => {
     onActive: (event, context) => {
       translateX.value = context.startX + event.translationX;
       const progress = Math.abs(translateX.value) / screenWidth;
-      textOpacity.value = interpolate(progress, [0, 0.5], [1, 0], Extrapolate.CLAMP);
-      nextQuoteOpacity.value = interpolate(progress, [0.5, 1], [0, 1], Extrapolate.CLAMP);
+      textOpacity.value = interpolate(
+        progress,
+        [0, 0.5],
+        [1, 0],
+        Extrapolate.CLAMP
+      );
+      nextQuoteOpacity.value = interpolate(
+        progress,
+        [0.5, 1],
+        [0, 1],
+        Extrapolate.CLAMP
+      );
     },
     onEnd: (event) => {
-      if (Math.abs(event.velocityX) > 400 || Math.abs(translateX.value) > screenWidth / 5) {
+      if (
+        Math.abs(event.velocityX) > 400 ||
+        Math.abs(translateX.value) > screenWidth / 5
+      ) {
         if (event.velocityX > 0 || translateX.value > 0) {
-          translateX.value = withSpring(screenWidth, { 
-            duration: 200,
-            velocity: event.velocityX
-          }, () => {
-            runOnJS(changeQuote)('previous');
-            translateX.value = 0;
-          });
+          translateX.value = withSpring(
+            screenWidth,
+            {
+              duration: 200,
+              velocity: event.velocityX,
+            },
+            () => {
+              runOnJS(changeQuote)("previous");
+              translateX.value = 0;
+            }
+          );
         } else {
-          translateX.value = withSpring(-screenWidth, { 
-            duration: 200,
-            velocity: event.velocityX
-          }, () => {
-            runOnJS(changeQuote)('next');
-            translateX.value = 0;
-          });
+          translateX.value = withSpring(
+            -screenWidth,
+            {
+              duration: 200,
+              velocity: event.velocityX,
+            },
+            () => {
+              runOnJS(changeQuote)("next");
+              translateX.value = 0;
+            }
+          );
         }
       } else {
         translateX.value = withSpring(0, { duration: 150 });
@@ -160,8 +212,8 @@ const HomeScreen = () => {
 
   const nextTextStyle = useAnimatedStyle(() => ({
     opacity: nextQuoteOpacity.value,
-    position: 'absolute',
-    width: '100%',
+    position: "absolute",
+    width: "100%",
     left: translateX.value > 0 ? -screenWidth : screenWidth,
   }));
 
@@ -169,48 +221,58 @@ const HomeScreen = () => {
     <View
       style={[styles.container, { backgroundColor: theme.backgroundColor }]}
     >
-      <PanGestureHandler
-        onGestureEvent={gestureHandler}
-        style={[styles.container, { backgroundColor: theme.backgroundColor }]}
-      >
-        <Animated.View
-          style={[
-            styles.container,
-            { backgroundColor: theme.backgroundColor },
-            animatedStyle,
-          ]}
+      <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 0.9 }}>
+        <PanGestureHandler
+          onGestureEvent={gestureHandler}
+          style={[styles.container, { backgroundColor: theme.backgroundColor }]}
         >
-          <Animated.View style={currentTextStyle}>
-            <Text style={[styles.quote, { color: theme.textColor }]}>
-              {quotes.length > 0 ? quotes[0].q : "Loading..."}
-            </Text>
-            <Text style={[styles.author, { color: theme.textColor }]}>
-              {quotes.length > 0 ? "- " + quotes[0].a : "Loading..."}
-            </Text>
+          <Animated.View
+            style={[
+              styles.container,
+              { backgroundColor: theme.backgroundColor },
+              animatedStyle,
+            ]}
+          >
+            <Animated.View style={currentTextStyle}>
+              <Text style={[styles.quote, { color: theme.textColor }]}>
+                {quotes.length > 0 ? quotes[0].q : "Loading..."}
+              </Text>
+              <Text style={[styles.author, { color: theme.textColor }]}>
+                {quotes.length > 0 ? "- " + quotes[0].a : "Loading..."}
+              </Text>
+            </Animated.View>
+            <Animated.View style={nextTextStyle}>
+              <Text style={[styles.quote, { color: theme.textColor }]}>
+                {quotes.length > 1 ? quotes[1].q : "Loading..."}
+              </Text>
+              <Text style={[styles.author, { color: theme.textColor }]}>
+                {quotes.length > 1 ? "- " + quotes[1].a : "Loading..."}
+              </Text>
+            </Animated.View>
           </Animated.View>
-          <Animated.View style={nextTextStyle}>
-            <Text style={[styles.quote, { color: theme.textColor }]}>
-              {quotes.length > 1 ? quotes[1].q : "Loading..."}
-            </Text>
-            <Text style={[styles.author, { color: theme.textColor }]}>
-              {quotes.length > 1 ? "- " + quotes[1].a : "Loading..."}
-            </Text>
-          </Animated.View>
-          <TouchableOpacity onPress={toggleFavoriteQuote}>
-            <Ionicons
-              style={styles.heartButton}
-              name={
-                favorites.some((favorite) => favorite.q === quotes[0]?.q)
-                  ? "heart"
-                  : "heart-outline"
-              }
-              size={24}
-              color={theme.buttonColor}
-            />
-          </TouchableOpacity>
-          <StatusBar style="auto" />
-        </Animated.View>
-      </PanGestureHandler>
+        </PanGestureHandler>
+      </ViewShot>
+      <TouchableOpacity
+        onPress={shareQuote}
+        style={[styles.shareButton, isCapturing && styles.hidden]}
+      >
+        <Ionicons name={"share-outline"} size={24} color={theme.buttonColor} />
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={toggleFavoriteQuote}
+        style={[styles.heartButton, isCapturing && styles.hidden]}
+      >
+        <Ionicons
+          name={
+            favorites.some((favorite) => favorite.q === quotes[0]?.q)
+              ? "heart"
+              : "heart-outline"
+          }
+          size={24}
+          color={theme.buttonColor}
+        />
+      </TouchableOpacity>
+      <StatusBar style="auto" />
     </View>
   );
 };
@@ -232,6 +294,22 @@ const styles = StyleSheet.create({
   },
   heartButton: {
     marginTop: 24,
+  },
+  shareButton: {
+    marginTop: 24,
+  },
+  hidden: {
+    opacity: 0,
+  },
+  shareButton: {
+    position: "absolute",
+    bottom: 20,
+    right: 60,
+  },
+  heartButton: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
   },
 });
 
