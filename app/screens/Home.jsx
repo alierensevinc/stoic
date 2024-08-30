@@ -26,6 +26,8 @@ import Animated, {
 } from "react-native-reanimated";
 import ViewShot from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
+import { useNavigation } from "@react-navigation/native";
+import { useFavoriteStore } from "../store/favoriteStore";
 
 // Zustand store for quotes
 const useQuoteStore = create((set) => ({
@@ -33,16 +35,10 @@ const useQuoteStore = create((set) => ({
   setQuotes: (newQuotes) => set({ quotes: newQuotes }),
 }));
 
-// Zustand store for favorites
-const useFavoriteStore = create((set) => ({
-  favorites: [],
-  setFavorites: (newFavorites) => set({ favorites: newFavorites }),
-}));
-
 const HomeScreen = () => {
   const { theme } = useContext(ThemeContext);
   const { quotes, setQuotes } = useQuoteStore();
-  const { favorites, setFavorites } = useFavoriteStore();
+  const { favorites, addFavorite, removeFavorite } = useFavoriteStore();
   const storage = new MMKV();
   const translateX = useSharedValue(0);
   const textOpacity = useSharedValue(1);
@@ -50,6 +46,7 @@ const HomeScreen = () => {
   const screenWidth = Dimensions.get("window").width;
   const viewShotRef = useRef();
   const [isCapturing, setIsCapturing] = useState(false);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const quotesString = storage.getString("quotes");
@@ -68,7 +65,7 @@ const HomeScreen = () => {
     }
 
     if (favoritesString) {
-      setFavorites(JSON.parse(favoritesString));
+      addFavorite(JSON.parse(favoritesString));
     }
   }, []);
 
@@ -88,18 +85,11 @@ const HomeScreen = () => {
   };
 
   const toggleFavoriteQuote = () => {
-    const quoteToToggle = quotes[0];
-
-    if (favorites.some((favorite) => favorite.q === quoteToToggle.q)) {
-      const updatedFavorites = favorites.filter(
-        (favorite) => favorite.q !== quoteToToggle.q
-      );
-      setFavorites(updatedFavorites);
-      storage.set("favorites", JSON.stringify(updatedFavorites));
+    const currentQuote = quotes[0];
+    if (favorites.some((fav) => fav.q === currentQuote.q)) {
+      removeFavorite(currentQuote);
     } else {
-      const updatedFavorites = [...favorites, quoteToToggle];
-      setFavorites(updatedFavorites);
-      storage.set("favorites", JSON.stringify(updatedFavorites));
+      addFavorite(currentQuote);
     }
   };
 
@@ -139,8 +129,8 @@ const HomeScreen = () => {
         ];
         setQuotes(previousQuotes);
       }
-      textOpacity.value = withTiming(1, { duration: 300 });
-      nextQuoteOpacity.value = withTiming(0, { duration: 300 });
+      textOpacity.value = withTiming(1, { duration: 500 }); // Increased from 300 to 500
+      nextQuoteOpacity.value = withTiming(0, { duration: 500 }); // Increased from 300 to 500
     }
   };
 
@@ -173,7 +163,7 @@ const HomeScreen = () => {
           translateX.value = withSpring(
             screenWidth,
             {
-              duration: 200,
+              duration: 500, // Increased from 200 to 500
               velocity: event.velocityX,
             },
             () => {
@@ -185,7 +175,7 @@ const HomeScreen = () => {
           translateX.value = withSpring(
             -screenWidth,
             {
-              duration: 200,
+              duration: 500, // Increased from 200 to 500
               velocity: event.velocityX,
             },
             () => {
@@ -195,9 +185,9 @@ const HomeScreen = () => {
           );
         }
       } else {
-        translateX.value = withSpring(0, { duration: 150 });
-        textOpacity.value = withTiming(1, { duration: 150 });
-        nextQuoteOpacity.value = withTiming(0, { duration: 150 });
+        translateX.value = withSpring(0, { duration: 300 }); // Increased from 150 to 300
+        textOpacity.value = withTiming(1, { duration: 300 }); // Increased from 150 to 300
+        nextQuoteOpacity.value = withTiming(0, { duration: 300 }); // Increased from 150 to 300
       }
     },
   });
@@ -216,6 +206,10 @@ const HomeScreen = () => {
     width: "100%",
     left: translateX.value > 0 ? -screenWidth : screenWidth,
   }));
+
+  const goToFavorites = () => {
+    navigation.navigate("Favorites");
+  };
 
   return (
     <View
@@ -272,6 +266,12 @@ const HomeScreen = () => {
           color={theme.buttonColor}
         />
       </TouchableOpacity>
+      <TouchableOpacity
+        onPress={goToFavorites}
+        style={[styles.favoritesButton, isCapturing && styles.hidden]}
+      >
+        <Ionicons name="bookmark-outline" size={24} color={theme.buttonColor} />
+      </TouchableOpacity>
       <StatusBar style="auto" />
     </View>
   );
@@ -286,10 +286,11 @@ const styles = StyleSheet.create({
   },
   quote: {
     fontSize: 36,
-    textAlign: "center",
+    textAlign: "flex-start",
   },
   author: {
     fontSize: 20,
+    marginTop: 8,
     alignSelf: "flex-end",
   },
   heartButton: {
@@ -310,6 +311,11 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 20,
     right: 20,
+  },
+  favoritesButton: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
   },
 });
 

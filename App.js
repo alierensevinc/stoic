@@ -1,13 +1,24 @@
-import { ThemeProvider } from "./app/context/ThemeContext";
+import React from "react";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "./app/screens/Home";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import FavoritesScreen from "./app/screens/Favorites";
+import { ThemeProvider } from "./app/context/ThemeContext";
+
+const Stack = createStackNavigator();
 
 export default function App() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <SafeAreaProvider>
       <ThemeProvider>
-        <HomeScreen />
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen name="Favorites" component={FavoritesScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
       </ThemeProvider>
-    </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 }
