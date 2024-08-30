@@ -19,6 +19,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
+  withTiming,
   runOnJS,
   interpolate,
   Extrapolate,
@@ -41,8 +42,9 @@ const HomeScreen = () => {
   const { quotes, setQuotes } = useQuoteStore();
   const { favorites, setFavorites } = useFavoriteStore();
   const storage = new MMKV();
-  const translateX = useSharedValue(0);  // Add this line
-
+  const translateX = useSharedValue(0);
+  const textOpacity = useSharedValue(1);
+  const nextQuoteOpacity = useSharedValue(0);
   const screenWidth = Dimensions.get("window").width;
 
   useEffect(() => {
@@ -106,6 +108,8 @@ const HomeScreen = () => {
         const previousQuotes = [quotes[quotes.length - 1], ...quotes.slice(0, -1)];
         setQuotes(previousQuotes);
       }
+      textOpacity.value = withTiming(1, { duration: 300 });
+      nextQuoteOpacity.value = withTiming(0, { duration: 300 });
     }
   };
 
@@ -115,38 +119,51 @@ const HomeScreen = () => {
     },
     onActive: (event, context) => {
       translateX.value = context.startX + event.translationX;
+      const progress = Math.abs(translateX.value) / screenWidth;
+      textOpacity.value = interpolate(progress, [0, 0.5], [1, 0], Extrapolate.CLAMP);
+      nextQuoteOpacity.value = interpolate(progress, [0.5, 1], [0, 1], Extrapolate.CLAMP);
     },
     onEnd: (event) => {
-      if (Math.abs(event.velocityX) > 500 || Math.abs(translateX.value) > screenWidth / 3) {
+      if (Math.abs(event.velocityX) > 400 || Math.abs(translateX.value) > screenWidth / 5) {
         if (event.velocityX > 0 || translateX.value > 0) {
-          translateX.value = withSpring(screenWidth, {}, () => {
+          translateX.value = withSpring(screenWidth, { 
+            duration: 200,
+            velocity: event.velocityX
+          }, () => {
             runOnJS(changeQuote)('previous');
             translateX.value = 0;
           });
         } else {
-          translateX.value = withSpring(-screenWidth, {}, () => {
+          translateX.value = withSpring(-screenWidth, { 
+            duration: 200,
+            velocity: event.velocityX
+          }, () => {
             runOnJS(changeQuote)('next');
             translateX.value = 0;
           });
         }
       } else {
-        translateX.value = withSpring(0);
+        translateX.value = withSpring(0, { duration: 150 });
+        textOpacity.value = withTiming(1, { duration: 150 });
+        nextQuoteOpacity.value = withTiming(0, { duration: 150 });
       }
     },
   });
 
-  const animatedStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      Math.abs(translateX.value),
-      [0, screenWidth / 2],
-      [1, 0],
-      Extrapolate.CLAMP
-    );
-    return {
-      transform: [{ translateX: translateX.value }],
-      opacity,
-    };
-  });
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
+
+  const currentTextStyle = useAnimatedStyle(() => ({
+    opacity: textOpacity.value,
+  }));
+
+  const nextTextStyle = useAnimatedStyle(() => ({
+    opacity: nextQuoteOpacity.value,
+    position: 'absolute',
+    width: '100%',
+    left: translateX.value > 0 ? -screenWidth : screenWidth,
+  }));
 
   return (
     <View
@@ -163,12 +180,22 @@ const HomeScreen = () => {
             animatedStyle,
           ]}
         >
-          <Text style={[styles.quote, { color: theme.textColor }]}>
-            {quotes.length > 0 ? quotes[0].q : "Loading..."}
-          </Text>
-          <Text style={[styles.author, { color: theme.textColor }]}>
-            {quotes.length > 0 ? "- " + quotes[0].a : "Loading..."}
-          </Text>
+          <Animated.View style={currentTextStyle}>
+            <Text style={[styles.quote, { color: theme.textColor }]}>
+              {quotes.length > 0 ? quotes[0].q : "Loading..."}
+            </Text>
+            <Text style={[styles.author, { color: theme.textColor }]}>
+              {quotes.length > 0 ? "- " + quotes[0].a : "Loading..."}
+            </Text>
+          </Animated.View>
+          <Animated.View style={nextTextStyle}>
+            <Text style={[styles.quote, { color: theme.textColor }]}>
+              {quotes.length > 1 ? quotes[1].q : "Loading..."}
+            </Text>
+            <Text style={[styles.author, { color: theme.textColor }]}>
+              {quotes.length > 1 ? "- " + quotes[1].a : "Loading..."}
+            </Text>
+          </Animated.View>
           <TouchableOpacity onPress={toggleFavoriteQuote}>
             <Ionicons
               style={styles.heartButton}
