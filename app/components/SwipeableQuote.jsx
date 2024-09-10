@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { StyleSheet, Text, Dimensions, View } from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
 import Animated, {
@@ -8,19 +8,29 @@ import Animated, {
   withSpring,
   withTiming,
   runOnJS,
+  Easing,
 } from "react-native-reanimated";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
-const SwipeableQuote = ({ theme, quote, onSwipe }) => {
+const FADE_IN_DURATION = 600;
+const FADE_OUT_DURATION = 300;
+const SPRING_CONFIG = {
+  damping: 20,
+  stiffness: 90,
+};
+
+const SwipeableQuote = React.memo(({ theme, quote, onSwipe }) => {
   const translateX = useSharedValue(0);
   const opacity = useSharedValue(1);
 
   useEffect(() => {
-    // Yeni alıntı geldiğinde sadece fade in animasyonu
     opacity.value = 0;
     translateX.value = 0;
-    opacity.value = withTiming(1, { duration: 500 });
+    opacity.value = withTiming(1, {
+      duration: FADE_IN_DURATION,
+      easing: Easing.bezier(0.25, 0.1, 0.25, 1), // Easing.ease
+    });
   }, [quote]);
 
   const gestureHandler = useAnimatedGestureHandler({
@@ -29,7 +39,6 @@ const SwipeableQuote = ({ theme, quote, onSwipe }) => {
     },
     onActive: (event, context) => {
       translateX.value = context.startX + event.translationX;
-      // Kaydırma sırasında opaklığı azalt
       opacity.value = 1 - Math.abs(translateX.value) / (SCREEN_WIDTH / 2);
     },
     onEnd: (event) => {
@@ -37,19 +46,27 @@ const SwipeableQuote = ({ theme, quote, onSwipe }) => {
         Math.abs(event.velocityX) > 400 ||
         Math.abs(translateX.value) > SCREEN_WIDTH / 3
       ) {
-        // Kaydırma yeterince hızlı veya uzunsa, alıntıyı değiştir
-        opacity.value = withTiming(0, { duration: 200 }, () => {
-          translateX.value = withSpring(0);
-          if (event.velocityX > 0 || translateX.value > 0) {
-            runOnJS(onSwipe)("previous");
-          } else {
-            runOnJS(onSwipe)("next");
+        opacity.value = withTiming(
+          0,
+          {
+            duration: FADE_OUT_DURATION,
+            easing: Easing.bezier(0.25, 0.1, 0.25, 1), // Easing.ease
+          },
+          () => {
+            translateX.value = 0;
+            if (event.velocityX > 0 || translateX.value > 0) {
+              runOnJS(onSwipe)("previous");
+            } else {
+              runOnJS(onSwipe)("next");
+            }
           }
-        });
+        );
       } else {
-        // Kaydırma yeterli değilse, orijinal konuma geri dön
-        translateX.value = withSpring(0);
-        opacity.value = withTiming(1, { duration: 200 });
+        translateX.value = withSpring(0, SPRING_CONFIG);
+        opacity.value = withTiming(1, {
+          duration: FADE_IN_DURATION,
+          easing: Easing.bezier(0.25, 0.1, 0.25, 1), // Easing.ease
+        });
       }
     },
   });
@@ -71,7 +88,7 @@ const SwipeableQuote = ({ theme, quote, onSwipe }) => {
       </Animated.View>
     </PanGestureHandler>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

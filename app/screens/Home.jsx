@@ -13,7 +13,7 @@ import SwipeableQuote from "../components/SwipeableQuote";
 
 const HomeScreen = () => {
   const { theme, isDarkMode, toggleTheme } = useContext(ThemeContext);
-  const { quotes, setQuotes, fetchQuotes } = useQuoteStore();
+  const { quotes, fetchQuotes } = useQuoteStore();
   const { favorites, addFavorite, removeFavorite } = useFavoriteStore();
   const [isCapturing, setIsCapturing] = useState(false);
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
