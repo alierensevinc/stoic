@@ -1,0 +1,39 @@
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+
+const QuoteItem = ({ item, theme }) => {
+  return (
+    <View
+      style={[
+        styles.quoteContainer,
+        { backgroundColor: theme.backgroundColor },
+      ]}
+    >
+      <Text style={[styles.quoteText, { color: theme.textColor }]}>
+        {item.q}
+      </Text>
+      <Text style={[styles.authorText, { color: theme.textColor }]}>
+        - {item.a}
+      </Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  quoteContainer: {
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 15,
+  },
+  quoteText: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  authorText: {
+    fontSize: 14,
+    textAlign: "right",
+    fontStyle: "italic",
+  },
+});
+
+export default QuoteItem;

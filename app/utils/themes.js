@@ -11,5 +11,14 @@ export const themes = {
     headerBackgroundColor: "#151b24",
     headerTextColor: "#f4f6fc",
   },
-  light: {},
+  light: {
+    backgroundColor: "#f4f6fc",
+    textColor: "#151b24",
+    buttonColor: "#151b24",
+    placeholderColor: "#151b24",
+    statusBarStyle: "light-content",
+    statusBarBackgroundColor: "#f4f6fc",
+    headerBackgroundColor: "#f4f6fc",
+    headerTextColor: "#151b24",
+  },
 };

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   View,
   Text,
@@ -13,10 +13,12 @@ import { ThemeContext } from "../context/ThemeContext";
 import { useFavoriteStore } from "../store/favoriteStore";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { SwipeListView } from "react-native-swipe-list-view";
+import QuoteItem from "../components/QuoteItem";
+import QuoteItemActions from "../components/QuoteItemActions";
 
 const FavoritesScreen = () => {
   const navigation = useNavigation();
-  const { theme } = React.useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
   const { favorites, removeFavorite } = useFavoriteStore();
 
   const shareQuote = async (item) => {
@@ -45,37 +47,14 @@ const FavoritesScreen = () => {
     );
   };
 
-  const renderItem = ({ item }) => (
-    <View
-      style={[
-        styles.quoteContainer,
-        { backgroundColor: theme.backgroundColor },
-      ]}
-    >
-      <Text style={[styles.quoteText, { color: theme.textColor }]}>
-        {item.q}
-      </Text>
-      <Text style={[styles.authorText, { color: theme.textColor }]}>
-        - {item.a}
-      </Text>
-    </View>
-  );
+  const renderItem = ({ item }) => <QuoteItem item={item} theme={theme} />;
 
   const renderHiddenItem = ({ item }) => (
-    <View style={[styles.rowBack, { backgroundColor: theme.backgroundColor }]}>
-      <TouchableOpacity
-        style={[styles.backRightBtn, styles.backRightBtnShare]}
-        onPress={() => shareQuote(item)}
-      >
-        <Ionicons name="share-outline" size={24} color="white" />
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.backRightBtn, styles.backRightBtnDelete]}
-        onPress={() => confirmDelete(item)}
-      >
-        <Ionicons name="trash-outline" size={24} color="white" />
-      </TouchableOpacity>
-    </View>
+    <QuoteItemActions
+      theme={theme}
+      onShare={() => shareQuote(item)}
+      onDelete={() => confirmDelete(item)}
+    />
   );
 
   return (
@@ -124,20 +103,6 @@ const styles = StyleSheet.create({
   listContainer: {
     paddingBottom: 20,
   },
-  quoteContainer: {
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 15,
-  },
-  quoteText: {
-    fontSize: 18,
-    marginBottom: 10,
-  },
-  authorText: {
-    fontSize: 14,
-    textAlign: "right",
-    fontStyle: "italic",
-  },
   backButton: {
     position: "absolute",
     top: 60,
@@ -148,29 +113,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     marginTop: 20,
-  },
-  rowBack: {
-    alignItems: "center",
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    padding: 15,
-    marginBottom: 15,
-    borderRadius: 10,
-  },
-  backRightBtn: {
-    alignItems: "center",
-    bottom: 0,
-    justifyContent: "center",
-    position: "absolute",
-    top: 0,
-    width: 75,
-  },
-  backRightBtnShare: {
-    right: 75,
-  },
-  backRightBtnDelete: {
-    right: 0,
   },
 });
 

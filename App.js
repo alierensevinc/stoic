@@ -2,9 +2,9 @@ import React from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import { ThemeProvider } from "./app/context/ThemeContext";
 import HomeScreen from "./app/screens/Home";
 import FavoritesScreen from "./app/screens/Favorites";
-import { ThemeProvider } from "./app/context/ThemeContext";
 
 const Stack = createStackNavigator();
 

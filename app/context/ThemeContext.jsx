@@ -1,37 +1,26 @@
-// context/ThemeContext.js
-
-import React, { createContext, useEffect, useState } from "react";
-import { themes } from "../utils/themes";
+import React, { createContext, useState } from "react";
 import { MMKV } from "react-native-mmkv";
-
-export const ThemeContext = createContext({
-  theme: themes.dark,
-  switchTheme: (theme) => {},
-});
+import { themes } from "../utils/themes";
 
 const storage = new MMKV();
 
+export const ThemeContext = createContext();
+
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(themes.dark); // Default theme
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const savedTheme = storage.getString("theme");
+    return savedTheme === "dark";
+  });
 
-  useEffect(() => {
-    try {
-      const selectedTheme = storage.getString("theme");
-      if (selectedTheme) {
-        setTheme(themes[selectedTheme]);
-      }
-    } catch (error) {
-      console.error("Failed to load theme from storage", error);
-    }
-  }, []);
+  const theme = isDarkMode ? themes.dark : themes.light;
 
-  const switchTheme = (themeName) => {
-    setTheme(themes[themeName]);
-    storage.set("theme", themeName);
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    storage.set("theme", !isDarkMode ? "dark" : "light");
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, switchTheme }}>
+    <ThemeContext.Provider value={{ theme, isDarkMode, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );
