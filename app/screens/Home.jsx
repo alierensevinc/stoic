@@ -63,10 +63,6 @@ const HomeScreen = () => {
     } else {
       getQuotes();
     }
-
-    if (favoritesString) {
-      addFavorite(JSON.parse(favoritesString));
-    }
   }, []);
 
   const getQuotes = async () => {
