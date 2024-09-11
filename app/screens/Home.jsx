@@ -243,8 +243,8 @@ const HomeScreen = () => {
         ];
         setQuotes(previousQuotes);
       }
-      textOpacity.value = withTiming(1, { duration: 500 }); // Increased from 300 to 500
-      nextQuoteOpacity.value = withTiming(0, { duration: 500 }); // Increased from 300 to 500
+      textOpacity.value = withTiming(1, { duration: 400 }); // Increased from 300 to 500
+      nextQuoteOpacity.value = withTiming(0, { duration: 600 }); // Increased from 300 to 500
     }
   };
 
