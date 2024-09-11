@@ -24,9 +24,10 @@ const ShareQuoteScreen = ({ route, navigation }) => {
         dialogTitle: "Share this quote",
         UTI: "public.jpeg",
       });
-      navigation.goBack();
     } catch (error) {
       console.error("Error sharing quote:", error);
+      navigation.goBack();
+    } finally {
       navigation.goBack();
     }
   };
@@ -36,21 +37,19 @@ const ShareQuoteScreen = ({ route, navigation }) => {
       style={[styles.container, { backgroundColor: theme.backgroundColor }]}
     >
       <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 0.9 }}>
-        <View style={styles.quoteContainer}>
-          <Text style={[styles.quote, { color: theme.textColor }]}>
-            {quote}
-          </Text>
-          <Text style={[styles.author, { color: theme.textColor }]}>
-            - {author}
-          </Text>
+        <View
+          style={[styles.container, { backgroundColor: theme.backgroundColor }]}
+        >
+          <View style={styles.quoteContainer}>
+            <Text style={[styles.quote, { color: theme.textColor }]}>
+              {quote}
+            </Text>
+            <Text style={[styles.author, { color: theme.textColor }]}>
+              - {author}
+            </Text>
+          </View>
         </View>
       </ViewShot>
-      <TouchableOpacity
-        style={styles.closeButton}
-        onPress={() => navigation.goBack()}
-      >
-        <Ionicons name="close" size={24} color={theme.textColor} />
-      </TouchableOpacity>
     </View>
   );
 };
