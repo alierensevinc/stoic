@@ -15,6 +15,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { SwipeListView } from "react-native-swipe-list-view";
 import QuoteItem from "../components/QuoteItem";
 import QuoteItemActions from "../components/QuoteItemActions";
+import InlineAd from "../components/InlineAd";
 
 const FavoritesScreen = () => {
   const navigation = useNavigation();
@@ -85,6 +86,7 @@ const FavoritesScreen = () => {
           No favorite quotes yet. Add some from the home screen!
         </Text>
       )}
+      <InlineAd />
     </SafeAreaView>
   );
 };
