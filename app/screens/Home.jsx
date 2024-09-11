@@ -28,12 +28,30 @@ import ViewShot from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
 import { useNavigation } from "@react-navigation/native";
 import { useFavoriteStore } from "../store/favoriteStore";
+import {
+  AdEventType,
+  InterstitialAd,
+  TestIds,
+} from "react-native-google-mobile-ads";
+import * as Device from "expo-device";
 
 // Zustand store for quotes
 const useQuoteStore = create((set) => ({
   quotes: [],
   setQuotes: (newQuotes) => set({ quotes: newQuotes }),
 }));
+
+const iosAdmobBanner = "ca-app-pub-4954831375392388~6035696472";
+const androidAdmobBanner = "ca-app-pub-4954831375392388~6035696472";
+const productionID =
+  Device.osName === "Android" ? androidAdmobBanner : iosAdmobBanner;
+const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : productionID;
+// Make sure to always use a test ID when not in production
+
+const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
+  keywords: ["food", "cooking", "fruit"], // Update based on the most relevant keywords for your app/users, these are just random examples
+  requestNonPersonalizedAdsOnly: true, // Update based on the initial tracking settings from initialization earlier
+});
 
 const HomeScreen = () => {
   const { theme } = useContext(ThemeContext);
@@ -47,6 +65,37 @@ const HomeScreen = () => {
   const viewShotRef = useRef();
   const [isCapturing, setIsCapturing] = useState(false);
   const navigation = useNavigation();
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    // Event listener for when the ad is loaded
+    const unsubscribeLoaded = interstitial.addAdEventListener(
+      AdEventType.LOADED,
+      () => {
+        setLoaded(true);
+      }
+    );
+
+    // Event listener for when the ad is closed
+    const unsubscribeClosed = interstitial.addAdEventListener(
+      AdEventType.CLOSED,
+      () => {
+        setLoaded(false);
+
+        // Load a new ad when the current ad is closed
+        interstitial.load();
+      }
+    );
+
+    // Start loading the interstitial ad straight away
+    interstitial.load();
+
+    // Unsubscribe from events on unmount
+    return () => {
+      unsubscribeLoaded();
+      unsubscribeClosed();
+    };
+  }, []);
 
   useEffect(() => {
     const quotesString = storage.getString("quotes");
@@ -86,6 +135,7 @@ const HomeScreen = () => {
       removeFavorite(currentQuote);
     } else {
       addFavorite(currentQuote);
+      interstitial.show();
     }
   };
 
@@ -111,6 +161,7 @@ const HomeScreen = () => {
       setIsCapturing(false);
       console.error("Error sharing quote:", error);
     }
+    interstitial.show();
   };
 
   const changeQuote = (direction) => {
@@ -205,6 +256,7 @@ const HomeScreen = () => {
 
   const goToFavorites = () => {
     navigation.navigate("Favorites");
+    interstitial.show();
   };
 
   return (
