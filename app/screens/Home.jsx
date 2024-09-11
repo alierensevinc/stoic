@@ -34,6 +34,7 @@ import {
   TestIds,
 } from "react-native-google-mobile-ads";
 import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
 
 // Zustand store for quotes
 const useQuoteStore = create((set) => ({
@@ -53,6 +54,56 @@ const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
   requestNonPersonalizedAdsOnly: true, // Update based on the initial tracking settings from initialization earlier
 });
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+export async function registerForPushNotificationsAsync() {
+  let token;
+
+  if (Platform.OS === "android") {
+    await Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: "#FF231F7C",
+    });
+  }
+
+  if (Device.isDevice) {
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== "granted") {
+      alert("Failed to get push token for push notification!");
+      return;
+    }
+    // Learn more about projectId:
+    // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
+
+    if (Constants.easConfig?.projectId) {
+      token = (
+        await Notifications.getExpoPushTokenAsync({
+          projectId: Constants.easConfig.projectId, // you can hard code project id if you dont want to use expo Constants
+        })
+      ).data;
+      console.log(token);
+    }
+  } else {
+    alert("Must use physical device for Push Notifications");
+  }
+
+  return token;
+}
+
 const HomeScreen = () => {
   const { theme } = useContext(ThemeContext);
   const { quotes, setQuotes } = useQuoteStore();
@@ -68,6 +119,7 @@ const HomeScreen = () => {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    registerForPushNotificationsAsync();
     // Event listener for when the ad is loaded
     const unsubscribeLoaded = interstitial.addAdEventListener(
       AdEventType.LOADED,
@@ -112,7 +164,20 @@ const HomeScreen = () => {
     } else {
       getQuotes();
     }
+
+    schedulePushNotification();
   }, []);
+
+  async function schedulePushNotification() {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "You've got notification! 🔔",
+        body: "Here is the notification body",
+        data: { data: "goes here" },
+      },
+      trigger: { hours: 1 },
+    });
+  }
 
   const getQuotes = async () => {
     try {
