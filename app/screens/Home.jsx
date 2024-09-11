@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
+  Switch,
 } from "react-native";
 import { MMKV } from "react-native-mmkv";
 import { StatusBar } from "expo-status-bar";
@@ -35,6 +36,7 @@ import {
 } from "react-native-google-mobile-ads";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
+import ThemeToggle from "../components/ThemeToggle";
 
 // Zustand store for quotes
 const useQuoteStore = create((set) => ({
@@ -385,7 +387,13 @@ const HomeScreen = () => {
       >
         <Ionicons name="bookmark-outline" size={24} color={theme.buttonColor} />
       </TouchableOpacity>
-      <StatusBar style="auto" />
+      <View style={styles.themeToggleContainer}>
+        <ThemeToggle />
+      </View>
+      <StatusBar
+        style={theme.statusBarStyle}
+        backgroundColor={theme.statusBarBackgroundColor}
+      />
     </View>
   );
 };
@@ -429,6 +437,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 20,
     left: 20,
+  },
+  themeToggleContainer: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    zIndex: 1,
   },
 });
 
