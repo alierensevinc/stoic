@@ -7,6 +7,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { ThemeProvider } from "./app/context/ThemeContext";
 import HomeScreen from "./app/screens/Home";
 import FavoritesScreen from "./app/screens/Favorites";
+import ShareQuoteScreen from './app/screens/ShareQuoteScreen';
 
 const Stack = createStackNavigator();
 
@@ -46,6 +47,7 @@ export default function App() {
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="Favorites" component={FavoritesScreen} />
+            <Stack.Screen name="ShareQuote" component={ShareQuoteScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </ThemeProvider>

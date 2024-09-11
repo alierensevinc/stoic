@@ -15,22 +15,18 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { SwipeListView } from "react-native-swipe-list-view";
 import QuoteItem from "../components/QuoteItem";
 import QuoteItemActions from "../components/QuoteItemActions";
-import InlineAd  from "../components/InlineAd";
+import InlineAd from "../components/InlineAd";
 
 const FavoritesScreen = () => {
   const navigation = useNavigation();
   const { theme } = useContext(ThemeContext);
   const { favorites, removeFavorite } = useFavoriteStore();
 
-  const shareQuote = async (item) => {
-    try {
-      await Share.share({
-        message: `"${item.q}" - ${item.a}`,
-      });
-    } catch (error) {
-      console.error("Error sharing quote:", error);
-      Alert.alert("Error", "Unable to share the quote. Please try again.");
-    }
+  const shareQuote = (item) => {
+    navigation.navigate("ShareQuote", {
+      quote: item.q,
+      author: item.a,
+    });
   };
 
   const confirmDelete = (item) => {

@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
-  Switch,
+  Platform,
 } from "react-native";
 import { MMKV } from "react-native-mmkv";
 import { StatusBar } from "expo-status-bar";
