@@ -153,7 +153,6 @@ const HomeScreen = () => {
 
   useEffect(() => {
     const quotesString = storage.getString("quotes");
-    const favoritesString = storage.getString("favorites");
 
     if (quotesString) {
       const quotesObject = JSON.parse(quotesString);
