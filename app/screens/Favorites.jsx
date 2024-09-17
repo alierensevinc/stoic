@@ -23,7 +23,7 @@ import {
 } from "react-native-google-mobile-ads";
 import * as Device from "expo-device";
 
-const iosAdmobBanner = "ca-app-pub-4954831375392388~6035696472";
+const iosAdmobBanner = "ca-app-pub-4954831375392388/9303227339";
 const androidAdmobBanner = "ca-app-pub-4954831375392388~6035696472";
 const productionID =
   Device.osName === "Android" ? androidAdmobBanner : iosAdmobBanner;

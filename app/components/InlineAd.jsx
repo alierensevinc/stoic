@@ -7,8 +7,8 @@ import {
   TestIds,
 } from "react-native-google-mobile-ads";
 
-const iosAdmobBanner = "ca-app-pub-4954831375392388~6035696472";
-const androidAdmobBanner = "ca-app-pub-4954831375392388~6035696472";
+const iosAdmobBanner = "ca-app-pub-4954831375392388/1031342884";
+const androidAdmobBanner = "ca-app-pub-4954831375392388/1031342884";
 const productionID =
   Device.osName === "Android" ? androidAdmobBanner : iosAdmobBanner;
 
@@ -17,12 +17,10 @@ const InlineAd = () => {
   return (
     <View style={{ height: isAdLoaded ? "auto" : 0 }}>
       <BannerAd
-        // It is extremely important to use test IDs as you can be banned/restricted by Google AdMob for inappropriately using real ad banners during testing
         unitId={__DEV__ ? TestIds.BANNER : productionID}
         size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
         requestOptions={{
           requestNonPersonalizedAdsOnly: true,
-          // You can change this setting depending on whether you want to use the permissions tracking we set up in the initializing
         }}
         onAdLoaded={() => {
           setIsAdLoaded(true);

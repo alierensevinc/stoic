@@ -42,7 +42,7 @@ const useQuoteStore = create((set) => ({
   setQuotes: (newQuotes) => set({ quotes: newQuotes }),
 }));
 
-const iosAdmobBanner = "ca-app-pub-4954831375392388~6035696472";
+const iosAdmobBanner = "ca-app-pub-4954831375392388/9303227339";
 const androidAdmobBanner = "ca-app-pub-4954831375392388~6035696472";
 const productionID =
   Device.osName === "Android" ? androidAdmobBanner : iosAdmobBanner;
