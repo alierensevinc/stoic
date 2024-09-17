@@ -2,14 +2,15 @@ import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
+  StyleSheet,
   SafeAreaView,
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { ThemeContext } from "../context/ThemeContext";
 import { useFavoriteStore } from "../store/favoriteStore";
+import { useAdStore } from "../store/adStore";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { SwipeListView } from "react-native-swipe-list-view";
 import QuoteItem from "../components/QuoteItem";
@@ -37,6 +38,7 @@ const FavoritesScreen = () => {
   const navigation = useNavigation();
   const { theme } = useContext(ThemeContext);
   const { favorites, removeFavorite } = useFavoriteStore();
+  const { actionCount, incrementActionCount, resetActionCount } = useAdStore();
   const [isAdLoaded, setIsAdLoaded] = useState(false);
 
   useEffect(() => {
@@ -69,14 +71,21 @@ const FavoritesScreen = () => {
     };
   }, []);
 
-  const shareQuote = (item) => {
-    console.log(isAdLoaded);
-    if (isAdLoaded) {
+  const handleAction = (callback) => {
+    incrementActionCount();
+    if ((actionCount + 1) % 5 === 0 && isAdLoaded) {
       interstitial.show();
+      resetActionCount();
     }
-    navigation.navigate("ShareQuote", {
-      quote: item.q,
-      author: item.a,
+    callback();
+  };
+
+  const shareQuote = (item) => {
+    handleAction(() => {
+      navigation.navigate("ShareQuote", {
+        quote: item.q,
+        author: item.a,
+      });
     });
   };
 
@@ -90,7 +99,9 @@ const FavoritesScreen = () => {
           text: "Delete",
           style: "destructive",
           onPress: () => {
-            removeFavorite(item);
+            handleAction(() => {
+              removeFavorite(item);
+            });
           },
         },
       ]

@@ -26,6 +26,7 @@ import ViewShot from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
 import { useNavigation } from "@react-navigation/native";
 import { useFavoriteStore } from "../store/favoriteStore";
+import { useAdStore } from "../store/adStore";
 import {
   AdEventType,
   InterstitialAd,
@@ -46,7 +47,6 @@ const androidAdmobBanner = "ca-app-pub-4954831375392388~6035696472";
 const productionID =
   Device.osName === "Android" ? androidAdmobBanner : iosAdmobBanner;
 const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : productionID;
-// Make sure to always use a test ID when not in production
 
 const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
   keywords: ["food", "cooking", "fruit"], // Update based on the most relevant keywords for your app/users, these are just random examples
@@ -107,6 +107,7 @@ const HomeScreen = () => {
   const { theme } = useContext(ThemeContext);
   const { quotes, setQuotes } = useQuoteStore();
   const { favorites, addFavorite, removeFavorite } = useFavoriteStore();
+  const { actionCount, incrementActionCount, resetActionCount } = useAdStore();
   const storage = new MMKV();
   const textOpacity = useSharedValue(1);
   const screenWidth = Dimensions.get("window").width;
@@ -190,47 +191,60 @@ const HomeScreen = () => {
     }
   };
 
-  const toggleFavoriteQuote = () => {
-    const currentQuote = quotes[0];
-    if (favorites.some((fav) => fav.q === currentQuote.q)) {
-      removeFavorite(currentQuote);
-    } else {
-      addFavorite(currentQuote);
+  const handleAction = (callback) => {
+    incrementActionCount();
+    if ((actionCount + 1) % 5 === 0 && loaded) {
       interstitial.show();
+      resetActionCount();
     }
+    callback();
+  };
+
+  const toggleFavoriteQuote = () => {
+    handleAction(() => {
+      const currentQuote = quotes[0];
+      if (favorites.some((fav) => fav.q === currentQuote.q)) {
+        removeFavorite(currentQuote);
+      } else {
+        addFavorite(currentQuote);
+      }
+    });
   };
 
   const shareQuote = async () => {
-    if (!(await Sharing.isAvailableAsync())) {
-      alert("Sharing isn't available on your platform");
-      return;
-    }
+    handleAction(async () => {
+      if (!(await Sharing.isAvailableAsync())) {
+        alert("Sharing isn't available on your platform");
+        return;
+      }
 
-    try {
-      setIsCapturing(true);
-      // Butonların gizlenmesi için kısa bir gecikme ekleyelim
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      try {
+        setIsCapturing(true);
+        // Butonların gizlenmesi için kısa bir gecikme ekleyelim
+        await new Promise((resolve) => setTimeout(resolve, 100));
 
-      const uri = await viewShotRef.current.capture();
-      setIsCapturing(false);
-      await Sharing.shareAsync("file://" + uri, {
-        mimeType: "image/jpeg",
-        dialogTitle: "Share this quote",
-        UTI: "public.jpeg",
-      });
-    } catch (error) {
-      setIsCapturing(false);
-      console.error("Error sharing quote:", error);
-    }
-    interstitial.show();
+        const uri = await viewShotRef.current.capture();
+        setIsCapturing(false);
+        await Sharing.shareAsync("file://" + uri, {
+          mimeType: "image/jpeg",
+          dialogTitle: "Share this quote",
+          UTI: "public.jpeg",
+        });
+      } catch (error) {
+        setIsCapturing(false);
+        console.error("Error sharing quote:", error);
+      }
+    });
   };
 
   const changeQuote = (direction) => {
-    if (quotes.length > 1) {
-      textOpacity.value = withTiming(0, { duration: 500 }, () => {
-        runOnJS(updateQuotes)(direction);
-      });
-    }
+    handleAction(() => {
+      if (quotes.length > 1) {
+        textOpacity.value = withTiming(0, { duration: 500 }, () => {
+          runOnJS(updateQuotes)(direction);
+        });
+      }
+    });
   };
 
   const updateQuotes = (direction) => {
@@ -267,8 +281,9 @@ const HomeScreen = () => {
   }));
 
   const goToFavorites = () => {
-    navigation.navigate("Favorites");
-    interstitial.show();
+    handleAction(() => {
+      navigation.navigate("Favorites");
+    });
   };
 
   return (
