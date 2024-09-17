@@ -10,7 +10,7 @@
     "eas-build-ios-simulator": "eas build --profile development-simulator --platform ios",
     "eas-build-ios-development": "eas build --profile development --platform ios",
     "eas-build-ios-preview": "eas build --profile preview --platform ios",
-    "android": "npx expo run:android",
+    "android": "expo run:android",
     "ios": "expo run:ios"
   },
   "dependencies": {

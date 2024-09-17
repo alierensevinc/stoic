@@ -19,11 +19,8 @@ import Animated, {
   useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
   withTiming,
   runOnJS,
-  interpolate,
-  Extrapolate,
 } from "react-native-reanimated";
 import ViewShot from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
@@ -111,9 +108,7 @@ const HomeScreen = () => {
   const { quotes, setQuotes } = useQuoteStore();
   const { favorites, addFavorite, removeFavorite } = useFavoriteStore();
   const storage = new MMKV();
-  const translateX = useSharedValue(0);
   const textOpacity = useSharedValue(1);
-  const nextQuoteOpacity = useSharedValue(0);
   const screenWidth = Dimensions.get("window").width;
   const viewShotRef = useRef();
   const [isCapturing, setIsCapturing] = useState(false);
@@ -232,92 +227,43 @@ const HomeScreen = () => {
 
   const changeQuote = (direction) => {
     if (quotes.length > 1) {
-      if (direction === "next") {
-        const nextQuotes = [...quotes.slice(1), quotes[0]];
-        setQuotes(nextQuotes);
-      } else if (direction === "previous") {
-        const previousQuotes = [
-          quotes[quotes.length - 1],
-          ...quotes.slice(0, -1),
-        ];
-        setQuotes(previousQuotes);
-      }
-      textOpacity.value = withTiming(1, { duration: 400 }); // Increased from 300 to 500
-      nextQuoteOpacity.value = withTiming(0, { duration: 600 }); // Increased from 300 to 500
+      textOpacity.value = withTiming(0, { duration: 500 }, () => {
+        runOnJS(updateQuotes)(direction);
+      });
     }
   };
 
+  const updateQuotes = (direction) => {
+    if (direction === "next") {
+      const nextQuotes = [...quotes.slice(1), quotes[0]];
+      setQuotes(nextQuotes);
+    } else if (direction === "previous") {
+      const previousQuotes = [
+        quotes[quotes.length - 1],
+        ...quotes.slice(0, -1),
+      ];
+      setQuotes(previousQuotes);
+    }
+    textOpacity.value = withTiming(1, { duration: 500 });
+  };
+
   const gestureHandler = useAnimatedGestureHandler({
-    onStart: (_, context) => {
-      context.startX = translateX.value;
-    },
-    onActive: (event, context) => {
-      translateX.value = context.startX + event.translationX;
-      const progress = Math.abs(translateX.value) / screenWidth;
-      textOpacity.value = interpolate(
-        progress,
-        [0, 0.5],
-        [1, 0],
-        Extrapolate.CLAMP
-      );
-      nextQuoteOpacity.value = interpolate(
-        progress,
-        [0.5, 1],
-        [0, 1],
-        Extrapolate.CLAMP
-      );
-    },
-    onEnd: (event) => {
+    onEnd: (event, context) => {
       if (
         Math.abs(event.velocityX) > 400 ||
-        Math.abs(translateX.value) > screenWidth / 5
+        Math.abs(event.translationX) > screenWidth / 5
       ) {
-        if (event.velocityX > 0 || translateX.value > 0) {
-          translateX.value = withSpring(
-            screenWidth,
-            {
-              duration: 500, // Increased from 200 to 500
-              velocity: event.velocityX,
-            },
-            () => {
-              runOnJS(changeQuote)("previous");
-              translateX.value = 0;
-            }
-          );
+        if (event.translationX > 0) {
+          runOnJS(changeQuote)("previous");
         } else {
-          translateX.value = withSpring(
-            -screenWidth,
-            {
-              duration: 500, // Increased from 200 to 500
-              velocity: event.velocityX,
-            },
-            () => {
-              runOnJS(changeQuote)("next");
-              translateX.value = 0;
-            }
-          );
+          runOnJS(changeQuote)("next");
         }
-      } else {
-        translateX.value = withSpring(0, { duration: 300 }); // Increased from 150 to 300
-        textOpacity.value = withTiming(1, { duration: 300 }); // Increased from 150 to 300
-        nextQuoteOpacity.value = withTiming(0, { duration: 300 }); // Increased from 150 to 300
       }
     },
   });
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX.value }],
-  }));
-
-  const currentTextStyle = useAnimatedStyle(() => ({
     opacity: textOpacity.value,
-  }));
-
-  const nextTextStyle = useAnimatedStyle(() => ({
-    opacity: nextQuoteOpacity.value,
-    position: "absolute",
-    width: "100%",
-    left: translateX.value > 0 ? -screenWidth : screenWidth,
   }));
 
   const goToFavorites = () => {
@@ -330,10 +276,7 @@ const HomeScreen = () => {
       style={[styles.container, { backgroundColor: theme.backgroundColor }]}
     >
       <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 0.9 }}>
-        <PanGestureHandler
-          onGestureEvent={gestureHandler}
-          style={[styles.container, { backgroundColor: theme.backgroundColor }]}
-        >
+        <PanGestureHandler onGestureEvent={gestureHandler}>
           <Animated.View
             style={[
               styles.container,
@@ -341,22 +284,12 @@ const HomeScreen = () => {
               animatedStyle,
             ]}
           >
-            <Animated.View style={currentTextStyle}>
-              <Text style={[styles.quote, { color: theme.textColor }]}>
-                {quotes.length > 0 ? quotes[0].q : "Loading..."}
-              </Text>
-              <Text style={[styles.author, { color: theme.textColor }]}>
-                {quotes.length > 0 ? "- " + quotes[0].a : "Loading..."}
-              </Text>
-            </Animated.View>
-            <Animated.View style={nextTextStyle}>
-              <Text style={[styles.quote, { color: theme.textColor }]}>
-                {quotes.length > 1 ? quotes[1].q : "Loading..."}
-              </Text>
-              <Text style={[styles.author, { color: theme.textColor }]}>
-                {quotes.length > 1 ? "- " + quotes[1].a : "Loading..."}
-              </Text>
-            </Animated.View>
+            <Text style={[styles.quote, { color: theme.textColor }]}>
+              {quotes.length > 0 ? quotes[0].q : "Loading..."}
+            </Text>
+            <Text style={[styles.author, { color: theme.textColor }]}>
+              {quotes.length > 0 ? "- " + quotes[0].a : "Loading..."}
+            </Text>
           </Animated.View>
         </PanGestureHandler>
       </ViewShot>
