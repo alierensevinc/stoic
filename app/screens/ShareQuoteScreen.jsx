@@ -6,11 +6,11 @@ import {
   View,
   SafeAreaView,
 } from "react-native";
-import { ThemeContext } from "../context/ThemeContext";
+import { useNavigation } from "@react-navigation/native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ViewShot from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
-import { useNavigation } from "@react-navigation/native";
+import { ThemeContext } from "../context/ThemeContext";
 
 const ShareQuoteScreen = ({ route }) => {
   const { theme } = useContext(ThemeContext);
@@ -79,26 +79,27 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    padding: 16,
+    padding: 24,
   },
   quote: {
-    fontSize: 36,
-    textAlign: "flex-start",
+    fontSize: 24,
+    textAlign: "center",
+    marginBottom: 10,
   },
   author: {
-    fontSize: 20,
-    marginTop: 8,
-    alignSelf: "flex-end",
+    fontSize: 18,
+    textAlign: "right",
+    fontStyle: "italic",
   },
   shareButton: {
     position: "absolute",
-    bottom: 20,
-    right: 60,
+    bottom: 36,
+    right: 72,
   },
   backButton: {
     position: "absolute",
-    bottom: 20,
-    right: 20,
+    bottom: 36,
+    right: 36,
   },
   hidden: {
     opacity: 0,

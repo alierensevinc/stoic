@@ -47,9 +47,9 @@ const ActionButtons = ({
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    bottom: 20,
-    left: 20,
-    right: 20,
+    bottom: 36,
+    left: 36,
+    right: 36,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   button: {
-    marginLeft: 15,
+    marginLeft: 16,
   },
   favoritesButton: {
     marginLeft: 0,

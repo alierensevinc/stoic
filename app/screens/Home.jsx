@@ -35,22 +35,17 @@ import {
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import ThemeToggle from "../components/ThemeToggle";
+import { IOS_ADMOB_INTERSTITIAL } from "@env";
 
-// Zustand store for quotes
 const useQuoteStore = create((set) => ({
   quotes: [],
   setQuotes: (newQuotes) => set({ quotes: newQuotes }),
 }));
 
-const iosAdmobBanner = "ca-app-pub-4954831375392388/9303227339";
-const androidAdmobBanner = "ca-app-pub-4954831375392388~6035696472";
-const productionID =
-  Device.osName === "Android" ? androidAdmobBanner : iosAdmobBanner;
-const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : productionID;
-
+const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : IOS_ADMOB_INTERSTITIAL;
 const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
-  keywords: ["food", "cooking", "fruit"], // Update based on the most relevant keywords for your app/users, these are just random examples
-  requestNonPersonalizedAdsOnly: true, // Update based on the initial tracking settings from initialization earlier
+  keywords: ["food", "cooking", "fruit"],
+  requestNonPersonalizedAdsOnly: true,
 });
 
 Notifications.setNotificationHandler({
@@ -85,13 +80,11 @@ export async function registerForPushNotificationsAsync() {
       alert("Failed to get push token for push notification!");
       return;
     }
-    // Learn more about projectId:
-    // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
 
     if (Constants.easConfig?.projectId) {
       token = (
         await Notifications.getExpoPushTokenAsync({
-          projectId: Constants.easConfig.projectId, // you can hard code project id if you dont want to use expo Constants
+          projectId: "57019be4-e319-4182-83c0-19b0b37e8551",
         })
       ).data;
       console.log(token);
@@ -118,7 +111,6 @@ const HomeScreen = () => {
 
   useEffect(() => {
     registerForPushNotificationsAsync();
-    // Event listener for when the ad is loaded
     const unsubscribeLoaded = interstitial.addAdEventListener(
       AdEventType.LOADED,
       () => {
@@ -126,21 +118,16 @@ const HomeScreen = () => {
       }
     );
 
-    // Event listener for when the ad is closed
     const unsubscribeClosed = interstitial.addAdEventListener(
       AdEventType.CLOSED,
       () => {
         setLoaded(false);
-
-        // Load a new ad when the current ad is closed
         interstitial.load();
       }
     );
 
-    // Start loading the interstitial ad straight away
     interstitial.load();
 
-    // Unsubscribe from events on unmount
     return () => {
       unsubscribeLoaded();
       unsubscribeClosed();

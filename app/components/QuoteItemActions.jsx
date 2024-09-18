@@ -27,8 +27,8 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     justifyContent: "flex-end",
-    padding: 15,
-    marginBottom: 15,
+    padding: 16,
+    marginBottom: 16,
     borderRadius: 10,
   },
   backRightBtn: {
@@ -37,10 +37,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     position: "absolute",
     top: 0,
-    width: 75,
+    width: 80,
   },
   backRightBtnShare: {
-    right: 75,
+    right: 80,
   },
   backRightBtnDelete: {
     right: 0,

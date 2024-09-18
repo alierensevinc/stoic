@@ -21,9 +21,9 @@ const QuoteItem = ({ item, theme }) => {
 
 const styles = StyleSheet.create({
   quoteContainer: {
-    padding: 15,
+    padding: 16,
     borderRadius: 10,
-    marginBottom: 15,
+    marginBottom: 16,
   },
   quoteText: {
     fontSize: 18,

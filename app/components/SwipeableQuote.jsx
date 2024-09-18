@@ -1,5 +1,5 @@
-import React, { useEffect, useCallback } from "react";
-import { StyleSheet, Text, Dimensions, View } from "react-native";
+import React, { useEffect } from "react";
+import { StyleSheet, Text, Dimensions } from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
 import Animated, {
   useAnimatedGestureHandler,
@@ -12,7 +12,6 @@ import Animated, {
 } from "react-native-reanimated";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-
 const FADE_IN_DURATION = 600;
 const FADE_OUT_DURATION = 300;
 const SPRING_CONFIG = {
@@ -29,7 +28,7 @@ const SwipeableQuote = React.memo(({ theme, quote, onSwipe }) => {
     translateX.value = 0;
     opacity.value = withTiming(1, {
       duration: FADE_IN_DURATION,
-      easing: Easing.bezier(0.25, 0.1, 0.25, 1), // Easing.ease
+      easing: Easing.bezier(0.25, 0.1, 0.25, 1),
     });
   }, [quote]);
 
@@ -50,7 +49,7 @@ const SwipeableQuote = React.memo(({ theme, quote, onSwipe }) => {
           0,
           {
             duration: FADE_OUT_DURATION,
-            easing: Easing.bezier(0.25, 0.1, 0.25, 1), // Easing.ease
+            easing: Easing.bezier(0.25, 0.1, 0.25, 1),
           },
           () => {
             translateX.value = 0;
@@ -96,7 +95,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: SCREEN_WIDTH,
-    padding: 20,
+    padding: 24,
   },
   quote: {
     fontSize: 24,

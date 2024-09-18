@@ -1,23 +1,20 @@
-import { View } from "react-native";
-import * as Device from "expo-device";
 import React, { useState } from "react";
+import { View } from "react-native";
 import {
   BannerAd,
   BannerAdSize,
   TestIds,
 } from "react-native-google-mobile-ads";
-
-const iosAdmobBanner = "ca-app-pub-4954831375392388/1031342884";
-const androidAdmobBanner = "ca-app-pub-4954831375392388/1031342884";
-const productionID =
-  Device.osName === "Android" ? androidAdmobBanner : iosAdmobBanner;
+import { IOS_ADMOB_BANNER } from "@env";
 
 const InlineAd = () => {
   const [isAdLoaded, setIsAdLoaded] = useState(false);
+  const adUnitId = __DEV__ ? TestIds.BANNER : IOS_ADMOB_BANNER;
+
   return (
     <View style={{ height: isAdLoaded ? "auto" : 0 }}>
       <BannerAd
-        unitId={__DEV__ ? TestIds.BANNER : productionID}
+        unitId={adUnitId}
         size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
         requestOptions={{
           requestNonPersonalizedAdsOnly: true,
