@@ -186,7 +186,6 @@ const HomeScreen = () => {
 
       try {
         setIsCapturing(true);
-        // Butonların gizlenmesi için kısa bir gecikme ekleyelim
         await new Promise((resolve) => setTimeout(resolve, 100));
 
         const uri = await viewShotRef.current.capture();
