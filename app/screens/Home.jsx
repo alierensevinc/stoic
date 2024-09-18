@@ -9,9 +9,7 @@ import {
 } from "react-native";
 import { MMKV } from "react-native-mmkv";
 import { StatusBar } from "expo-status-bar";
-import axios from "axios";
 import moment from "moment";
-import { create } from "zustand";
 import { ThemeContext } from "../context/ThemeContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { PanGestureHandler } from "react-native-gesture-handler";
@@ -36,11 +34,7 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import ThemeToggle from "../components/ThemeToggle";
 import { IOS_ADMOB_INTERSTITIAL } from "@env";
-
-const useQuoteStore = create((set) => ({
-  quotes: [],
-  setQuotes: (newQuotes) => set({ quotes: newQuotes }),
-}));
+import { useQuoteStore } from "../store/quoteStore";
 
 const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : IOS_ADMOB_INTERSTITIAL;
 const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
@@ -98,7 +92,7 @@ export async function registerForPushNotificationsAsync() {
 
 const HomeScreen = () => {
   const { theme } = useContext(ThemeContext);
-  const { quotes, setQuotes } = useQuoteStore();
+  const { quotes, setQuotes, getQuotes } = useQuoteStore();
   const { favorites, addFavorite, removeFavorite } = useFavoriteStore();
   const { actionCount, incrementActionCount, resetActionCount } = useAdStore();
   const storage = new MMKV();
@@ -162,21 +156,6 @@ const HomeScreen = () => {
       trigger: { hours: 1 },
     });
   }
-
-  const getQuotes = async () => {
-    try {
-      const response = await axios.get("https://zenquotes.io/api/quotes/");
-      const quotes = response.data;
-      const quotesObject = {
-        date: moment().format("YYYY-MM-DD HH"),
-        quotes,
-      };
-      storage.set("quotes", JSON.stringify(quotesObject));
-      setQuotes(quotes);
-    } catch (error) {
-      console.error("Error fetching quotes:", error);
-    }
-  };
 
   const handleAction = (callback) => {
     incrementActionCount();

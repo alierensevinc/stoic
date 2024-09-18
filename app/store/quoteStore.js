@@ -8,7 +8,7 @@ const storage = new MMKV();
 export const useQuoteStore = create((set) => ({
   quotes: [],
   setQuotes: (quotes) => set({ quotes }),
-  fetchQuotes: async () => {
+  getQuotes: async () => {
     try {
       const storedQuotes = storage.getString("quotes");
       if (storedQuotes) {
