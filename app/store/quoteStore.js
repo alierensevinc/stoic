@@ -1,14 +1,16 @@
-import { create } from "zustand";
 import { MMKV } from "react-native-mmkv";
 import axios from "axios";
 import moment from "moment";
+import { create } from "zustand";
 
 const storage = new MMKV();
 
 export const useQuoteStore = create((set) => ({
   quotes: [],
+  archiveQuotes: [],
   setQuotes: (quotes) => set({ quotes }),
-  getQuotes: async () => {
+  setArchiveQuotes: (archiveQuotes) => set({ archiveQuotes }),
+  fetchQuotes: async () => {
     try {
       const storedQuotes = storage.getString("quotes");
       if (storedQuotes) {
@@ -27,8 +29,24 @@ export const useQuoteStore = create((set) => ({
       };
       storage.set("quotes", JSON.stringify(quotesObject));
       set({ quotes });
+      set({ archiveQuotes: quotes });
     } catch (error) {
       console.error("Error fetching quotes:", error);
     }
   },
+  loadQuotesFromArchive: () => {
+    const storedArchiveQuotes = storage.getString("archiveQuotes");
+    if (storedArchiveQuotes) {
+      const archiveQuotes = JSON.parse(storedArchiveQuotes);
+      set({ quotes: archiveQuotes });
+    }
+  },
 }));
+
+// Save archiveQuotes to storage whenever it changes
+useQuoteStore.subscribe(
+  (state) => state.archiveQuotes,
+  (archiveQuotes) => {
+    storage.set("archiveQuotes", JSON.stringify(archiveQuotes));
+  }
+);

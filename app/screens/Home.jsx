@@ -35,6 +35,7 @@ import * as Notifications from "expo-notifications";
 import ThemeToggle from "../components/ThemeToggle";
 import { IOS_ADMOB_INTERSTITIAL } from "@env";
 import { useQuoteStore } from "../store/quoteStore";
+import NetInfo from "@react-native-community/netinfo";
 
 const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : IOS_ADMOB_INTERSTITIAL;
 const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
@@ -92,7 +93,8 @@ export async function registerForPushNotificationsAsync() {
 
 const HomeScreen = () => {
   const { theme } = useContext(ThemeContext);
-  const { quotes, setQuotes, getQuotes } = useQuoteStore();
+  const { quotes, setQuotes, fetchQuotes, loadQuotesFromArchive } =
+    useQuoteStore();
   const { favorites, addFavorite, removeFavorite } = useFavoriteStore();
   const { actionCount, incrementActionCount, resetActionCount } = useAdStore();
   const storage = new MMKV();
@@ -129,19 +131,13 @@ const HomeScreen = () => {
   }, []);
 
   useEffect(() => {
-    const quotesString = storage.getString("quotes");
-
-    if (quotesString) {
-      const quotesObject = JSON.parse(quotesString);
-
-      if (quotesObject.date !== moment().format("YYYY-MM-DD HH")) {
-        getQuotes();
+    NetInfo.fetch().then((state) => {
+      if (state.isConnected) {
+        fetchQuotes();
       } else {
-        setQuotes(quotesObject.quotes);
+        loadQuotesFromArchive();
       }
-    } else {
-      getQuotes();
-    }
+    });
 
     schedulePushNotification();
   }, []);
