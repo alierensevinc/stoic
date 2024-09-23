@@ -5,11 +5,9 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
-  Platform,
 } from "react-native";
 import { MMKV } from "react-native-mmkv";
 import { StatusBar } from "expo-status-bar";
-import moment from "moment";
 import { ThemeContext } from "../context/ThemeContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { PanGestureHandler } from "react-native-gesture-handler";
@@ -30,12 +28,15 @@ import {
   InterstitialAd,
   TestIds,
 } from "react-native-google-mobile-ads";
-import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import ThemeToggle from "../components/ThemeToggle";
 import { IOS_ADMOB_INTERSTITIAL } from "@env";
 import { useQuoteStore } from "../store/quoteStore";
 import NetInfo from "@react-native-community/netinfo";
+import {
+  schedulePushNotification,
+  registerForPushNotificationsAsync,
+} from "../helpers/NotificationHelper";
 
 const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : IOS_ADMOB_INTERSTITIAL;
 const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
@@ -50,46 +51,6 @@ Notifications.setNotificationHandler({
     shouldSetBadge: false,
   }),
 });
-
-export async function registerForPushNotificationsAsync() {
-  let token;
-
-  if (Platform.OS === "android") {
-    await Notifications.setNotificationChannelAsync("default", {
-      name: "default",
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: "#FF231F7C",
-    });
-  }
-
-  if (Device.isDevice) {
-    const { status: existingStatus } =
-      await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== "granted") {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== "granted") {
-      alert("Failed to get push token for push notification!");
-      return;
-    }
-
-    if (Constants.easConfig?.projectId) {
-      token = (
-        await Notifications.getExpoPushTokenAsync({
-          projectId: "57019be4-e319-4182-83c0-19b0b37e8551",
-        })
-      ).data;
-      console.log(token);
-    }
-  } else {
-    alert("Must use physical device for Push Notifications");
-  }
-
-  return token;
-}
 
 const HomeScreen = () => {
   const { theme } = useContext(ThemeContext);
@@ -142,17 +103,6 @@ const HomeScreen = () => {
     schedulePushNotification();
   }, []);
 
-  async function schedulePushNotification() {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "You've got notification! 🔔",
-        body: "Here is the notification body",
-        data: { data: "goes here" },
-      },
-      trigger: { hours: 1 },
-    });
-  }
-
   const handleAction = (callback) => {
     incrementActionCount();
     if ((actionCount + 1) % 5 === 0 && loaded) {
@@ -163,6 +113,14 @@ const HomeScreen = () => {
   };
 
   const toggleFavoriteQuote = () => {
+    // TODO : Delete This
+    Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Look at that notification",
+        body: "I'm so proud of myself!",
+      },
+      trigger: null,
+    });
     handleAction(() => {
       const currentQuote = quotes[0];
       if (favorites.some((fav) => fav.q === currentQuote.q)) {

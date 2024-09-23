@@ -71,12 +71,13 @@ const FavoritesScreen = () => {
   };
 
   const shareQuote = (item) => {
-    handleAction(() => {
+    if (isAdLoaded) {
+      interstitial.show();
       navigation.navigate("ShareQuote", {
         quote: item.q,
         author: item.a,
       });
-    });
+    }
   };
 
   const confirmDelete = (item) => {

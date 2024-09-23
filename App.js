@@ -7,7 +7,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { ThemeProvider } from "./app/context/ThemeContext";
 import HomeScreen from "./app/screens/Home";
 import FavoritesScreen from "./app/screens/Favorites";
-import ShareQuoteScreen from './app/screens/ShareQuoteScreen';
+import ShareQuoteScreen from "./app/screens/ShareQuote";
 
 const Stack = createStackNavigator();
 

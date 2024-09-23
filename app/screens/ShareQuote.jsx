@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -19,6 +19,10 @@ const ShareQuoteScreen = ({ route }) => {
   const [isCapturing, setIsCapturing] = useState(false);
   const navigation = useNavigation();
 
+  useEffect(() => {
+    shareQuote();
+  }, []);
+
   const shareQuote = async () => {
     if (!(await Sharing.isAvailableAsync())) {
       alert("Sharing isn't available on your platform");
@@ -30,12 +34,14 @@ const ShareQuoteScreen = ({ route }) => {
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       const uri = await viewShotRef.current.capture();
+
       setIsCapturing(false);
       await Sharing.shareAsync("file://" + uri, {
         mimeType: "image/jpeg",
         dialogTitle: "Share this quote",
         UTI: "public.jpeg",
       });
+      navigation.goBack();
     } catch (error) {
       setIsCapturing(false);
       console.error("Error sharing quote:", error);
@@ -58,18 +64,6 @@ const ShareQuoteScreen = ({ route }) => {
           </Text>
         </View>
       </ViewShot>
-      <TouchableOpacity
-        onPress={shareQuote}
-        style={[styles.shareButton, isCapturing && styles.hidden]}
-      >
-        <Ionicons name={"share-outline"} size={24} color={theme.buttonColor} />
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        style={[styles.backButton, isCapturing && styles.hidden]}
-      >
-        <Ionicons name="arrow-back" size={24} color={theme.buttonColor} />
-      </TouchableOpacity>
     </SafeAreaView>
   );
 };
