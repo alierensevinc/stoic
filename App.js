@@ -1,7 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+import {
+  createStackNavigator,
+  TransitionSpecs,
+  CardStyleInterpolators,
+} from "@react-navigation/stack";
+import { Animated } from "react-native"; // Import Animated
 import mobileAds from "react-native-google-mobile-ads";
 import * as SplashScreen from "expo-splash-screen";
 import { ThemeProvider } from "./app/context/ThemeContext";
@@ -46,13 +51,48 @@ export default function App() {
     return null;
   }
 
+  const forFadeAndScale = ({ current, next }) => {
+    const opacity = Animated.add(
+      current.progress,
+      next ? next.progress : 0
+    ).interpolate({
+      inputRange: [0, 1, 2],
+      outputRange: [0, 1, 0],
+    });
+
+    const scale = Animated.add(
+      current.progress,
+      next ? next.progress : 0
+    ).interpolate({
+      inputRange: [0, 1, 2],
+      outputRange: [0.85, 1, 0.85],
+    });
+
+    return {
+      cardStyle: {
+        opacity,
+        transform: [{ scale }],
+      },
+    };
+  };
+
   return (
     <SafeAreaProvider onLayout={onLayoutRootView}>
       <ThemeProvider>
         <NavigationContainer>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="Favorites" component={FavoritesScreen} />
+            <Stack.Screen
+              name="Favorites"
+              component={FavoritesScreen}
+              options={{
+                transitionSpec: {
+                  open: TransitionSpecs.TransitionIOSSpec,
+                  close: TransitionSpecs.TransitionIOSSpec,
+                },
+                cardStyleInterpolator: forFadeAndScale,
+              }}
+            />
             <Stack.Screen name="ShareQuote" component={ShareQuoteScreen} />
           </Stack.Navigator>
         </NavigationContainer>
