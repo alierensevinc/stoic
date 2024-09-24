@@ -8,13 +8,19 @@ import { ThemeProvider } from "./app/context/ThemeContext";
 import HomeScreen from "./app/screens/Home";
 import FavoritesScreen from "./app/screens/Favorites";
 import ShareQuoteScreen from "./app/screens/ShareQuote";
+import { useFonts } from "expo-font";
 
 const Stack = createStackNavigator();
-
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
+  const [loaded, error] = useFonts({
+    "Montserrat-Bold": require("./assets/fonts/montserrat/Montserrat-Bold.ttf"),
+    "Montserrat-Italic": require("./assets/fonts/montserrat/Montserrat-Italic.ttf"),
+    "Montserrat-Medium": require("./assets/fonts/montserrat/Montserrat-Medium.ttf"),
+    "Montserrat-Regular": require("./assets/fonts/montserrat/Montserrat-Regular.ttf"),
+  });
 
   useEffect(() => {
     async function prepare() {
@@ -31,12 +37,12 @@ export default function App() {
   }, []);
 
   const onLayoutRootView = useCallback(async () => {
-    if (appIsReady) {
+    if (appIsReady && (loaded || error)) {
       await SplashScreen.hideAsync();
     }
   }, [appIsReady]);
 
-  if (!appIsReady) {
+  if (!appIsReady && !loaded && !error) {
     return null;
   }
 

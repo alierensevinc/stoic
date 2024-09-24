@@ -93,7 +93,8 @@
             "3qcr597p9d.skadnetwork"
           ]
         }
-      ]
+      ],
+      ["expo-font"]
     ],
     "extra": {
       "eas": {

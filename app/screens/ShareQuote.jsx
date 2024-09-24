@@ -56,10 +56,20 @@ const ShareQuoteScreen = ({ route }) => {
         <View
           style={[styles.container, { backgroundColor: theme.backgroundColor }]}
         >
-          <Text style={[styles.quote, { color: theme.textColor }]}>
+          <Text
+            style={[
+              styles.quote,
+              { color: theme.textColor, fontFamily: "Montserrat-Regular" },
+            ]}
+          >
             {quote}
           </Text>
-          <Text style={[styles.author, { color: theme.textColor }]}>
+          <Text
+            style={[
+              styles.author,
+              { color: theme.textColor, fontFamily: "Montserrat-Italic" },
+            ]}
+          >
             - {author}
           </Text>
         </View>

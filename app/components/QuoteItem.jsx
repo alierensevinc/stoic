@@ -9,10 +9,20 @@ const QuoteItem = ({ item, theme }) => {
         { backgroundColor: theme.backgroundColor },
       ]}
     >
-      <Text style={[styles.quoteText, { color: theme.textColor }]}>
+      <Text
+        style={[
+          styles.quoteText,
+          { color: theme.textColor, fontFamily: "Montserrat-Regular" },
+        ]}
+      >
         {item.q}
       </Text>
-      <Text style={[styles.authorText, { color: theme.textColor }]}>
+      <Text
+        style={[
+          styles.authorText,
+          { color: theme.textColor, fontFamily: "Montserrat-Italic" },
+        ]}
+      >
         - {item.a}
       </Text>
     </View>

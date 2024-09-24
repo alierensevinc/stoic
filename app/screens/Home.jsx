@@ -209,6 +209,10 @@ const HomeScreen = () => {
     <View
       style={[styles.container, { backgroundColor: theme.backgroundColor }]}
     >
+      <StatusBar
+        style={theme.statusBarStyle}
+        backgroundColor={theme.statusBarBackgroundColor}
+      />
       <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 0.9 }}>
         <PanGestureHandler onGestureEvent={gestureHandler}>
           <Animated.View
@@ -218,11 +222,21 @@ const HomeScreen = () => {
               animatedStyle,
             ]}
           >
-            <Text style={[styles.quote, { color: theme.textColor }]}>
+            <Text
+              style={[
+                styles.quote,
+                { color: theme.textColor, fontFamily: "Montserrat-Regular" },
+              ]}
+            >
               {quotes.length > 0 ? quotes[0].q : "Loading..."}
             </Text>
-            <Text style={[styles.author, { color: theme.textColor }]}>
-              {quotes.length > 0 ? "- " + quotes[0].a : "Loading..."}
+            <Text
+              style={[
+                styles.author,
+                { color: theme.textColor, fontFamily: "Montserrat-Italic" },
+              ]}
+            >
+              {quotes.length > 0 ? "- " + quotes[0].a : ""}
             </Text>
           </Animated.View>
         </PanGestureHandler>
@@ -240,8 +254,8 @@ const HomeScreen = () => {
         <Ionicons
           name={
             favorites.some((favorite) => favorite.q === quotes[0]?.q)
-              ? "heart"
-              : "heart-outline"
+              ? "bookmark"
+              : "bookmark-outline"
           }
           size={24}
           color={theme.buttonColor}
@@ -251,15 +265,15 @@ const HomeScreen = () => {
         onPress={goToFavorites}
         style={[styles.favoritesButton, isCapturing && styles.hidden]}
       >
-        <Ionicons name="bookmark-outline" size={24} color={theme.buttonColor} />
+        <Ionicons
+          name="bookmarks-outline"
+          size={24}
+          color={theme.buttonColor}
+        />
       </TouchableOpacity>
       <View style={styles.themeToggleContainer}>
         <ThemeToggle />
       </View>
-      <StatusBar
-        style={theme.statusBarStyle}
-        backgroundColor={theme.statusBarBackgroundColor}
-      />
     </View>
   );
 };

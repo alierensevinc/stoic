@@ -119,7 +119,12 @@ const FavoritesScreen = () => {
       >
         <Ionicons name="arrow-back" size={24} color={theme.buttonColor} />
       </TouchableOpacity>
-      <Text style={[styles.title, { color: theme.textColor }]}>
+      <Text
+        style={[
+          styles.title,
+          { color: theme.textColor, fontFamily: "Montserrat-Medium" },
+        ]}
+      >
         Favorite Quotes
       </Text>
       {favorites.length > 0 ? (
@@ -133,7 +138,12 @@ const FavoritesScreen = () => {
           contentContainerStyle={styles.listContainer}
         />
       ) : (
-        <Text style={[styles.emptyText, { color: theme.textColor }]}>
+        <Text
+          style={[
+            styles.emptyText,
+            { color: theme.textColor, fontFamily: "Montserrat-Regular" },
+          ]}
+        >
           No favorite quotes yet. Add some from the home screen!
         </Text>
       )}

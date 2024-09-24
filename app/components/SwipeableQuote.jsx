@@ -78,10 +78,20 @@ const SwipeableQuote = React.memo(({ theme, quote, onSwipe }) => {
   return (
     <PanGestureHandler onGestureEvent={gestureHandler}>
       <Animated.View style={[styles.container, animatedStyle]}>
-        <Text style={[styles.quote, { color: theme.textColor }]}>
+        <Text
+          style={[
+            styles.quote,
+            { color: theme.textColor, fontFamily: "Montserrat-Regular" },
+          ]}
+        >
           {quote.q}
         </Text>
-        <Text style={[styles.author, { color: theme.textColor }]}>
+        <Text
+          style={[
+            styles.author,
+            { color: theme.textColor, fontFamily: "Montserrat-Italic" },
+          ]}
+        >
           - {quote.a}
         </Text>
       </Animated.View>
