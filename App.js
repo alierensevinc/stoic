@@ -73,6 +73,10 @@ export default function App() {
     };
   };
 
+  const forFadeInFromCenter = () => {
+    return {};
+  };
+
   return (
     <SafeAreaProvider onLayout={onLayoutRootView}>
       <ThemeProvider>
@@ -90,7 +94,6 @@ export default function App() {
                 cardStyleInterpolator: forFadeInFromBottomLeft,
               }}
             />
-            <Stack.Screen name="ShareQuote" component={ShareQuoteScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </ThemeProvider>

@@ -21,6 +21,7 @@ import { useAdStore } from "../store/adStore";
 import QuoteItem from "../components/QuoteItem";
 import QuoteItemActions from "../components/QuoteItemActions";
 import InlineAd from "../components/InlineAd";
+import ShareQuoteScreen from "./ShareQuote"; // Import ShareQuoteScreen
 
 import { IOS_ADMOB_INTERSTITIAL } from "@env";
 const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : IOS_ADMOB_INTERSTITIAL;
@@ -36,11 +37,14 @@ const FavoritesScreen = () => {
   const { favorites, removeFavorite } = useFavoriteStore();
   const { actionCount, incrementActionCount, resetActionCount } = useAdStore();
   const [isAdLoaded, setIsAdLoaded] = useState(false);
+  const [showShareQuote, setShowShareQuote] = useState(false);
+  const [quoteToShare, setQuoteToShare] = useState(null);
 
   useEffect(() => {
     const unsubscribeLoaded = interstitial.addAdEventListener(
       AdEventType.LOADED,
       () => {
+        console.log("unsubscribeLoaded");
         setIsAdLoaded(true);
       }
     );
@@ -48,6 +52,7 @@ const FavoritesScreen = () => {
     const unsubscribeClosed = interstitial.addAdEventListener(
       AdEventType.CLOSED,
       () => {
+        console.log("unsubscribeClosed");
         setIsAdLoaded(false);
         interstitial.load();
       }
@@ -71,13 +76,10 @@ const FavoritesScreen = () => {
   };
 
   const shareQuote = (item) => {
-    if (isAdLoaded) {
-      interstitial.show();
-      navigation.navigate("ShareQuote", {
-        quote: item.q,
-        author: item.a,
-      });
-    }
+    handleAction(() => {
+      setQuoteToShare(item);
+      setShowShareQuote(true);
+    });
   };
 
   const confirmDelete = (item) => {
@@ -108,6 +110,11 @@ const FavoritesScreen = () => {
       onDelete={() => confirmDelete(item)}
     />
   );
+
+  const handleShareComplete = () => {
+    setShowShareQuote(false);
+    setQuoteToShare(null);
+  };
 
   return (
     <SafeAreaView
@@ -148,6 +155,15 @@ const FavoritesScreen = () => {
         </Text>
       )}
       <InlineAd />
+      {showShareQuote && quoteToShare && (
+        <View style={styles.hidden}>
+          <ShareQuoteScreen
+            quote={quoteToShare.q}
+            author={quoteToShare.a}
+            onShareComplete={handleShareComplete}
+          />
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -176,6 +192,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     marginTop: 20,
+  },
+  hidden: {
+    position: "absolute",
+    top: -1000,
+    left: -1000,
+    width: "100%",
+    height: "100%",
+    opacity: 0,
   },
 });
 

@@ -1,31 +1,24 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  SafeAreaView,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { StyleSheet, Text, View, SafeAreaView, Alert } from "react-native";
 import ViewShot from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
 import { ThemeContext } from "../context/ThemeContext";
 
-const ShareQuoteScreen = ({ route }) => {
+const ShareQuoteScreen = ({ quote, author, onShareComplete }) => {
   const { theme } = useContext(ThemeContext);
-  const { quote, author } = route.params;
   const viewShotRef = useRef();
   const [isCapturing, setIsCapturing] = useState(false);
-  const navigation = useNavigation();
+  const [viewReady, setViewReady] = useState(false);
 
   useEffect(() => {
-    shareQuote();
-  }, []);
+    if (viewReady) {
+      shareQuote();
+    }
+  }, [viewReady]);
 
   const shareQuote = async () => {
     if (!(await Sharing.isAvailableAsync())) {
-      alert("Sharing isn't available on your platform");
+      Alert.alert("Sharing isn't available on your platform");
       return;
     }
 
@@ -36,12 +29,13 @@ const ShareQuoteScreen = ({ route }) => {
       const uri = await viewShotRef.current.capture();
 
       setIsCapturing(false);
+      onShareComplete();
+
       await Sharing.shareAsync("file://" + uri, {
         mimeType: "image/jpeg",
         dialogTitle: "Share this quote",
         UTI: "public.jpeg",
       });
-      navigation.goBack();
     } catch (error) {
       setIsCapturing(false);
       console.error("Error sharing quote:", error);
@@ -55,6 +49,12 @@ const ShareQuoteScreen = ({ route }) => {
       <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 0.9 }}>
         <View
           style={[styles.container, { backgroundColor: theme.backgroundColor }]}
+          onLayout={(event) => {
+            const { width, height } = event.nativeEvent.layout;
+            if (width > 0 && height > 0) {
+              setViewReady(true);
+            }
+          }}
         >
           <Text
             style={[
@@ -93,19 +93,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginTop: 8,
     alignSelf: "flex-end",
-  },
-  shareButton: {
-    position: "absolute",
-    bottom: 20,
-    right: 60,
-  },
-  backButton: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
-  },
-  hidden: {
-    opacity: 0,
   },
 });
 
