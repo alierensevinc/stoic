@@ -51,27 +51,24 @@ export default function App() {
     return null;
   }
 
-  const forFadeAndScale = ({ current, next }) => {
-    const opacity = Animated.add(
-      current.progress,
-      next ? next.progress : 0
-    ).interpolate({
-      inputRange: [0, 1, 2],
-      outputRange: [0, 1, 0],
+  const forFadeInFromBottomLeft = ({ current }) => {
+    const progress = current.progress;
+
+    const opacity = progress.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 1],
     });
 
-    const scale = Animated.add(
-      current.progress,
-      next ? next.progress : 0
-    ).interpolate({
-      inputRange: [0, 1, 2],
-      outputRange: [0.85, 1, 0.85],
+    const scale = progress.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0.85, 1],
     });
 
     return {
       cardStyle: {
         opacity,
         transform: [{ scale }],
+        transformOrigin: "bottom left",
       },
     };
   };
@@ -90,7 +87,7 @@ export default function App() {
                   open: TransitionSpecs.TransitionIOSSpec,
                   close: TransitionSpecs.TransitionIOSSpec,
                 },
-                cardStyleInterpolator: forFadeAndScale,
+                cardStyleInterpolator: forFadeInFromBottomLeft,
               }}
             />
             <Stack.Screen name="ShareQuote" component={ShareQuoteScreen} />
