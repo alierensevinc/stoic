@@ -21,7 +21,7 @@ import { useAdStore } from "../store/adStore";
 import QuoteItem from "../components/QuoteItem";
 import QuoteItemActions from "../components/QuoteItemActions";
 import InlineAd from "../components/InlineAd";
-import ShareQuoteScreen from "./ShareQuote"; // Import ShareQuoteScreen
+import ShareQuoteScreen from "../components/ShareQuote";
 
 import { IOS_ADMOB_INTERSTITIAL } from "@env";
 const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : IOS_ADMOB_INTERSTITIAL;
@@ -31,7 +31,7 @@ const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
   requestNonPersonalizedAdsOnly: true,
 });
 
-const FavoritesScreen = () => {
+const BookmarksScreen = () => {
   const navigation = useNavigation();
   const { theme } = useContext(ThemeContext);
   const { favorites, removeFavorite } = useFavoriteStore();
@@ -203,4 +203,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FavoritesScreen;
+export default BookmarksScreen;

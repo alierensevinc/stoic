@@ -1,19 +1,14 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
-import {
-  createStackNavigator,
-  TransitionSpecs,
-  CardStyleInterpolators,
-} from "@react-navigation/stack";
-import { Animated } from "react-native"; // Import Animated
+import { createStackNavigator, TransitionSpecs } from "@react-navigation/stack";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import mobileAds from "react-native-google-mobile-ads";
 import * as SplashScreen from "expo-splash-screen";
+import { useFonts } from "expo-font";
 import { ThemeProvider } from "./app/context/ThemeContext";
 import HomeScreen from "./app/screens/Home";
-import FavoritesScreen from "./app/screens/Favorites";
-import ShareQuoteScreen from "./app/screens/ShareQuote";
-import { useFonts } from "expo-font";
+import BookmarksScreen from "./app/screens/Bookmarks";
+import { bookmarkScreenInterpolator } from "./app/utils/animations";
 
 const Stack = createStackNavigator();
 SplashScreen.preventAutoHideAsync();
@@ -31,13 +26,11 @@ export default function App() {
     async function prepare() {
       try {
         await mobileAds().initialize();
-
         setAppIsReady(true);
       } catch (e) {
         console.warn(e);
       }
     }
-
     prepare();
   }, []);
 
@@ -51,32 +44,6 @@ export default function App() {
     return null;
   }
 
-  const forFadeInFromBottomLeft = ({ current }) => {
-    const progress = current.progress;
-
-    const opacity = progress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0, 1],
-    });
-
-    const scale = progress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0.85, 1],
-    });
-
-    return {
-      cardStyle: {
-        opacity,
-        transform: [{ scale }],
-        transformOrigin: "bottom left",
-      },
-    };
-  };
-
-  const forFadeInFromCenter = () => {
-    return {};
-  };
-
   return (
     <SafeAreaProvider onLayout={onLayoutRootView}>
       <ThemeProvider>
@@ -84,14 +51,14 @@ export default function App() {
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen
-              name="Favorites"
-              component={FavoritesScreen}
+              name="Bookmarks"
+              component={BookmarksScreen}
               options={{
                 transitionSpec: {
                   open: TransitionSpecs.TransitionIOSSpec,
                   close: TransitionSpecs.TransitionIOSSpec,
                 },
-                cardStyleInterpolator: forFadeInFromBottomLeft,
+                cardStyleInterpolator: bookmarkScreenInterpolator,
               }}
             />
           </Stack.Navigator>

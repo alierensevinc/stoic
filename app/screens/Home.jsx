@@ -199,9 +199,9 @@ const HomeScreen = () => {
     opacity: textOpacity.value,
   }));
 
-  const goToFavorites = () => {
+  const navigateToBookmarks = () => {
     handleAction(() => {
-      navigation.navigate("Favorites");
+      navigation.navigate("Bookmarks");
     });
   };
 
@@ -262,7 +262,7 @@ const HomeScreen = () => {
         />
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={goToFavorites}
+        onPress={navigateToBookmarks}
         style={[styles.favoritesButton, isCapturing && styles.hidden]}
       >
         <Ionicons
