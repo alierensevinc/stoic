@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View, SafeAreaView, Alert } from "react-native";
 import ViewShot from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
-import { ThemeContext } from "../context/ThemeContext";
+import { ThemeContext } from "context/ThemeContext";
 
 const ShareQuoteScreen = ({ quote, author, onShareComplete }) => {
   const { theme } = useContext(ThemeContext);

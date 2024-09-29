@@ -5,14 +5,19 @@ import { create } from "zustand";
 
 const storage = new MMKV();
 
+const QUOTES_KEY = "quotes";
+const ARCHIVE_QUOTES_KEY = "archiveQuotes";
+const QUOTES_API_URL = "https://zenquotes.io/api/quotes/";
+
 export const useQuoteStore = create((set) => ({
   quotes: [],
   archiveQuotes: [],
   setQuotes: (quotes) => set({ quotes }),
   setArchiveQuotes: (archiveQuotes) => set({ archiveQuotes }),
+
   fetchQuotes: async () => {
     try {
-      const storedQuotes = storage.getString("quotes");
+      const storedQuotes = storage.getString(QUOTES_KEY);
       if (storedQuotes) {
         const quotesObject = JSON.parse(storedQuotes);
         if (quotesObject.date === moment().format("YYYY-MM-DD HH")) {
@@ -21,32 +26,35 @@ export const useQuoteStore = create((set) => ({
         }
       }
 
-      const response = await axios.get("https://zenquotes.io/api/quotes/");
+      const response = await axios.get(QUOTES_API_URL);
       const quotes = response.data;
       const quotesObject = {
         date: moment().format("YYYY-MM-DD HH"),
         quotes,
       };
-      storage.set("quotes", JSON.stringify(quotesObject));
-      set({ quotes });
-      set({ archiveQuotes: quotes });
+      storage.set(QUOTES_KEY, JSON.stringify(quotesObject));
+      set({ quotes, archiveQuotes: quotes });
     } catch (error) {
       console.error("Error fetching quotes:", error);
     }
   },
+
   loadQuotesFromArchive: () => {
-    const storedArchiveQuotes = storage.getString("archiveQuotes");
-    if (storedArchiveQuotes) {
-      const archiveQuotes = JSON.parse(storedArchiveQuotes);
-      set({ quotes: archiveQuotes });
+    try {
+      const storedArchiveQuotes = storage.getString(ARCHIVE_QUOTES_KEY);
+      if (storedArchiveQuotes) {
+        const archiveQuotes = JSON.parse(storedArchiveQuotes);
+        set({ quotes: archiveQuotes });
+      }
+    } catch (error) {
+      console.error("Error loading quotes from archive:", error);
     }
   },
 }));
 
-// Save archiveQuotes to storage whenever it changes
 useQuoteStore.subscribe(
   (state) => state.archiveQuotes,
   (archiveQuotes) => {
-    storage.set("archiveQuotes", JSON.stringify(archiveQuotes));
+    storage.set(ARCHIVE_QUOTES_KEY, JSON.stringify(archiveQuotes));
   }
 );

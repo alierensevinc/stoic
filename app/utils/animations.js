@@ -8,7 +8,7 @@ export const bookmarkScreenInterpolator = ({ current }) => {
 
   const scale = progress.interpolate({
     inputRange: [0, 1],
-    outputRange: [0.85, 1],
+    outputRange: [0.5, 1],
   });
 
   return {

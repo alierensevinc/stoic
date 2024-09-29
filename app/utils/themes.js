@@ -1,5 +1,3 @@
-// themes.js
-
 export const themes = {
   dark: {
     backgroundColor: "#151b24",

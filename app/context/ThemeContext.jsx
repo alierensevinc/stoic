@@ -1,6 +1,6 @@
 import React, { createContext, useState } from "react";
 import { MMKV } from "react-native-mmkv";
-import { themes } from "../utils/themes";
+import { themes } from "utils/themes";
 
 const storage = new MMKV();
 

@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { View, Switch, StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { ThemeContext } from "../context/ThemeContext";
+import { ThemeContext } from "context/ThemeContext";
 
 const ThemeToggle = () => {
   const { theme, isDarkMode, toggleTheme } = useContext(ThemeContext);

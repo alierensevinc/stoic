@@ -1,6 +1,7 @@
 import { Platform } from "react-native";
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
+import Constants from "expo-constants";
 
 export async function registerForPushNotificationsAsync() {
   let token;
@@ -27,14 +28,18 @@ export async function registerForPushNotificationsAsync() {
       return;
     }
 
-    if (Constants.easConfig?.projectId) {
-      token = (
-        await Notifications.getExpoPushTokenAsync({
-          projectId: "57019be4-e319-4182-83c0-19b0b37e8551",
-        })
-      ).data;
-      console.log(token);
-      alert(token);
+    try {
+      if (Constants.easConfig?.projectId) {
+        token = (
+          await Notifications.getExpoPushTokenAsync({
+            projectId: Constants.easConfig.projectId,
+          })
+        ).data;
+        console.log(token);
+        alert(token);
+      }
+    } catch (error) {
+      console.error("Error getting push token:", error);
     }
   } else {
     alert("Must use physical device for Push Notifications");
@@ -44,12 +49,16 @@ export async function registerForPushNotificationsAsync() {
 }
 
 export async function schedulePushNotification() {
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: "You've got notification! 🔔",
-      body: "Here is the notification body",
-      data: { data: "goes here" },
-    },
-    trigger: { hours: 1 },
-  });
+  try {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "You've got notification! 🔔",
+        body: "Here is the notification body",
+        data: { data: "goes here" },
+      },
+      trigger: { seconds: 3600 }, // 1 hour
+    });
+  } catch (error) {
+    console.error("Error scheduling notification:", error);
+  }
 }
