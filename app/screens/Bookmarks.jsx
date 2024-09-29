@@ -1,19 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-  Alert,
-} from "react-native";
+import React, { useContext, useState } from "react";
+import { View, SafeAreaView, StyleSheet, Alert, Text } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import {
-  AdEventType,
-  InterstitialAd,
-  TestIds,
-} from "react-native-google-mobile-ads";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { SwipeListView } from "react-native-swipe-list-view";
 import { ThemeContext } from "../context/ThemeContext";
 import { useFavoriteStore } from "../store/favoriteStore";
@@ -22,54 +9,23 @@ import QuoteItem from "../components/QuoteItem";
 import QuoteItemActions from "../components/QuoteItemActions";
 import InlineAd from "../components/InlineAd";
 import ShareQuoteScreen from "../components/ShareQuote";
-
-import { IOS_ADMOB_INTERSTITIAL } from "@env";
-const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : IOS_ADMOB_INTERSTITIAL;
-
-const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
-  keywords: ["food", "cooking", "fruit"],
-  requestNonPersonalizedAdsOnly: true,
-});
+import BackButton from "../components/BackButton";
+import EmptyState from "../components/EmptyState";
+import { useInterstitialAd } from "../hooks/useInterstitialAd";
 
 const BookmarksScreen = () => {
   const navigation = useNavigation();
   const { theme } = useContext(ThemeContext);
   const { favorites, removeFavorite } = useFavoriteStore();
   const { actionCount, incrementActionCount, resetActionCount } = useAdStore();
-  const [isAdLoaded, setIsAdLoaded] = useState(false);
   const [showShareQuote, setShowShareQuote] = useState(false);
   const [quoteToShare, setQuoteToShare] = useState(null);
-
-  useEffect(() => {
-    const unsubscribeLoaded = interstitial.addAdEventListener(
-      AdEventType.LOADED,
-      () => {
-        console.log("unsubscribeLoaded");
-        setIsAdLoaded(true);
-      }
-    );
-
-    const unsubscribeClosed = interstitial.addAdEventListener(
-      AdEventType.CLOSED,
-      () => {
-        console.log("unsubscribeClosed");
-        setIsAdLoaded(false);
-        interstitial.load();
-      }
-    );
-
-    interstitial.load();
-
-    return () => {
-      unsubscribeLoaded();
-      unsubscribeClosed();
-    };
-  }, []);
+  const { isAdLoaded, showAd } = useInterstitialAd();
 
   const handleAction = (callback) => {
     incrementActionCount();
     if ((actionCount + 1) % 5 === 0 && isAdLoaded) {
-      interstitial.show();
+      showAd();
       resetActionCount();
     }
     callback();
@@ -120,12 +76,10 @@ const BookmarksScreen = () => {
     <SafeAreaView
       style={[styles.container, { backgroundColor: theme.backgroundColor }]}
     >
-      <TouchableOpacity
+      <BackButton
         onPress={() => navigation.goBack()}
-        style={styles.backButton}
-      >
-        <Ionicons name="arrow-back" size={24} color={theme.buttonColor} />
-      </TouchableOpacity>
+        color={theme.buttonColor}
+      />
       <Text
         style={[
           styles.title,
@@ -134,6 +88,7 @@ const BookmarksScreen = () => {
       >
         Favorite Quotes
       </Text>
+
       {favorites.length > 0 ? (
         <SwipeListView
           data={favorites}
@@ -145,14 +100,9 @@ const BookmarksScreen = () => {
           contentContainerStyle={styles.listContainer}
         />
       ) : (
-        <Text
-          style={[
-            styles.emptyText,
-            { color: theme.textColor, fontFamily: "Montserrat-Regular" },
-          ]}
-        >
-          No favorite quotes yet. Add some from the home screen!
-        </Text>
+        <View style={styles.emptyStateContainer}>
+          <EmptyState text="No favorite quotes yet" color={theme.textColor} />
+        </View>
       )}
       <InlineAd />
       {showShareQuote && quoteToShare && (
@@ -182,16 +132,12 @@ const styles = StyleSheet.create({
   listContainer: {
     paddingBottom: 20,
   },
-  backButton: {
-    position: "absolute",
-    top: 60,
-    left: 20,
-    zIndex: 1,
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: "center",
   },
-  emptyText: {
-    fontSize: 16,
-    textAlign: "center",
-    marginTop: 20,
+  inlineAd: {
+    alignSelf: "center",
   },
   hidden: {
     position: "absolute",

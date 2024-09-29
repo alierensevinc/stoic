@@ -1,0 +1,50 @@
+import { useEffect, useState } from "react";
+import {
+  AdEventType,
+  InterstitialAd,
+  TestIds,
+} from "react-native-google-mobile-ads";
+import { IOS_ADMOB_INTERSTITIAL } from "@env";
+
+const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : IOS_ADMOB_INTERSTITIAL;
+
+const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
+  keywords: ["food", "cooking", "fruit"],
+  requestNonPersonalizedAdsOnly: true,
+});
+
+export const useInterstitialAd = () => {
+  const [isAdLoaded, setIsAdLoaded] = useState(false);
+
+  useEffect(() => {
+    const unsubscribeLoaded = interstitial.addAdEventListener(
+      AdEventType.LOADED,
+      () => {
+        setIsAdLoaded(true);
+      }
+    );
+
+    const unsubscribeClosed = interstitial.addAdEventListener(
+      AdEventType.CLOSED,
+      () => {
+        setIsAdLoaded(false);
+        interstitial.load();
+      }
+    );
+
+    interstitial.load();
+
+    return () => {
+      unsubscribeLoaded();
+      unsubscribeClosed();
+    };
+  }, []);
+
+  const showAd = () => {
+    if (isAdLoaded) {
+      interstitial.show();
+    }
+  };
+
+  return { isAdLoaded, showAd };
+};

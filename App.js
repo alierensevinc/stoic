@@ -1,16 +1,12 @@
 import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator, TransitionSpecs } from "@react-navigation/stack";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
 import { ThemeProvider } from "./app/context/ThemeContext";
-import HomeScreen from "./app/screens/Home";
-import BookmarksScreen from "./app/screens/Bookmarks";
-import { bookmarkScreenInterpolator } from "./app/utils/animations";
+import AppNavigator from "./app/navigation/AppNavigator";
 import { useAppInitialization } from "./app/hooks/useAppInitialization";
 import { useFontsLoading } from "./app/hooks/useFontsLoading";
 
-const Stack = createStackNavigator();
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
@@ -34,20 +30,7 @@ export default function App() {
     <SafeAreaProvider>
       <ThemeProvider>
         <NavigationContainer>
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen
-              name="Bookmarks"
-              component={BookmarksScreen}
-              options={{
-                transitionSpec: {
-                  open: TransitionSpecs.TransitionIOSSpec,
-                  close: TransitionSpecs.TransitionIOSSpec,
-                },
-                cardStyleInterpolator: bookmarkScreenInterpolator,
-              }}
-            />
-          </Stack.Navigator>
+          <AppNavigator />
         </NavigationContainer>
       </ThemeProvider>
     </SafeAreaProvider>
