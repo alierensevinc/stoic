@@ -11,6 +11,25 @@ module.exports = function (api) {
           path: ".env",
         },
       ],
+      [
+        "module-resolver",
+        {
+          root: ["./app"],
+          alias: {
+            "@": "./app",
+            components: "./app/components",
+            context: "./app/context",
+            helpers: "./app/helpers",
+            hooks: "./app/hooks",
+            navigation: "./app/navigation",
+            screens: "./app/screens",
+            store: "./app/store",
+            styles: "./app/styles",
+            utils: "./app/utils",
+            underscore: "lodash",
+          },
+        },
+      ],
     ],
   };
 };

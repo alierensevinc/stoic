@@ -11,7 +11,7 @@ const BackButton = ({ onPress, color }) => (
 const styles = StyleSheet.create({
   backButton: {
     position: "absolute",
-    top: 60,
+    top: 64,
     left: 20,
     zIndex: 1,
   },
