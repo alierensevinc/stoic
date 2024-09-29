@@ -1,51 +1,37 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator, TransitionSpecs } from "@react-navigation/stack";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import mobileAds from "react-native-google-mobile-ads";
 import * as SplashScreen from "expo-splash-screen";
-import { useFonts } from "expo-font";
 import { ThemeProvider } from "./app/context/ThemeContext";
 import HomeScreen from "./app/screens/Home";
 import BookmarksScreen from "./app/screens/Bookmarks";
 import { bookmarkScreenInterpolator } from "./app/utils/animations";
+import { useAppInitialization } from "./app/hooks/useAppInitialization";
+import { useFontsLoading } from "./app/hooks/useFontsLoading";
 
 const Stack = createStackNavigator();
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  const [appIsReady, setAppIsReady] = useState(false);
-  const [loaded, error] = useFonts({
-    "Montserrat-Bold": require("./assets/fonts/montserrat/Montserrat-Bold.ttf"),
-    "Montserrat-Italic": require("./assets/fonts/montserrat/Montserrat-Italic.ttf"),
-    "Montserrat-Medium": require("./assets/fonts/montserrat/Montserrat-Medium.ttf"),
-    "Montserrat-Regular": require("./assets/fonts/montserrat/Montserrat-Regular.ttf"),
-  });
+  const appIsReady = useAppInitialization();
+  const { fontsLoaded, fontsError } = useFontsLoading();
 
   useEffect(() => {
-    async function prepare() {
-      try {
-        await mobileAds().initialize();
-        setAppIsReady(true);
-      } catch (e) {
-        console.warn(e);
+    const hideSplashScreen = async () => {
+      if (appIsReady && (fontsLoaded || fontsError)) {
+        await SplashScreen.hideAsync();
       }
-    }
-    prepare();
-  }, []);
+    };
+    hideSplashScreen();
+  }, [appIsReady, fontsLoaded, fontsError]);
 
-  const onLayoutRootView = useCallback(async () => {
-    if (appIsReady && (loaded || error)) {
-      await SplashScreen.hideAsync();
-    }
-  }, [appIsReady]);
-
-  if (!appIsReady && !loaded && !error) {
+  if (!appIsReady || !fontsLoaded) {
     return null;
   }
 
   return (
-    <SafeAreaProvider onLayout={onLayoutRootView}>
+    <SafeAreaProvider>
       <ThemeProvider>
         <NavigationContainer>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
