@@ -1,12 +1,13 @@
-import { useContext, useState } from "react";
-import { View, StyleSheet, Alert, Text } from "react-native";
+import { useContext, useState, useRef } from "react";
+import { View, Alert, Text } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
+import * as Sharing from "expo-sharing";
 import { ThemeContext } from "context/ThemeContext";
 import { useBookmarksStore } from "store/bookmarksStore";
 import { useAdStore } from "store/adStore";
 import InlineAd from "components/InlineAd";
-import ShareQuoteScreen from "components/ShareQuote";
+import QuoteViewShot from "components/QuoteViewShot";
 import BackButton from "components/BackButton";
 import EmptyState from "components/EmptyState";
 import QuoteList from "components/QuoteList";
@@ -23,7 +24,7 @@ const BookmarksScreen = () => {
     quoteToShare: null,
   });
   const { isAdLoaded, showAd } = useInterstitialAd();
-  const insets = useSafeAreaInsets();
+  const viewShotRef = useRef();
 
   const handleAction = (callback) => {
     incrementActionCount();
@@ -34,9 +35,27 @@ const BookmarksScreen = () => {
     callback();
   };
 
-  const shareQuote = (item) => {
-    handleAction(() => {
-      setShareState({ showShareQuote: true, quoteToShare: item });
+  const shareQuote = async (item) => {
+    handleAction(async () => {
+      if (!(await Sharing.isAvailableAsync())) {
+        alert("Sharing isn't available on your platform");
+        return;
+      }
+
+      try {
+        setShareState({ showShareQuote: true, quoteToShare: item });
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        const uri = await viewShotRef.current.capture();
+        await Sharing.shareAsync("file://" + uri, {
+          mimeType: "image/jpeg",
+          dialogTitle: "Share this quote",
+          UTI: "public.jpeg",
+        });
+        setShareState({ showShareQuote: false, quoteToShare: null });
+      } catch (error) {
+        console.error("Error sharing quote:", error);
+      }
     });
   };
 
@@ -59,10 +78,6 @@ const BookmarksScreen = () => {
     );
   };
 
-  const handleShareComplete = () => {
-    setShareState({ showShareQuote: false, quoteToShare: null });
-  };
-
   return (
     <Container>
       <BackButton
@@ -70,10 +85,14 @@ const BookmarksScreen = () => {
         color={theme.buttonColor}
       />
       <Text
-        style={[
-          styles.title,
-          { color: theme.textColor, fontFamily: "Montserrat-Medium" },
-        ]}
+        style={{
+          fontSize: 24,
+          fontWeight: "bold",
+          marginBottom: 20,
+          textAlign: "center",
+          color: theme.textColor,
+          fontFamily: "Montserrat-Medium",
+        }}
       >
         Bookmarks
       </Text>
@@ -85,54 +104,23 @@ const BookmarksScreen = () => {
           onDelete={confirmDelete}
         />
       ) : (
-        <View style={styles.emptyStateContainer}>
+        <View className="flex-1 justify-center">
           <EmptyState text="No bookmarks yet" color={theme.textColor} />
         </View>
       )}
-      <InlineAd style={styles.inlineAd} />
+      <InlineAd className="absolute bottom-0 left-0 right-0 self-center" />
       {shareState.showShareQuote && shareState.quoteToShare && (
-        <View style={styles.hidden}>
-          <ShareQuoteScreen
-            quote={shareState.quoteToShare.q}
-            author={shareState.quoteToShare.a}
-            onShareComplete={handleShareComplete}
+        <View className="absolute top-[-1000px] left-[-1000px] w-full h-full opacity-0">
+          <QuoteViewShot
+            viewShotRef={viewShotRef}
+            theme={theme}
+            quote={shareState.quoteToShare} // Pass a single quote
+            captureOnReady={true} // Ensure it captures automatically
           />
         </View>
       )}
     </Container>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  emptyStateContainer: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  inlineAd: {
-    alignSelf: "center",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  hidden: {
-    position: "absolute",
-    top: -1000,
-    left: -1000,
-    width: "100%",
-    height: "100%",
-    opacity: 0,
-  },
-});
 
 export default BookmarksScreen;

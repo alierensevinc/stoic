@@ -198,13 +198,16 @@ const HomeScreen = () => {
         style={theme.statusBarStyle}
         backgroundColor={theme.statusBarBackgroundColor}
       />
-      <QuoteViewShot
-        viewShotRef={viewShotRef}
-        gestureHandler={gestureHandler}
-        animatedStyle={animatedStyle}
-        theme={theme}
-        quotes={quotes}
-      />
+      {quotes.length > 0 && (
+        <QuoteViewShot
+          viewShotRef={viewShotRef}
+          gestureHandler={gestureHandler} // Pass gesture handler
+          animatedStyle={animatedStyle} // Pass animated style
+          theme={theme}
+          quote={quotes[0]} // Pass only the current quote
+          captureOnReady={false} // Ensure it doesn't capture automatically
+        />
+      )}
       <ActionButtons
         theme={theme}
         shareQuote={shareQuote}
