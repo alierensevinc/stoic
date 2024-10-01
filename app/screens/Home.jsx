@@ -1,5 +1,8 @@
 import React, { useEffect, useContext, useRef, useState } from "react";
-import { StyleSheet, Text, View, Dimensions, SafeAreaView } from "react-native";
+import { StyleSheet, Text, View, Dimensions } from "react-native";
+import {
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { MMKV } from "react-native-mmkv";
 import { StatusBar } from "expo-status-bar";
 import { ThemeContext } from "../context/ThemeContext";
@@ -60,6 +63,7 @@ const HomeScreen = () => {
   const [isCapturing, setIsCapturing] = useState(false);
   const navigation = useNavigation();
   const [loaded, setLoaded] = useState(false);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     registerForPushNotificationsAsync();
@@ -192,8 +196,17 @@ const HomeScreen = () => {
   const isFavorite = favorites.some((favorite) => favorite.q === quotes[0]?.q);
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: theme.backgroundColor }]}
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: theme.backgroundColor,
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
+          paddingLeft: insets.left,
+          paddingRight: insets.right,
+        },
+      ]}
     >
       <StatusBar
         style={theme.statusBarStyle}
@@ -217,7 +230,7 @@ const HomeScreen = () => {
       <View style={styles.themeToggleContainer}>
         <ThemeToggle />
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

@@ -1,5 +1,6 @@
 import React, { useContext, useState } from "react";
-import { View, SafeAreaView, StyleSheet, Alert, Text } from "react-native";
+import { View, StyleSheet, Alert, Text } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { ThemeContext } from "context/ThemeContext";
 import { useFavoriteStore } from "store/favoriteStore";
@@ -21,6 +22,7 @@ const BookmarksScreen = () => {
     quoteToShare: null,
   });
   const { isAdLoaded, showAd } = useInterstitialAd();
+  const insets = useSafeAreaInsets();
 
   const handleAction = (callback) => {
     incrementActionCount();
@@ -61,8 +63,18 @@ const BookmarksScreen = () => {
   };
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: theme.backgroundColor }]}
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: theme.backgroundColor,
+          paddingTop: insets.top,
+          paddingBottom: 0,
+          paddingLeft: insets.left,
+          paddingRight: insets.right,
+        },
+      ]}
+      forceInset={{ top: "always", bottom: "never" }}
     >
       <BackButton
         onPress={() => navigation.goBack()}
@@ -98,7 +110,7 @@ const BookmarksScreen = () => {
           />
         </View>
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -119,6 +131,10 @@ const styles = StyleSheet.create({
   },
   inlineAd: {
     alignSelf: "center",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   hidden: {
     position: "absolute",
