@@ -10,6 +10,7 @@ import ShareQuoteScreen from "components/ShareQuote";
 import BackButton from "components/BackButton";
 import EmptyState from "components/EmptyState";
 import QuoteList from "components/QuoteList";
+import Container from "components/Container";
 import { useInterstitialAd } from "hooks/useInterstitialAd";
 
 const BookmarksScreen = () => {
@@ -63,19 +64,7 @@ const BookmarksScreen = () => {
   };
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: theme.backgroundColor,
-          paddingTop: insets.top,
-          paddingBottom: 0,
-          paddingLeft: insets.left,
-          paddingRight: insets.right,
-        },
-      ]}
-      forceInset={{ top: "always", bottom: "never" }}
-    >
+    <Container>
       <BackButton
         onPress={() => navigation.goBack()}
         color={theme.buttonColor}
@@ -86,7 +75,7 @@ const BookmarksScreen = () => {
           { color: theme.textColor, fontFamily: "Montserrat-Medium" },
         ]}
       >
-        Favorite Quotes
+        Bookmarks
       </Text>
       {favorites.length > 0 ? (
         <QuoteList
@@ -110,7 +99,7 @@ const BookmarksScreen = () => {
           />
         </View>
       )}
-    </View>
+    </Container>
   );
 };
 

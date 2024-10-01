@@ -37,6 +37,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 20,
     padding: 5,
+    position: "absolute",
+    top: 48,
+    right: 16,
+    zIndex: 1,
   },
   icon: {
     marginHorizontal: 5,

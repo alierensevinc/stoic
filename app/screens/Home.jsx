@@ -1,8 +1,5 @@
 import React, { useEffect, useContext, useRef, useState } from "react";
 import { StyleSheet, Text, View, Dimensions } from "react-native";
-import {
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
 import { MMKV } from "react-native-mmkv";
 import { StatusBar } from "expo-status-bar";
 import { ThemeContext } from "../context/ThemeContext";
@@ -28,6 +25,7 @@ import * as Notifications from "expo-notifications";
 import ThemeToggle from "../components/ThemeToggle";
 import ActionButtons from "../components/ActionButtons";
 import QuoteViewShot from "../components/QuoteViewShot"; // Import QuoteViewShot
+import Container from "../components/Container"; // Import Container
 import { IOS_ADMOB_INTERSTITIAL } from "@env";
 import { useQuoteStore } from "../store/quoteStore";
 import NetInfo from "@react-native-community/netinfo";
@@ -63,7 +61,6 @@ const HomeScreen = () => {
   const [isCapturing, setIsCapturing] = useState(false);
   const navigation = useNavigation();
   const [loaded, setLoaded] = useState(false);
-  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     registerForPushNotificationsAsync();
@@ -111,7 +108,7 @@ const HomeScreen = () => {
     callback();
   };
 
-  const toggleFavoriteQuote = () => {
+  const addToBookmarks = () => {
     handleAction(() => {
       const currentQuote = quotes[0];
       if (favorites.some((fav) => fav.q === currentQuote.q)) {
@@ -130,8 +127,11 @@ const HomeScreen = () => {
       }
 
       try {
+        setIsCapturing(true);
         await new Promise((resolve) => setTimeout(resolve, 100));
+
         const uri = await viewShotRef.current.capture();
+        setIsCapturing(false);
         await Sharing.shareAsync("file://" + uri, {
           mimeType: "image/jpeg",
           dialogTitle: "Share this quote",
@@ -193,21 +193,12 @@ const HomeScreen = () => {
     });
   };
 
-  const isFavorite = favorites.some((favorite) => favorite.q === quotes[0]?.q);
+  const isBookmarked = favorites.some(
+    (favorite) => favorite.q === quotes[0]?.q
+  );
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: theme.backgroundColor,
-          paddingTop: insets.top,
-          paddingBottom: insets.bottom,
-          paddingLeft: insets.left,
-          paddingRight: insets.right,
-        },
-      ]}
-    >
+    <Container>
       <StatusBar
         style={theme.statusBarStyle}
         backgroundColor={theme.statusBarBackgroundColor}
@@ -221,44 +212,14 @@ const HomeScreen = () => {
       />
       <ActionButtons
         theme={theme}
-        isCapturing={isCapturing}
         shareQuote={shareQuote}
-        toggleFavoriteQuote={toggleFavoriteQuote}
-        goToFavorites={navigateToBookmarks}
-        isFavorite={isFavorite}
+        addToBookmarks={addToBookmarks}
+        navigateToBookmarks={navigateToBookmarks}
+        isBookmarked={isBookmarked}
       />
-      <View style={styles.themeToggleContainer}>
-        <ThemeToggle />
-      </View>
-    </View>
+      <ThemeToggle />
+    </Container>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 16,
-  },
-  quote: {
-    fontSize: 36,
-    textAlign: "flex-start",
-  },
-  author: {
-    fontSize: 20,
-    marginTop: 8,
-    alignSelf: "flex-end",
-  },
-  hidden: {
-    opacity: 0,
-  },
-  themeToggleContainer: {
-    position: "absolute",
-    top: 64,
-    right: 16,
-    zIndex: 1,
-  },
-});
 
 export default HomeScreen;

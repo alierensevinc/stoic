@@ -1,44 +1,34 @@
 import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import ActionButton from "./ActionButton";
 
 const ActionButtons = ({
   theme,
-  isCapturing,
   shareQuote,
-  toggleFavoriteQuote,
-  goToFavorites,
-  isFavorite,
+  addToBookmarks,
+  navigateToBookmarks,
+  isBookmarked,
 }) => {
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        onPress={goToFavorites}
-        style={[
-          styles.button,
-          styles.favoritesButton,
-          isCapturing && styles.hidden,
-        ]}
-      >
-        <Ionicons name="bookmark-outline" size={24} color={theme.buttonColor} />
-      </TouchableOpacity>
+      <ActionButton
+        onPress={navigateToBookmarks}
+        theme={theme}
+        iconName="bookmarks"
+      />
       <View style={styles.rightButtonsContainer}>
-        <TouchableOpacity
+        <ActionButton
           onPress={shareQuote}
-          style={[styles.button, isCapturing && styles.hidden]}
-        >
-          <Ionicons name="share-outline" size={24} color={theme.buttonColor} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={toggleFavoriteQuote}
-          style={[styles.button, isCapturing && styles.hidden]}
-        >
-          <Ionicons
-            name={isFavorite ? "heart" : "heart-outline"}
-            size={24}
-            color={theme.buttonColor}
-          />
-        </TouchableOpacity>
+          theme={theme}
+          style={styles.button}
+          iconName="share-outline"
+        />
+        <ActionButton
+          onPress={addToBookmarks}
+          theme={theme}
+          iconName={isBookmarked ? "bookmark" : "bookmark-outline"}
+        />
       </View>
     </View>
   );
@@ -58,13 +48,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   button: {
-    marginLeft: 16,
-  },
-  favoritesButton: {
-    marginLeft: 0,
-  },
-  hidden: {
-    opacity: 0,
+    marginRight: 24,
   },
 });
 
