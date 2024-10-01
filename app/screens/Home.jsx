@@ -1,11 +1,9 @@
 import React, { useEffect, useContext, useRef, useState } from "react";
-import { StyleSheet, Text, View, Dimensions } from "react-native";
+import { StyleSheet, View, Dimensions } from "react-native";
 import { MMKV } from "react-native-mmkv";
 import { StatusBar } from "expo-status-bar";
-import { ThemeContext } from "../context/ThemeContext";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { PanGestureHandler } from "react-native-gesture-handler";
-import Animated, {
+import { ThemeContext } from "context/ThemeContext";
+import {
   useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
@@ -15,24 +13,24 @@ import Animated, {
 import * as Sharing from "expo-sharing";
 import { useNavigation } from "@react-navigation/native";
 import { useBookmarksStore } from "store/bookmarksStore";
-import { useAdStore } from "../store/adStore";
+import { useAdStore } from "store/adStore";
 import {
   AdEventType,
   InterstitialAd,
   TestIds,
 } from "react-native-google-mobile-ads";
 import * as Notifications from "expo-notifications";
-import ThemeToggle from "../components/ThemeToggle";
-import ActionButtons from "../components/ActionButtons";
-import QuoteViewShot from "../components/QuoteViewShot"; // Import QuoteViewShot
-import Container from "../components/Container"; // Import Container
+import ThemeToggle from "components/ThemeToggle";
+import ActionButtons from "components/ActionButtons";
+import QuoteViewShot from "components/QuoteViewShot";
+import Container from "components/Container";
 import { IOS_ADMOB_INTERSTITIAL } from "@env";
-import { useQuoteStore } from "../store/quoteStore";
+import { useQuoteStore } from "store/quoteStore";
 import NetInfo from "@react-native-community/netinfo";
 import {
   schedulePushNotification,
   registerForPushNotificationsAsync,
-} from "../helpers/NotificationHelper";
+} from "helpers/NotificationHelper";
 
 const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : IOS_ADMOB_INTERSTITIAL;
 const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
@@ -195,7 +193,7 @@ const HomeScreen = () => {
   };
 
   const isBookmarked = bookmarks.some(
-    (bookmark) => bookmark.q === bookmarks[0]?.q
+    (bookmark) => bookmark.q === quotes[0]?.q
   );
 
   return (
