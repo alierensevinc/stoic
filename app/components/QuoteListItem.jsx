@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-const QuoteItem = ({ item, theme }) => {
+const QuoteListItem = ({ item, theme }) => {
   return (
     <View
       style={[
@@ -42,8 +42,7 @@ const styles = StyleSheet.create({
   authorText: {
     fontSize: 14,
     textAlign: "right",
-    fontStyle: "italic",
   },
 });
 
-export default QuoteItem;
+export default QuoteListItem;

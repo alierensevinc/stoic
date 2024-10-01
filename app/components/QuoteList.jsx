@@ -1,14 +1,14 @@
 import React from "react";
 import { SwipeListView } from "react-native-swipe-list-view";
-import QuoteItem from "./QuoteItem";
-import QuoteItemActions from "./QuoteItemActions";
+import QuoteListItem from "./QuoteListItem";
+import QuoteListItemActions from "./QuoteListItemActions";
 
 const QuoteList = ({ data, theme, onShare, onDelete }) => (
   <SwipeListView
     data={data}
-    renderItem={({ item }) => <QuoteItem item={item} theme={theme} />}
+    renderItem={({ item }) => <QuoteListItem item={item} theme={theme} />}
     renderHiddenItem={({ item }) => (
-      <QuoteItemActions
+      <QuoteListItemActions
         theme={theme}
         onShare={() => onShare(item)}
         onDelete={() => onDelete(item)}

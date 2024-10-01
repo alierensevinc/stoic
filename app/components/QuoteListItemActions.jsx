@@ -2,7 +2,7 @@ import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-const QuoteItemActions = ({ theme, onShare, onDelete }) => {
+const QuoteListItemActions = ({ theme, onShare, onDelete }) => {
   return (
     <View style={[styles.rowBack, { backgroundColor: theme.backgroundColor }]}>
       <TouchableOpacity
@@ -47,4 +47,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default QuoteItemActions;
+export default QuoteListItemActions;
