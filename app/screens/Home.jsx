@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useRef, useState } from "react";
-import { StyleSheet, Text, View, Dimensions } from "react-native";
+import { StyleSheet, Text, View, Dimensions, SafeAreaView } from "react-native";
 import { MMKV } from "react-native-mmkv";
 import { StatusBar } from "expo-status-bar";
 import { ThemeContext } from "../context/ThemeContext";
@@ -108,14 +108,6 @@ const HomeScreen = () => {
   };
 
   const toggleFavoriteQuote = () => {
-    // TODO : Delete This
-    Notifications.scheduleNotificationAsync({
-      content: {
-        title: "Look at that notification",
-        body: "I'm so proud of myself!",
-      },
-      trigger: null,
-    });
     handleAction(() => {
       const currentQuote = quotes[0];
       if (favorites.some((fav) => fav.q === currentQuote.q)) {
@@ -134,11 +126,8 @@ const HomeScreen = () => {
       }
 
       try {
-        setIsCapturing(true);
         await new Promise((resolve) => setTimeout(resolve, 100));
-
         const uri = await viewShotRef.current.capture();
-        setIsCapturing(false);
         await Sharing.shareAsync("file://" + uri, {
           mimeType: "image/jpeg",
           dialogTitle: "Share this quote",
@@ -203,7 +192,7 @@ const HomeScreen = () => {
   const isFavorite = favorites.some((favorite) => favorite.q === quotes[0]?.q);
 
   return (
-    <View
+    <SafeAreaView
       style={[styles.container, { backgroundColor: theme.backgroundColor }]}
     >
       <StatusBar
@@ -228,7 +217,7 @@ const HomeScreen = () => {
       <View style={styles.themeToggleContainer}>
         <ThemeToggle />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -253,8 +242,8 @@ const styles = StyleSheet.create({
   },
   themeToggleContainer: {
     position: "absolute",
-    top: 40,
-    right: 20,
+    top: 64,
+    right: 16,
     zIndex: 1,
   },
 });

@@ -47,9 +47,9 @@ const ActionButtons = ({
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    bottom: 36,
-    left: 36,
-    right: 36,
+    bottom: 32,
+    left: 32,
+    right: 32,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
