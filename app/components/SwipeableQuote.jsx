@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { StyleSheet, Text, Dimensions } from "react-native";
+import { useEffect } from "react";
+import { Text, Dimensions } from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
 import Animated, {
   useAnimatedGestureHandler,
@@ -10,6 +10,7 @@ import Animated, {
   runOnJS,
   Easing,
 } from "react-native-reanimated";
+import { View } from "nativewind";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const FADE_IN_DURATION = 600;
@@ -77,46 +78,25 @@ const SwipeableQuote = React.memo(({ theme, quote, onSwipe }) => {
 
   return (
     <PanGestureHandler onGestureEvent={gestureHandler}>
-      <Animated.View style={[styles.container, animatedStyle]}>
+      <Animated.View
+        className="flex-1 justify-center items-center w-full p-6"
+        style={animatedStyle}
+      >
         <Text
-          style={[
-            styles.quote,
-            { color: theme.textColor, fontFamily: "Montserrat-Regular" },
-          ]}
+          className="text-2xl text-center mb-2"
+          style={{ color: theme.textColor, fontFamily: "Montserrat-Regular" }}
         >
           {quote.q}
         </Text>
         <Text
-          style={[
-            styles.author,
-            { color: theme.textColor, fontFamily: "Montserrat-Italic" },
-          ]}
+          className="text-lg text-right italic"
+          style={{ color: theme.textColor, fontFamily: "Montserrat-Italic" }}
         >
           - {quote.a}
         </Text>
       </Animated.View>
     </PanGestureHandler>
   );
-});
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    width: SCREEN_WIDTH,
-    padding: 24,
-  },
-  quote: {
-    fontSize: 24,
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  author: {
-    fontSize: 18,
-    textAlign: "right",
-    fontStyle: "italic",
-  },
 });
 
 export default SwipeableQuote;

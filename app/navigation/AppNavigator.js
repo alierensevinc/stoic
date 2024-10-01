@@ -1,4 +1,3 @@
-import React from "react";
 import { createStackNavigator, TransitionSpecs } from "@react-navigation/stack";
 import HomeScreen from "screens/Home";
 import BookmarksScreen from "screens/Bookmarks";

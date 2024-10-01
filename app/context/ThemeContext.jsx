@@ -1,4 +1,4 @@
-import React, { createContext, useState } from "react";
+import { createContext, useState } from "react";
 import { MMKV } from "react-native-mmkv";
 import { themes } from "utils/themes";
 

@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, View, SafeAreaView, Alert } from "react-native";
+import { useContext, useEffect, useRef, useState } from "react";
+import { Text, View, SafeAreaView, Alert } from "react-native";
 import ViewShot from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
 import { ThemeContext } from "context/ThemeContext";
@@ -7,7 +7,6 @@ import { ThemeContext } from "context/ThemeContext";
 const ShareQuoteScreen = ({ quote, author, onShareComplete }) => {
   const { theme } = useContext(ThemeContext);
   const viewShotRef = useRef();
-  const [isCapturing, setIsCapturing] = useState(false);
   const [viewReady, setViewReady] = useState(false);
 
   useEffect(() => {
@@ -23,12 +22,10 @@ const ShareQuoteScreen = ({ quote, author, onShareComplete }) => {
     }
 
     try {
-      setIsCapturing(true);
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       const uri = await viewShotRef.current.capture();
 
-      setIsCapturing(false);
       onShareComplete();
 
       await Sharing.shareAsync("file://" + uri, {
@@ -37,18 +34,19 @@ const ShareQuoteScreen = ({ quote, author, onShareComplete }) => {
         UTI: "public.jpeg",
       });
     } catch (error) {
-      setIsCapturing(false);
       console.error("Error sharing quote:", error);
     }
   };
 
   return (
     <SafeAreaView
-      style={[styles.container, { backgroundColor: theme.backgroundColor }]}
+      className="flex-1 items-center justify-center p-8"
+      style={{ backgroundColor: theme.backgroundColor }}
     >
       <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 0.9 }}>
         <View
-          style={[styles.container, { backgroundColor: theme.backgroundColor }]}
+          className="flex-1 items-center justify-center p-8"
+          style={{ backgroundColor: theme.backgroundColor }}
           onLayout={(event) => {
             const { width, height } = event.nativeEvent.layout;
             if (width > 0 && height > 0) {
@@ -57,18 +55,14 @@ const ShareQuoteScreen = ({ quote, author, onShareComplete }) => {
           }}
         >
           <Text
-            style={[
-              styles.quote,
-              { color: theme.textColor, fontFamily: "Montserrat-Regular" },
-            ]}
+            className="text-4xl text-left"
+            style={{ color: theme.textColor, fontFamily: "Montserrat-Regular" }}
           >
             {quote}
           </Text>
           <Text
-            style={[
-              styles.author,
-              { color: theme.textColor, fontFamily: "Montserrat-Italic" },
-            ]}
+            className="text-xl mt-2 self-end"
+            style={{ color: theme.textColor, fontFamily: "Montserrat-Italic" }}
           >
             - {author}
           </Text>
@@ -77,23 +71,5 @@ const ShareQuoteScreen = ({ quote, author, onShareComplete }) => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 32,
-  },
-  quote: {
-    fontSize: 36,
-    textAlign: "flex-start",
-  },
-  author: {
-    fontSize: 20,
-    marginTop: 8,
-    alignSelf: "flex-end",
-  },
-});
 
 export default ShareQuoteScreen;

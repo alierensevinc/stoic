@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
@@ -19,7 +19,7 @@ export default function App() {
         await SplashScreen.hideAsync();
       }
     };
-    
+
     hideSplashScreen();
   }, [appIsReady, fontsLoaded, fontsError]);
 

@@ -1,5 +1,5 @@
-import React, { useEffect, useContext, useRef, useState } from "react";
-import { StyleSheet, View, Dimensions } from "react-native";
+import { useEffect, useContext, useRef, useState } from "react";
+import { Dimensions } from "react-native";
 import { MMKV } from "react-native-mmkv";
 import { StatusBar } from "expo-status-bar";
 import { ThemeContext } from "context/ThemeContext";
@@ -57,7 +57,6 @@ const HomeScreen = () => {
   const textOpacity = useSharedValue(1);
   const screenWidth = Dimensions.get("window").width;
   const viewShotRef = useRef();
-  const [isCapturing, setIsCapturing] = useState(false);
   const navigation = useNavigation();
   const [loaded, setLoaded] = useState(false);
 
@@ -126,18 +125,15 @@ const HomeScreen = () => {
       }
 
       try {
-        setIsCapturing(true);
         await new Promise((resolve) => setTimeout(resolve, 100));
 
         const uri = await viewShotRef.current.capture();
-        setIsCapturing(false);
         await Sharing.shareAsync("file://" + uri, {
           mimeType: "image/jpeg",
           dialogTitle: "Share this quote",
           UTI: "public.jpeg",
         });
       } catch (error) {
-        setIsCapturing(false);
         console.error("Error sharing quote:", error);
       }
     });
@@ -197,7 +193,7 @@ const HomeScreen = () => {
   );
 
   return (
-    <Container style={styles.container}>
+    <Container>
       <StatusBar
         style={theme.statusBarStyle}
         backgroundColor={theme.statusBarBackgroundColor}
@@ -211,44 +207,14 @@ const HomeScreen = () => {
       />
       <ActionButtons
         theme={theme}
-        isCapturing={isCapturing}
         shareQuote={shareQuote}
-        addToBookmarks={toggleBookmark}
         navigateToBookmarks={navigateToBookmarks}
+        addToBookmarks={toggleBookmark}
         isBookmarked={isBookmarked}
       />
-      <View style={styles.themeToggleContainer}>
-        <ThemeToggle />
-      </View>
+      <ThemeToggle />
     </Container>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 16,
-  },
-  quote: {
-    fontSize: 36,
-    textAlign: "flex-start",
-  },
-  author: {
-    fontSize: 20,
-    marginTop: 8,
-    alignSelf: "flex-end",
-  },
-  hidden: {
-    opacity: 0,
-  },
-  themeToggleContainer: {
-    position: "absolute",
-    top: 40,
-    right: 20,
-    zIndex: 1,
-  },
-});
 
 export default HomeScreen;

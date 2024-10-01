@@ -1,5 +1,4 @@
-import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useContext } from "react";
 import { ThemeContext } from "../context/ThemeContext";
@@ -10,8 +9,8 @@ const Container = ({ children, style }) => {
 
   return (
     <View
+      className={`flex-1 items-center justify-center p-4`}
       style={[
-        styles.container,
         {
           backgroundColor: theme.backgroundColor,
           paddingTop: insets.top,
@@ -26,14 +25,5 @@ const Container = ({ children, style }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 16,
-  },
-});
 
 export default Container;

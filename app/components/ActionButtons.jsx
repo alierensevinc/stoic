@@ -1,27 +1,25 @@
-import React from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { View } from "react-native";
 import ActionButton from "./ActionButton";
 
 const ActionButtons = ({
   theme,
   shareQuote,
-  addToBookmarks,
   navigateToBookmarks,
+  addToBookmarks,
   isBookmarked,
 }) => {
   return (
-    <View style={styles.container}>
+    <View className="absolute bottom-8 left-8 right-8 flex-row justify-between items-center">
       <ActionButton
         onPress={navigateToBookmarks}
         theme={theme}
         iconName="bookmarks"
       />
-      <View style={styles.rightButtonsContainer}>
+      <View className="flex-row">
         <ActionButton
           onPress={shareQuote}
           theme={theme}
-          style={styles.button}
+          className="mr-6"
           iconName="share-outline"
         />
         <ActionButton
@@ -33,23 +31,5 @@ const ActionButtons = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    position: "absolute",
-    bottom: 32,
-    left: 32,
-    right: 32,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  rightButtonsContainer: {
-    flexDirection: "row",
-  },
-  button: {
-    marginRight: 24,
-  },
-});
 
 export default ActionButtons;
