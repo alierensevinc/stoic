@@ -2,10 +2,10 @@ import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
-import { ThemeProvider } from "./app/context/ThemeContext";
-import AppNavigator from "./app/navigation/AppNavigator";
-import { useAppInitialization } from "./app/hooks/useAppInitialization";
-import { useFontsLoading } from "./app/hooks/useFontsLoading";
+import { ThemeProvider } from "context/ThemeContext";
+import AppNavigator from "navigation/AppNavigator";
+import { useAppInitialization } from "hooks/useAppInitialization";
+import { useFontsLoading } from "hooks/useFontsLoading";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -19,6 +19,7 @@ export default function App() {
         await SplashScreen.hideAsync();
       }
     };
+    
     hideSplashScreen();
   }, [appIsReady, fontsLoaded, fontsError]);
 

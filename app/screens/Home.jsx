@@ -14,7 +14,7 @@ import Animated, {
 } from "react-native-reanimated";
 import * as Sharing from "expo-sharing";
 import { useNavigation } from "@react-navigation/native";
-import { useFavoriteStore } from "../store/favoriteStore";
+import { useBookmarksStore } from "store/bookmarksStore";
 import { useAdStore } from "../store/adStore";
 import {
   AdEventType,
@@ -52,7 +52,8 @@ const HomeScreen = () => {
   const { theme } = useContext(ThemeContext);
   const { quotes, setQuotes, fetchQuotes, loadQuotesFromArchive } =
     useQuoteStore();
-  const { favorites, addFavorite, removeFavorite } = useFavoriteStore();
+  const { bookmarks, addToBookmarks, removeFromBookmarks } =
+    useBookmarksStore();
   const { actionCount, incrementActionCount, resetActionCount } = useAdStore();
   const storage = new MMKV();
   const textOpacity = useSharedValue(1);
@@ -108,13 +109,13 @@ const HomeScreen = () => {
     callback();
   };
 
-  const addToBookmarks = () => {
+  const toggleBookmark = () => {
     handleAction(() => {
       const currentQuote = quotes[0];
-      if (favorites.some((fav) => fav.q === currentQuote.q)) {
-        removeFavorite(currentQuote);
+      if (bookmarks.some((bookmark) => bookmark.q === currentQuote.q)) {
+        removeFromBookmarks(currentQuote);
       } else {
-        addFavorite(currentQuote);
+        addToBookmarks(currentQuote);
       }
     });
   };
@@ -193,12 +194,12 @@ const HomeScreen = () => {
     });
   };
 
-  const isBookmarked = favorites.some(
-    (favorite) => favorite.q === quotes[0]?.q
+  const isBookmarked = bookmarks.some(
+    (bookmark) => bookmark.q === bookmarks[0]?.q
   );
 
   return (
-    <Container>
+    <Container style={styles.container}>
       <StatusBar
         style={theme.statusBarStyle}
         backgroundColor={theme.statusBarBackgroundColor}
@@ -212,14 +213,44 @@ const HomeScreen = () => {
       />
       <ActionButtons
         theme={theme}
+        isCapturing={isCapturing}
         shareQuote={shareQuote}
-        addToBookmarks={addToBookmarks}
+        addToBookmarks={toggleBookmark}
         navigateToBookmarks={navigateToBookmarks}
         isBookmarked={isBookmarked}
       />
-      <ThemeToggle />
+      <View style={styles.themeToggleContainer}>
+        <ThemeToggle />
+      </View>
     </Container>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 16,
+  },
+  quote: {
+    fontSize: 36,
+    textAlign: "flex-start",
+  },
+  author: {
+    fontSize: 20,
+    marginTop: 8,
+    alignSelf: "flex-end",
+  },
+  hidden: {
+    opacity: 0,
+  },
+  themeToggleContainer: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    zIndex: 1,
+  },
+});
 
 export default HomeScreen;

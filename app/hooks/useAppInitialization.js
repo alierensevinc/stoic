@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import mobileAds from "react-native-google-mobile-ads";
-import * as SplashScreen from "expo-splash-screen";
 
 export const useAppInitialization = () => {
   const [appIsReady, setAppIsReady] = useState(false);
@@ -14,6 +13,7 @@ export const useAppInitialization = () => {
         console.warn(e);
       }
     }
+
     prepare();
   }, []);
 

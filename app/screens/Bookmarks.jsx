@@ -3,7 +3,7 @@ import { View, StyleSheet, Alert, Text } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { ThemeContext } from "context/ThemeContext";
-import { useFavoriteStore } from "store/favoriteStore";
+import { useBookmarksStore } from "store/bookmarksStore";
 import { useAdStore } from "store/adStore";
 import InlineAd from "components/InlineAd";
 import ShareQuoteScreen from "components/ShareQuote";
@@ -16,7 +16,7 @@ import { useInterstitialAd } from "hooks/useInterstitialAd";
 const BookmarksScreen = () => {
   const navigation = useNavigation();
   const { theme } = useContext(ThemeContext);
-  const { favorites, removeFavorite } = useFavoriteStore();
+  const { bookmarks, removeFromBookmarks } = useBookmarksStore();
   const { actionCount, incrementActionCount, resetActionCount } = useAdStore();
   const [shareState, setShareState] = useState({
     showShareQuote: false,
@@ -43,7 +43,7 @@ const BookmarksScreen = () => {
   const confirmDelete = (item) => {
     Alert.alert(
       "Delete Quote",
-      "Are you sure you want to remove this quote from favorites?",
+      "Are you sure you want to remove this quote from bookmarks?",
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -51,7 +51,7 @@ const BookmarksScreen = () => {
           style: "destructive",
           onPress: () => {
             handleAction(() => {
-              removeFavorite(item);
+              removeFromBookmarks(item);
             });
           },
         },
@@ -77,16 +77,16 @@ const BookmarksScreen = () => {
       >
         Bookmarks
       </Text>
-      {favorites.length > 0 ? (
+      {bookmarks.length > 0 ? (
         <QuoteList
-          data={favorites}
+          data={bookmarks}
           theme={theme}
           onShare={shareQuote}
           onDelete={confirmDelete}
         />
       ) : (
         <View style={styles.emptyStateContainer}>
-          <EmptyState text="No favorite quotes yet" color={theme.textColor} />
+          <EmptyState text="No bookmarks yet" color={theme.textColor} />
         </View>
       )}
       <InlineAd style={styles.inlineAd} />
