@@ -1,11 +1,5 @@
 import React, { useEffect, useContext, useRef, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  Dimensions,
-} from "react-native";
+import { StyleSheet, Text, View, Dimensions } from "react-native";
 import { MMKV } from "react-native-mmkv";
 import { StatusBar } from "expo-status-bar";
 import { ThemeContext } from "../context/ThemeContext";
@@ -18,7 +12,6 @@ import Animated, {
   withTiming,
   runOnJS,
 } from "react-native-reanimated";
-import ViewShot from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
 import { useNavigation } from "@react-navigation/native";
 import { useFavoriteStore } from "../store/favoriteStore";
@@ -30,6 +23,8 @@ import {
 } from "react-native-google-mobile-ads";
 import * as Notifications from "expo-notifications";
 import ThemeToggle from "../components/ThemeToggle";
+import ActionButtons from "../components/ActionButtons";
+import QuoteViewShot from "../components/QuoteViewShot"; // Import QuoteViewShot
 import { IOS_ADMOB_INTERSTITIAL } from "@env";
 import { useQuoteStore } from "../store/quoteStore";
 import NetInfo from "@react-native-community/netinfo";
@@ -205,6 +200,8 @@ const HomeScreen = () => {
     });
   };
 
+  const isFavorite = favorites.some((favorite) => favorite.q === quotes[0]?.q);
+
   return (
     <View
       style={[styles.container, { backgroundColor: theme.backgroundColor }]}
@@ -213,64 +210,21 @@ const HomeScreen = () => {
         style={theme.statusBarStyle}
         backgroundColor={theme.statusBarBackgroundColor}
       />
-      <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 0.9 }}>
-        <PanGestureHandler onGestureEvent={gestureHandler}>
-          <Animated.View
-            style={[
-              styles.container,
-              { backgroundColor: theme.backgroundColor },
-              animatedStyle,
-            ]}
-          >
-            <Text
-              style={[
-                styles.quote,
-                { color: theme.textColor, fontFamily: "Montserrat-Regular" },
-              ]}
-            >
-              {quotes.length > 0 ? quotes[0].q : "Loading..."}
-            </Text>
-            <Text
-              style={[
-                styles.author,
-                { color: theme.textColor, fontFamily: "Montserrat-Italic" },
-              ]}
-            >
-              {quotes.length > 0 ? "- " + quotes[0].a : ""}
-            </Text>
-          </Animated.View>
-        </PanGestureHandler>
-      </ViewShot>
-      <TouchableOpacity
-        onPress={shareQuote}
-        style={[styles.shareButton, isCapturing && styles.hidden]}
-      >
-        <Ionicons name={"share-outline"} size={24} color={theme.buttonColor} />
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={toggleFavoriteQuote}
-        style={[styles.heartButton, isCapturing && styles.hidden]}
-      >
-        <Ionicons
-          name={
-            favorites.some((favorite) => favorite.q === quotes[0]?.q)
-              ? "bookmark"
-              : "bookmark-outline"
-          }
-          size={24}
-          color={theme.buttonColor}
-        />
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={navigateToBookmarks}
-        style={[styles.favoritesButton, isCapturing && styles.hidden]}
-      >
-        <Ionicons
-          name="bookmarks-outline"
-          size={24}
-          color={theme.buttonColor}
-        />
-      </TouchableOpacity>
+      <QuoteViewShot
+        viewShotRef={viewShotRef}
+        gestureHandler={gestureHandler}
+        animatedStyle={animatedStyle}
+        theme={theme}
+        quotes={quotes}
+      />
+      <ActionButtons
+        theme={theme}
+        isCapturing={isCapturing}
+        shareQuote={shareQuote}
+        toggleFavoriteQuote={toggleFavoriteQuote}
+        goToFavorites={navigateToBookmarks}
+        isFavorite={isFavorite}
+      />
       <View style={styles.themeToggleContainer}>
         <ThemeToggle />
       </View>
@@ -294,29 +248,8 @@ const styles = StyleSheet.create({
     marginTop: 8,
     alignSelf: "flex-end",
   },
-  heartButton: {
-    marginTop: 24,
-  },
-  shareButton: {
-    marginTop: 24,
-  },
   hidden: {
     opacity: 0,
-  },
-  shareButton: {
-    position: "absolute",
-    bottom: 20,
-    right: 60,
-  },
-  heartButton: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
-  },
-  favoritesButton: {
-    position: "absolute",
-    bottom: 20,
-    left: 20,
   },
   themeToggleContainer: {
     position: "absolute",
