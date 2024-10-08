@@ -15,7 +15,6 @@ const QuoteViewShot = ({
   const [viewReady, setViewReady] = useState(false);
   const internalRef = useRef();
 
-  console.log(quote);
   useEffect(() => {
     if (viewReady && captureOnReady && viewShotRef?.current) {
       // Trigger the capture when the view is ready

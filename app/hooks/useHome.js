@@ -37,6 +37,7 @@ export const useHome = () => {
     loadQuotesFromArchive,
     cameFromNotification,
     setCameFromNotification,
+    preventFetch,
   } = useQuoteStore();
   const { bookmarks, addToBookmarks, removeFromBookmarks } =
     useBookmarksStore();
@@ -72,7 +73,7 @@ export const useHome = () => {
   }, []);
 
   useEffect(() => {
-    if (!cameFromNotification) {
+    if (!cameFromNotification && !preventFetch) {
       NetInfo.fetch().then((state) => {
         if (state.isConnected) {
           fetchQuotes();
@@ -85,7 +86,7 @@ export const useHome = () => {
     return () => {
       setCameFromNotification(false);
     };
-  }, [cameFromNotification]);
+  }, [cameFromNotification, preventFetch]);
 
   const handleAction = (callback) => {
     incrementActionCount();

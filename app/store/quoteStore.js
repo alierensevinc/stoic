@@ -16,34 +16,40 @@ export const useQuoteStore = create((set) => ({
   archiveQuotes: [],
   futureQuotes: [],
   cameFromNotification: false,
+  notificationFutureQuote: null,
+  preventFetch: false, // New flag to prevent immediate fetching
   setQuotes: (quotes) => set({ quotes }),
   setArchiveQuotes: (archiveQuotes) => set({ archiveQuotes }),
   setFutureQuotes: (futureQuotes) => set({ futureQuotes }),
   setCameFromNotification: (value) => set({ cameFromNotification: value }),
+  setNotificationFutureQuote: (quote) =>
+    set({ notificationFutureQuote: quote }),
+  setPreventFetch: (value) => set({ preventFetch: value }), // Setter for the new flag
 
   fetchQuotes: async () => {
     try {
       const {
         cameFromNotification,
         futureQuotes,
+        notificationFutureQuote,
+        preventFetch,
         setQuotes,
         setFutureQuotes,
         setCameFromNotification,
+        setNotificationFutureQuote,
+        setPreventFetch,
       } = useQuoteStore.getState();
 
-      if (cameFromNotification && futureQuotes && futureQuotes.length > 0) {
-        setQuotes(futureQuotes);
-        setCameFromNotification(false);
+      if (preventFetch) {
+        setPreventFetch(false); // Reset the flag
         return;
       }
 
-      const storedQuotes = storage.getString(QUOTES_KEY);
-      if (storedQuotes) {
-        const quotesObject = JSON.parse(storedQuotes);
-        if (quotesObject.date === moment().format("YYYY-MM-DD HH")) {
-          set({ quotes: quotesObject.quotes });
-          return;
-        }
+      if (cameFromNotification && notificationFutureQuote) {
+        setQuotes([notificationFutureQuote, ...futureQuotes.slice(1)]);
+        setCameFromNotification(false);
+        setNotificationFutureQuote(null);
+        return;
       }
 
       const response = await axios.get(QUOTES_API_URL);
@@ -97,20 +103,28 @@ useQuoteStore.subscribe(
 
 // Function to handle the notification trigger
 async function handleFutureQuotesNotification() {
-  const { futureQuotes, setQuotes, setCameFromNotification } =
-    useQuoteStore.getState();
+  const {
+    futureQuotes,
+    setQuotes,
+    setCameFromNotification,
+    setNotificationFutureQuote,
+    setPreventFetch,
+  } = useQuoteStore.getState();
 
   if (!futureQuotes || futureQuotes.length === 0) {
     const storedFutureQuotes = storage.getString(FUTURE_QUOTES_KEY);
     if (storedFutureQuotes) {
       const parsedFutureQuotes = JSON.parse(storedFutureQuotes);
-      setQuotes(parsedFutureQuotes);
+      setNotificationFutureQuote(parsedFutureQuotes[0]);
+      setQuotes([parsedFutureQuotes[0], ...parsedFutureQuotes.slice(1)]);
     }
   } else {
-    setQuotes(futureQuotes);
+    setNotificationFutureQuote(futureQuotes[0]);
+    setQuotes([futureQuotes[0], ...futureQuotes.slice(1)]);
   }
 
   setCameFromNotification(true);
+  setPreventFetch(true); // Set the flag to prevent immediate fetching
 }
 
 // Listen for notification responses
@@ -136,7 +150,7 @@ export async function scheduleFutureQuotesNotification() {
         body: firstFutureQuote.author, // Use the author as the body
         data: { type: "futureQuotes" },
       },
-      trigger: { seconds: 300 }, // 5 minutes
+      trigger: { seconds: 10 }, // 5 minutes
     });
   } catch (error) {
     console.error("Error scheduling future quotes notification:", error);
