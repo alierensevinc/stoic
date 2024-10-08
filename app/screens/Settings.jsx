@@ -1,23 +1,72 @@
-import { useState } from "react";
-import { Text, View } from "react-native";
+import React, { useState, useEffect } from "react";
+import { Text, View, Alert, Linking, AppState } from "react-native";
 import { useSettings } from "hooks/useSettings";
 import Container from "components/Container";
 import BackButton from "components/BackButton";
 import InlineAd from "components/InlineAd";
 import SettingsItem from "components/SettingsItem";
 import SettingsToggleItem from "components/SettingsToggleItem";
+import * as Notifications from "expo-notifications";
 
 const SettingsScreen = () => {
   const { theme, navigation, removeAllBookmarks } = useSettings();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
+  useEffect(() => {
+    // Check the current notification permission status
+    const checkNotificationPermission = async () => {
+      const { status } = await Notifications.getPermissionsAsync();
+      setNotificationsEnabled(status === "granted");
+    };
+
+    checkNotificationPermission();
+
+    // Add AppState listener
+    const appStateListener = AppState.addEventListener(
+      "change",
+      (nextAppState) => {
+        if (nextAppState === "active") {
+          checkNotificationPermission();
+        }
+      }
+    );
+
+    // Cleanup listener on unmount
+    return () => {
+      appStateListener.remove();
+    };
+  }, []);
+
   const handleDeleteAllBookmarks = () => {
     removeAllBookmarks();
   };
 
-  const handleToggleNotifications = (value) => {
+  const handleToggleNotifications = async (value) => {
+    if (value) {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Give Permissions",
+          "To enable notifications, please go to your device settings and grant the notification permissions for this app.",
+          [
+            { text: "Cancel", style: "cancel" },
+            { text: "Open Settings", onPress: () => Linking.openSettings() },
+          ]
+        );
+        setNotificationsEnabled(false);
+        return;
+      }
+    } else {
+      Alert.alert(
+        "Revoke Permissions",
+        "To disable notifications, please go to your device settings and revoke the notification permissions for this app.",
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Open Settings", onPress: () => Linking.openSettings() },
+        ]
+      );
+    }
     setNotificationsEnabled(value);
-    // Add logic to enable/disable notifications permissions here
   };
 
   return (
