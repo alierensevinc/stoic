@@ -99,7 +99,7 @@ export const useHome = () => {
   const toggleBookmark = () => {
     handleAction(() => {
       const currentQuote = quotes[0];
-      if (bookmarks.some((bookmark) => bookmark.q === currentQuote.q)) {
+      if (bookmarks.some((bookmark) => bookmark.text === currentQuote.text)) {
         removeFromBookmarks(currentQuote);
       } else {
         addToBookmarks(currentQuote);
@@ -179,7 +179,7 @@ export const useHome = () => {
   };
 
   const isBookmarked = bookmarks.some(
-    (bookmark) => bookmark.q === quotes[0]?.q
+    (bookmark) => bookmark.text === quotes[0]?.text
   );
 
   return {

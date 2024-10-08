@@ -15,6 +15,7 @@ const QuoteViewShot = ({
   const [viewReady, setViewReady] = useState(false);
   const internalRef = useRef();
 
+  console.log(quote);
   useEffect(() => {
     if (viewReady && captureOnReady && viewShotRef?.current) {
       // Trigger the capture when the view is ready
@@ -50,7 +51,7 @@ const QuoteViewShot = ({
                   fontFamily: "Montserrat-Regular",
                 }}
               >
-                {quote.q}
+                {quote.text}
               </Text>
               <Text
                 className="text-xl mt-2 self-end"
@@ -59,7 +60,7 @@ const QuoteViewShot = ({
                   fontFamily: "Montserrat-Italic",
                 }}
               >
-                - {quote.a}
+                - {quote.author}
               </Text>
             </View>
           </ViewShot>

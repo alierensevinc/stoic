@@ -10,13 +10,13 @@ const QuoteListItem = ({ item, theme }) => {
         className="text-lg mb-2"
         style={{ color: theme.textColor, fontFamily: "Montserrat-Regular" }}
       >
-        {item.q}
+        {item.text}
       </Text>
       <Text
         className="text-base text-right"
         style={{ color: theme.textColor, fontFamily: "Montserrat-Italic" }}
       >
-        - {item.a}
+        - {item.author}
       </Text>
     </View>
   );

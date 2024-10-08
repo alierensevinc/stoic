@@ -9,7 +9,7 @@ const storage = new MMKV();
 const QUOTES_KEY = "quotes";
 const ARCHIVE_QUOTES_KEY = "archiveQuotes";
 const FUTURE_QUOTES_KEY = "futureQuotes";
-const QUOTES_API_URL = "https://zenquotes.io/api/quotes/";
+const QUOTES_API_URL = "https://stoic-quotes.com/api/quotes?num=20";
 
 export const useQuoteStore = create((set) => ({
   quotes: [],
@@ -23,6 +23,20 @@ export const useQuoteStore = create((set) => ({
 
   fetchQuotes: async () => {
     try {
+      const {
+        cameFromNotification,
+        futureQuotes,
+        setQuotes,
+        setFutureQuotes,
+        setCameFromNotification,
+      } = useQuoteStore.getState();
+
+      if (cameFromNotification && futureQuotes && futureQuotes.length > 0) {
+        setQuotes(futureQuotes);
+        setCameFromNotification(false);
+        return;
+      }
+
       const storedQuotes = storage.getString(QUOTES_KEY);
       if (storedQuotes) {
         const quotesObject = JSON.parse(storedQuotes);
@@ -43,9 +57,9 @@ export const useQuoteStore = create((set) => ({
 
       // Fetch another set of quotes for future use
       const futureResponse = await axios.get(QUOTES_API_URL);
-      const futureQuotes = futureResponse.data;
-      storage.set(FUTURE_QUOTES_KEY, JSON.stringify(futureQuotes));
-      set({ futureQuotes });
+      const newFutureQuotes = futureResponse.data;
+      storage.set(FUTURE_QUOTES_KEY, JSON.stringify(newFutureQuotes));
+      setFutureQuotes(newFutureQuotes);
 
       // Schedule a notification for 5 minutes later to load futureQuotes
       await scheduleFutureQuotesNotification();
@@ -118,11 +132,11 @@ export async function scheduleFutureQuotesNotification() {
 
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: firstFutureQuote.q, // Use the quote text as the title
-        body: firstFutureQuote.a, // Use the author as the body
+        title: firstFutureQuote.text, // Use the quote text as the title
+        body: firstFutureQuote.author, // Use the author as the body
         data: { type: "futureQuotes" },
       },
-      trigger: { seconds: 30 }, // 5 minutes
+      trigger: { seconds: 300 }, // 5 minutes
     });
   } catch (error) {
     console.error("Error scheduling future quotes notification:", error);
@@ -130,7 +144,12 @@ export async function scheduleFutureQuotesNotification() {
 }
 
 export const initializeNotifications = async () => {
-  await Notifications.requestPermissionsAsync();
+  const { status } = await Notifications.requestPermissionsAsync();
+  if (status !== "granted") {
+    console.error("Notification permissions not granted");
+    return;
+  }
+
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldShowAlert: true,

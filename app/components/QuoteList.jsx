@@ -15,7 +15,7 @@ const QuoteList = ({ data, theme, onShare, onDelete }) => (
     )}
     rightOpenValue={-160}
     disableRightSwipe
-    keyExtractor={(item) => item.q}
+    keyExtractor={(item) => item.text}
     contentContainerStyle={{ paddingBottom: 20 }}
   />
 );

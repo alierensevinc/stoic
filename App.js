@@ -6,8 +6,10 @@ import { ThemeProvider } from "context/ThemeContext";
 import AppNavigator from "navigation/AppNavigator";
 import { useAppInitialization } from "hooks/useAppInitialization";
 import { useFontsLoading } from "hooks/useFontsLoading";
+import { initializeNotifications } from "store/quoteStore";
 
 SplashScreen.preventAutoHideAsync();
+initializeNotifications();
 
 export default function App() {
   const appIsReady = useAppInitialization();

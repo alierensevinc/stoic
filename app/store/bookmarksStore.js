@@ -16,10 +16,9 @@ export const useBookmarksStore = create((set) => ({
   removeFromBookmarks: (quote) =>
     set((state) => {
       const newBookmarks = state.bookmarks.filter(
-        (bookmark) => bookmark.q !== quote.q
+        (bookmark) => bookmark.text !== quote.text
       );
       storage.set("bookmarks", JSON.stringify(newBookmarks));
       return { bookmarks: newBookmarks };
     }),
 }));
-
