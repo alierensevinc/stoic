@@ -1,7 +1,7 @@
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useContext } from "react";
-import { ThemeContext } from "../context/ThemeContext";
+import { ThemeContext } from "context/ThemeContext";
 
 const Container = ({ children, style }) => {
   const insets = useSafeAreaInsets();
@@ -9,7 +9,7 @@ const Container = ({ children, style }) => {
 
   return (
     <View
-      className={`flex-1 items-center justify-center p-4`}
+      className="flex-1 items-center justify-center p-4"
       style={[
         {
           backgroundColor: theme.backgroundColor,

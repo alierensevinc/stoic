@@ -21,4 +21,10 @@ export const useBookmarksStore = create((set) => ({
       storage.set("bookmarks", JSON.stringify(newBookmarks));
       return { bookmarks: newBookmarks };
     }),
+
+  removeAllBookmarks: () =>
+    set(() => {
+      storage.set("bookmarks", JSON.stringify([]));
+      return { bookmarks: [] };
+    }),
 }));
