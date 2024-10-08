@@ -7,8 +7,8 @@ const ThemeToggle = () => {
   const { theme, isDarkMode, toggleTheme } = useContext(ThemeContext);
 
   return (
-    <View className="absolute flex-row items-center rounded-2xl p-1 top-12 right-4 z-10">
-      <View className="mx-1.5">
+    <View className="absolute flex-row items-center rounded-2xl p-1 top-16 right-8 z-10">
+      <View className="mr-1.5">
         <Ionicons
           name="sunny"
           size={24}
@@ -23,7 +23,7 @@ const ThemeToggle = () => {
         value={isDarkMode}
         rc
       />
-      <View className="mx-1.5">
+      <View className="ml-1.5">
         <Ionicons
           name="moon"
           size={24}

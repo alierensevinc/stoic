@@ -27,14 +27,8 @@ const BookmarksScreen = () => {
         color={theme.buttonColor}
       />
       <Text
-        style={{
-          fontSize: 24,
-          fontWeight: "bold",
-          marginBottom: 20,
-          textAlign: "center",
-          color: theme.textColor,
-          fontFamily: "Montserrat-Medium",
-        }}
+        className="text-2xl font-bold mb-5 text-center"
+        style={{ color: theme.textColor, fontFamily: "Montserrat-Medium" }}
       >
         Bookmarks
       </Text>
@@ -46,30 +40,13 @@ const BookmarksScreen = () => {
           onDelete={confirmDelete}
         />
       ) : (
-        <View style={{ flex: 1, justifyContent: "center" }}>
+        <View className="flex-1 justify-center">
           <EmptyState text="No bookmarks yet" color={theme.textColor} />
         </View>
       )}
-      <InlineAd
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          alignSelf: "center",
-        }}
-      />
+      <InlineAd className="absolute bottom-0 left-0 right-0 self-center" />
       {shareState.showShareQuote && shareState.quoteToShare && (
-        <View
-          style={{
-            position: "absolute",
-            top: -1000,
-            left: -1000,
-            width: "100%",
-            height: "100%",
-            opacity: 0,
-          }}
-        >
+        <View className="absolute top-[-1000px] left-[-1000px] w-full h-full opacity-0">
           <QuoteViewShot
             viewShotRef={viewShotRef}
             theme={theme}

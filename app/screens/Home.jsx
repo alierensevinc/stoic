@@ -5,6 +5,7 @@ import ThemeToggle from "components/ThemeToggle";
 import ActionButtons from "components/ActionButtons";
 import QuoteViewShot from "components/QuoteViewShot";
 import Container from "components/Container";
+import SettingsButton from "components/SettingsButton";
 
 const HomeScreen = () => {
   const {
@@ -43,6 +44,7 @@ const HomeScreen = () => {
         isBookmarked={isBookmarked}
       />
       <ThemeToggle />
+      <SettingsButton theme={theme} />
     </Container>
   );
 };

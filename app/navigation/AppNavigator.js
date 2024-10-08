@@ -1,7 +1,11 @@
 import { createStackNavigator, TransitionSpecs } from "@react-navigation/stack";
 import HomeScreen from "screens/Home";
 import BookmarksScreen from "screens/Bookmarks";
-import { bookmarkScreenInterpolator } from "utils/animations";
+import SettingsScreen from "screens/Settings";
+import {
+  settingsScreenInterpolator,
+  bookmarkScreenInterpolator,
+} from "utils/animations";
 
 const Stack = createStackNavigator();
 
@@ -26,6 +30,17 @@ const AppNavigator = () => (
           close: TransitionSpecs.TransitionIOSSpec,
         },
         cardStyleInterpolator: bookmarkScreenInterpolator,
+      }}
+    />
+    <Stack.Screen
+      name="Settings"
+      component={SettingsScreen}
+      options={{
+        transitionSpec: {
+          open: TransitionSpecs.TransitionIOSSpec,
+          close: TransitionSpecs.TransitionIOSSpec,
+        },
+        cardStyleInterpolator: settingsScreenInterpolator,
       }}
     />
   </Stack.Navigator>
