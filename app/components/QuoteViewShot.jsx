@@ -44,7 +44,7 @@ const QuoteViewShot = ({
               }}
             >
               <Text
-                className="text-4xl text-left"
+                className="text-2xl text-left"
                 style={{
                   color: theme.textColor,
                   fontFamily: "Montserrat-Regular",
