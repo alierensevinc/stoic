@@ -1,19 +1,12 @@
 import React from "react";
-import { Text, Button, ActivityIndicator } from "react-native";
+import { Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSettings } from "hooks/useSettings";
 import Container from "components/Container";
 import BackButton from "components/BackButton";
 
 const SettingsScreen = () => {
-  const navigation = useNavigation();
-  const {
-    theme,
-    isLoading,
-    refreshQuotes,
-    loadArchivedQuotes,
-    navigateToHome,
-  } = useSettings();
+  const { theme, navigation } = useSettings();
 
   return (
     <Container>
