@@ -1,15 +1,23 @@
-import React from "react";
-import { Text, View, Button } from "react-native";
+import { useState } from "react";
+import { Text, View } from "react-native";
 import { useSettings } from "hooks/useSettings";
 import Container from "components/Container";
 import BackButton from "components/BackButton";
 import InlineAd from "components/InlineAd";
+import SettingsItem from "components/SettingsItem";
+import SettingsToggleItem from "components/SettingsToggleItem";
 
 const SettingsScreen = () => {
   const { theme, navigation, removeAllBookmarks } = useSettings();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   const handleDeleteAllBookmarks = () => {
     removeAllBookmarks();
+  };
+
+  const handleToggleNotifications = (value) => {
+    setNotificationsEnabled(value);
+    // Add logic to enable/disable notifications permissions here
   };
 
   return (
@@ -18,20 +26,25 @@ const SettingsScreen = () => {
         onPress={() => navigation.goBack()}
         color={theme.buttonColor}
       />
-      <View style={{ flex: 1, justifyContent: "flex-start", width: "100%" }}>
+      <View className="flex-1 justify-start w-100">
         <Text
           className="text-2xl font-bold mb-5 text-center"
           style={{ color: theme.textColor, fontFamily: "Montserrat-Medium" }}
         >
           Settings
         </Text>
-        <View className="mt-5">
-          <Button
-            title="Delete All Bookmarks"
-            onPress={handleDeleteAllBookmarks}
-            color={theme.buttonColor}
-          />
-        </View>
+        <SettingsItem
+          title="Delete All Bookmarks"
+          onPress={handleDeleteAllBookmarks}
+          color={theme.buttonColor}
+        />
+        <SettingsToggleItem
+          title="Enable Notifications"
+          isToggle={true}
+          toggleValue={notificationsEnabled}
+          onToggleChange={handleToggleNotifications}
+          color={theme.textColor}
+        />
       </View>
       <InlineAd className="absolute bottom-0 left-0 right-0 self-center" />
     </Container>
