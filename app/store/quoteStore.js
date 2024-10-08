@@ -30,7 +30,7 @@ const scheduleNotification = async (quote) => {
         body: quote.author,
         data: { type: "futureQuotes" },
       },
-      trigger: { seconds: 10 }, // 5 minutes
+      trigger: { seconds: 3600 }, // 5 minutes
     });
   } catch (error) {
     console.error("Error scheduling future quotes notification:", error);
@@ -65,6 +65,9 @@ const fetchQuotesFromAPI = async () => {
 };
 
 const fetchQuotes = async (setQuotes, setArchiveQuotes, setFutureQuotes) => {
+  const oldQuotes = loadFromStorage(QUOTES_KEY)?.quotes || [];
+  setArchiveQuotes(oldQuotes);
+
   const quotes = await fetchQuotesFromAPI();
   const quotesObject = {
     date: moment().format("YYYY-MM-DD HH"),
@@ -72,7 +75,6 @@ const fetchQuotes = async (setQuotes, setArchiveQuotes, setFutureQuotes) => {
   };
   saveToStorage(QUOTES_KEY, quotesObject);
   setQuotes(quotes);
-  setArchiveQuotes(quotes);
 
   const futureQuotes = await fetchQuotesFromAPI();
   saveToStorage(FUTURE_QUOTES_KEY, futureQuotes);
@@ -127,10 +129,9 @@ export const useQuoteStore = create((set) => ({
       setQuotes([notificationFutureQuote, ...futureQuotes.slice(1)]);
       setCameFromNotification(false);
       setNotificationFutureQuote(null);
-      return;
+    } else {
+      await fetchQuotes(setQuotes, setArchiveQuotes, setFutureQuotes);
     }
-
-    await fetchQuotes(setQuotes, setArchiveQuotes, setFutureQuotes);
   },
 
   loadQuotesFromArchive: () => {
@@ -157,6 +158,7 @@ const handleFutureQuotesNotification = async () => {
     setCameFromNotification,
     setNotificationFutureQuote,
     setPreventFetch,
+    setFutureQuotes,
   } = useQuoteStore.getState();
 
   if (!futureQuotes || futureQuotes.length === 0) {
@@ -173,7 +175,12 @@ const handleFutureQuotesNotification = async () => {
   setCameFromNotification(true);
   setPreventFetch(true);
 
-  await scheduleNotification(futureQuotes[1]);
+  // Fetch new future quotes before scheduling the next notification
+  const newFutureQuotes = await fetchQuotesFromAPI();
+  saveToStorage(FUTURE_QUOTES_KEY, newFutureQuotes);
+  setFutureQuotes(newFutureQuotes);
+
+  await scheduleNotification(newFutureQuotes[0]);
 };
 
 Notifications.addNotificationResponseReceivedListener((response) => {
