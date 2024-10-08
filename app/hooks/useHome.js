@@ -1,4 +1,3 @@
-// hooks/useHome.js
 import { useEffect, useContext, useRef, useState } from "react";
 import { Dimensions } from "react-native";
 import { MMKV } from "react-native-mmkv";
@@ -19,13 +18,8 @@ import {
   InterstitialAd,
   TestIds,
 } from "react-native-google-mobile-ads";
-import * as Notifications from "expo-notifications";
 import { useQuoteStore } from "store/quoteStore";
 import NetInfo from "@react-native-community/netinfo";
-import {
-  schedulePushNotification,
-  registerForPushNotificationsAsync,
-} from "helpers/NotificationHelper";
 import { IOS_ADMOB_INTERSTITIAL } from "@env";
 
 const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : IOS_ADMOB_INTERSTITIAL;
@@ -34,22 +28,19 @@ const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
   requestNonPersonalizedAdsOnly: true,
 });
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
-
 export const useHome = () => {
   const { theme } = useContext(ThemeContext);
-  const { quotes, setQuotes, fetchQuotes, loadQuotesFromArchive } =
-    useQuoteStore();
+  const {
+    quotes,
+    setQuotes,
+    fetchQuotes,
+    loadQuotesFromArchive,
+    cameFromNotification,
+    setCameFromNotification,
+  } = useQuoteStore();
   const { bookmarks, addToBookmarks, removeFromBookmarks } =
     useBookmarksStore();
   const { actionCount, incrementActionCount, resetActionCount } = useAdStore();
-  const storage = new MMKV();
   const textOpacity = useSharedValue(1);
   const screenWidth = Dimensions.get("window").width;
   const viewShotRef = useRef();
@@ -57,7 +48,6 @@ export const useHome = () => {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    registerForPushNotificationsAsync();
     const unsubscribeLoaded = interstitial.addAdEventListener(
       AdEventType.LOADED,
       () => {
@@ -82,16 +72,20 @@ export const useHome = () => {
   }, []);
 
   useEffect(() => {
-    NetInfo.fetch().then((state) => {
-      if (state.isConnected) {
-        fetchQuotes();
-      } else {
-        loadQuotesFromArchive();
-      }
-    });
+    if (!cameFromNotification) {
+      NetInfo.fetch().then((state) => {
+        if (state.isConnected) {
+          fetchQuotes();
+        } else {
+          loadQuotesFromArchive();
+        }
+      });
+    }
 
-    schedulePushNotification();
-  }, []);
+    return () => {
+      setCameFromNotification(false);
+    };
+  }, [cameFromNotification]);
 
   const handleAction = (callback) => {
     incrementActionCount();
