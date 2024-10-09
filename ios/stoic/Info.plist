@@ -54,6 +54,8 @@
     </dict>
     <key>NSUserTrackingUsageDescription</key>
     <string>This identifier will be used to deliver personalized ads to you.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>$(PRODUCT_NAME) wants to save photos</string>
     <key>SKAdNetworkItems</key>
     <array>
       <dict>
