@@ -21,7 +21,6 @@ import {
 import { useQuoteStore } from "store/quoteStore";
 import NetInfo from "@react-native-community/netinfo";
 import { IOS_ADMOB_INTERSTITIAL } from "@env";
-import Share from "react-native-share";
 
 const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : IOS_ADMOB_INTERSTITIAL;
 const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
@@ -118,14 +117,13 @@ export const useHome = () => {
 
       try {
         await new Promise((resolve) => setTimeout(resolve, 100));
-        const uri = await viewShotRef.current.capture();
 
-        const shareOptions = {
-          title: "Title",
-          type: "image/jpeg",
-          url: "file://" + uri,
-        };
-        await Share.open(shareOptions);
+        const uri = await viewShotRef.current.capture();
+        await Sharing.shareAsync("file://" + uri, {
+          mimeType: "image/jpeg",
+          dialogTitle: "Share this quote",
+          UTI: "public.jpeg",
+        });
       } catch (error) {
         console.error("Error sharing quote:", error);
       }

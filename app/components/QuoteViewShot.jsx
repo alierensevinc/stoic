@@ -18,7 +18,7 @@ const QuoteViewShot = ({
   useEffect(() => {
     if (viewReady && captureOnReady && viewShotRef?.current) {
       // Trigger the capture when the view is ready
-      viewShotRef.current.capture({ result: "base64" });
+      viewShotRef.current.capture();
     }
   }, [viewReady, captureOnReady, viewShotRef]);
 

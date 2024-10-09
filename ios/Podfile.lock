@@ -10,6 +10,8 @@ PODS:
     - ExpoModulesCore
   - EXNotifications (0.28.17):
     - ExpoModulesCore
+  - EXPermissions (14.4.0):
+    - ExpoModulesCore
   - Expo (51.0.31):
     - ExpoModulesCore
   - expo-dev-client (4.0.25):
@@ -1606,27 +1608,6 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNShare (11.0.3):
-    - DoubleConversion
-    - glog
-    - hermes-engine
-    - RCT-Folly (= 2024.01.01.00)
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Codegen
-    - React-Core
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-rendererdebug
-    - React-utils
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - Yoga
   - SocketRocket (0.7.0)
   - Yoga (0.0.0)
 
@@ -1638,6 +1619,7 @@ DEPENDENCIES:
   - EXJSONUtils (from `../node_modules/expo-json-utils/ios`)
   - EXManifests (from `../node_modules/expo-manifests/ios`)
   - EXNotifications (from `../node_modules/expo-notifications/ios`)
+  - EXPermissions (from `../node_modules/expo-permissions/ios`)
   - Expo (from `../node_modules/expo`)
   - expo-dev-client (from `../node_modules/expo-dev-client/ios`)
   - expo-dev-launcher (from `../node_modules/expo-dev-launcher`)
@@ -1713,7 +1695,6 @@ DEPENDENCIES:
   - RNGoogleMobileAds (from `../node_modules/react-native-google-mobile-ads`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
-  - RNShare (from `../node_modules/react-native-share`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -1739,6 +1720,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-manifests/ios"
   EXNotifications:
     :path: "../node_modules/expo-notifications/ios"
+  EXPermissions:
+    :path: "../node_modules/expo-permissions/ios"
   Expo:
     :path: "../node_modules/expo"
   expo-dev-client:
@@ -1886,8 +1869,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
-  RNShare:
-    :path: "../node_modules/react-native-share"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -1899,6 +1880,7 @@ SPEC CHECKSUMS:
   EXJSONUtils: 30c17fd9cc364d722c0946a550dfbf1be92ef6a4
   EXManifests: c1fab4c3237675e7b0299ea8df0bcb14baca4f42
   EXNotifications: 1177f1f3acba90ac409ac70d011dc00c75049635
+  EXPermissions: 51c6115893689c3e9787f4819aa67ceeae601038
   Expo: 4773e11951abd0f666f67023f0cb1d48c3e8a32b
   expo-dev-client: 97910d9e4753f5deae96c3b657a071ee09ce85f5
   expo-dev-launcher: fe4f2c0a0aa627449eeaec5f9f11e04090f97c40
@@ -1976,7 +1958,6 @@ SPEC CHECKSUMS:
   RNGoogleMobileAds: f920a1f359a9322a2988cbfb963d3275ba9f897e
   RNReanimated: f8dc6e880959a874d8d65c1e1fcdc29c946b9fea
   RNScreens: 30249f9331c3b00ae7cb7922e11f58b3ed369c07
-  RNShare: 4e495e633deed6b386024d1e7301d960e53c56a8
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   Yoga: dafebc41bc66910af33077aaa41078e89fd635bf
 
