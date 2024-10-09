@@ -5,6 +5,7 @@ import { useBookmarksStore } from "store/bookmarksStore";
 import { useAdStore } from "store/adStore";
 import { useInterstitialAd } from "hooks/useInterstitialAd";
 import { ThemeContext } from "context/ThemeContext";
+import Share from "react-native-share";
 
 export const useBookmarks = () => {
   const { bookmarks, removeFromBookmarks } = useBookmarksStore();
@@ -38,12 +39,12 @@ export const useBookmarks = () => {
         await new Promise((resolve) => setTimeout(resolve, 100));
 
         const uri = await viewShotRef.current.capture();
-        await Sharing.shareAsync("file://" + uri, {
-          mimeType: "image/jpeg",
-          dialogTitle: "Share this quote",
-          UTI: "public.jpeg",
-        });
-        setShareState({ showShareQuote: false, quoteToShare: null });
+        const shareOptions = {
+          title: "Title",
+          type: "image/jpeg",
+          url: "file://" + uri,
+        };
+        await Share.open(shareOptions);
       } catch (error) {
         console.error("Error sharing quote:", error);
       }
