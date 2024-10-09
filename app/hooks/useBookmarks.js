@@ -5,6 +5,7 @@ import { useBookmarksStore } from "store/bookmarksStore";
 import { useAdStore } from "store/adStore";
 import { useInterstitialAd } from "hooks/useInterstitialAd";
 import { ThemeContext } from "context/ThemeContext";
+import * as FileSystem from "expo-file-system";
 
 export const useBookmarks = () => {
   const { bookmarks, removeFromBookmarks } = useBookmarksStore();
@@ -38,7 +39,13 @@ export const useBookmarks = () => {
         await new Promise((resolve) => setTimeout(resolve, 100));
 
         const uri = await viewShotRef.current.capture();
-        await Sharing.shareAsync("file://" + uri, {
+        const extractedPath =
+          FileSystem.cacheDirectory + "Quote by " + item.author + ".jpeg";
+        await FileSystem.copyAsync({
+          from: uri,
+          to: extractedPath,
+        });
+        await Sharing.shareAsync("file://" + extractedPath, {
           mimeType: "image/jpeg",
           dialogTitle: "Share this quote",
           UTI: "public.jpeg",

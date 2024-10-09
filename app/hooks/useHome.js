@@ -21,6 +21,7 @@ import {
 import { useQuoteStore } from "store/quoteStore";
 import NetInfo from "@react-native-community/netinfo";
 import { IOS_ADMOB_INTERSTITIAL } from "@env";
+import * as FileSystem from "expo-file-system";
 
 const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : IOS_ADMOB_INTERSTITIAL;
 const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
@@ -108,7 +109,7 @@ export const useHome = () => {
     });
   };
 
-  const shareQuote = async () => {
+  const shareQuote = async (author) => {
     handleAction(async () => {
       if (!(await Sharing.isAvailableAsync())) {
         alert("Sharing isn't available on your platform");
@@ -119,7 +120,14 @@ export const useHome = () => {
         await new Promise((resolve) => setTimeout(resolve, 100));
 
         const uri = await viewShotRef.current.capture();
-        await Sharing.shareAsync("file://" + uri, {
+        const extractedPath =
+          FileSystem.cacheDirectory + "Quote by " + author + ".jpeg";
+        await FileSystem.copyAsync({
+          from: uri,
+          to: extractedPath,
+        });
+
+        await Sharing.shareAsync("file://" + extractedPath, {
           mimeType: "image/jpeg",
           dialogTitle: "Share this quote",
           UTI: "public.jpeg",
@@ -182,6 +190,14 @@ export const useHome = () => {
   const isBookmarked = bookmarks.some(
     (bookmark) => bookmark.text === quotes[0]?.text
   );
+
+  const extractPathUntilReactNative = (fullPath) => {
+    const reactNativeIndex = fullPath.indexOf("ReactNative/");
+    if (reactNativeIndex !== -1) {
+      return fullPath.substring(0, reactNativeIndex + "ReactNative/".length);
+    }
+    return fullPath;
+  };
 
   return {
     theme,

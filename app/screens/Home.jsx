@@ -38,7 +38,7 @@ const HomeScreen = () => {
       )}
       <ActionButtons
         theme={theme}
-        shareQuote={shareQuote}
+        shareQuote={() => shareQuote(quotes[0].author)}
         navigateToBookmarks={navigateToBookmarks}
         addToBookmarks={toggleBookmark}
         isBookmarked={isBookmarked}
