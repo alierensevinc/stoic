@@ -9,6 +9,7 @@ const storage = new MMKV();
 const QUOTES_KEY = "quotes";
 const ARCHIVE_QUOTES_KEY = "archiveQuotes";
 const FUTURE_QUOTES_KEY = "futureQuotes";
+const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled";
 const QUOTES_API_URL = "https://stoic-quotes.com/api/quotes?num=20";
 
 // Utility functions
@@ -24,6 +25,12 @@ const loadFromStorage = (key) => {
 // Notification functions
 const scheduleNotification = async (quote) => {
   try {
+    const notificationsEnabled = storage.getBoolean(NOTIFICATIONS_ENABLED_KEY);
+    if (!notificationsEnabled) {
+      console.log("Notifications are disabled. Skipping scheduling.");
+      return;
+    }
+
     const startHour = 9;
     const endHour = 23;
 

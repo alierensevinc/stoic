@@ -10,8 +10,6 @@ PODS:
     - ExpoModulesCore
   - EXNotifications (0.28.17):
     - ExpoModulesCore
-  - EXPermissions (14.4.0):
-    - ExpoModulesCore
   - Expo (51.0.31):
     - ExpoModulesCore
   - expo-dev-client (4.0.25):
@@ -1619,7 +1617,6 @@ DEPENDENCIES:
   - EXJSONUtils (from `../node_modules/expo-json-utils/ios`)
   - EXManifests (from `../node_modules/expo-manifests/ios`)
   - EXNotifications (from `../node_modules/expo-notifications/ios`)
-  - EXPermissions (from `../node_modules/expo-permissions/ios`)
   - Expo (from `../node_modules/expo`)
   - expo-dev-client (from `../node_modules/expo-dev-client/ios`)
   - expo-dev-launcher (from `../node_modules/expo-dev-launcher`)
@@ -1720,8 +1717,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-manifests/ios"
   EXNotifications:
     :path: "../node_modules/expo-notifications/ios"
-  EXPermissions:
-    :path: "../node_modules/expo-permissions/ios"
   Expo:
     :path: "../node_modules/expo"
   expo-dev-client:
@@ -1880,7 +1875,6 @@ SPEC CHECKSUMS:
   EXJSONUtils: 30c17fd9cc364d722c0946a550dfbf1be92ef6a4
   EXManifests: c1fab4c3237675e7b0299ea8df0bcb14baca4f42
   EXNotifications: 1177f1f3acba90ac409ac70d011dc00c75049635
-  EXPermissions: 51c6115893689c3e9787f4819aa67ceeae601038
   Expo: 4773e11951abd0f666f67023f0cb1d48c3e8a32b
   expo-dev-client: 97910d9e4753f5deae96c3b657a071ee09ce85f5
   expo-dev-launcher: fe4f2c0a0aa627449eeaec5f9f11e04090f97c40
