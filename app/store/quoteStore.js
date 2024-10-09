@@ -24,33 +24,32 @@ const loadFromStorage = (key) => {
 // Notification functions
 const scheduleNotification = async (quote) => {
   try {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: quote.text,
-        body: quote.author,
-        data: { type: "futureQuotes" },
-      },
-      trigger: { seconds: 3600 }, // 5 minutes
-    });
+    const startHour = 9;
+    const endHour = 23;
+
+    for (let hour = startHour; hour <= endHour; hour++) {
+      let triggerTime = new Date();
+      triggerTime.setHours(hour);
+      triggerTime.setMinutes(0);
+      triggerTime.setSeconds(0);
+
+      // If the trigger time is in the past, schedule it for the next day
+      if (triggerTime <= new Date()) {
+        triggerTime.setDate(triggerTime.getDate() + 1);
+      }
+
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: quote.text,
+          body: quote.author,
+          data: { type: "futureQuotes" },
+        },
+        trigger: triggerTime,
+      });
+    }
   } catch (error) {
     console.error("Error scheduling future quotes notification:", error);
   }
-};
-
-const initializeNotifications = async () => {
-  const { status } = await Notifications.requestPermissionsAsync();
-  if (status !== "granted") {
-    console.error("Notification permissions not granted");
-    return;
-  }
-
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldPlaySound: true,
-      shouldSetBadge: false,
-    }),
-  });
 };
 
 // Fetch functions
@@ -188,5 +187,21 @@ Notifications.addNotificationResponseReceivedListener((response) => {
     handleFutureQuotesNotification();
   }
 });
+
+const initializeNotifications = async () => {
+  const { status } = await Notifications.requestPermissionsAsync();
+  if (status !== "granted") {
+    console.error("Notification permissions not granted");
+    return;
+  }
+
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
+};
 
 export { initializeNotifications };

@@ -5,7 +5,7 @@
   "scripts": {
     "build-ios": "npx expo prebuild --platform ios",
     "clean-build-ios": "npx expo prebuild --clean --platform ios",
-    "run-ios": "NODE_ENV=test npx expo run:ios",
+    "run-ios": "npx expo run:ios",
     "build-and-run-ios": "npx expo prebuild --platform ios && npx expo run:ios",
     "eas-build-ios-simulator": "eas build --profile development-simulator --platform ios",
     "eas-build-ios-development": "eas build --profile development --platform ios",

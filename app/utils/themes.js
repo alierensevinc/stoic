@@ -8,6 +8,7 @@ export const themes = {
     statusBarBackgroundColor: "#151b24",
     headerBackgroundColor: "#151b24",
     headerTextColor: "#f4f6fc",
+    backgroundTintColor: "##444950",
   },
   light: {
     backgroundColor: "#f4f6fc",
@@ -18,5 +19,6 @@ export const themes = {
     statusBarBackgroundColor: "#f4f6fc",
     headerBackgroundColor: "#f4f6fc",
     headerTextColor: "#151b24",
+    backgroundTintColor: "###c3c5ca",
   },
 };
