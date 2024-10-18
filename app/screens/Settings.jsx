@@ -6,6 +6,7 @@ import BackButton from "components/BackButton";
 import InlineAd from "components/InlineAd";
 import SettingsItem from "components/SettingsItem";
 import SettingsToggleItem from "components/SettingsToggleItem";
+import AppInfo from "components/AppInfo";
 
 const SettingsScreen = () => {
   const {
@@ -46,6 +47,7 @@ const SettingsScreen = () => {
           color={theme.textColor}
         />
       </View>
+      <AppInfo theme={theme} />
       <InlineAd className="absolute bottom-0 left-0 right-0 self-center" />
     </Container>
   );
