@@ -17,22 +17,16 @@ export const useSettings = () => {
   );
 
   const [notificationsEnabled, setNotificationsEnabled] = useState(
-    storage.getBoolean(NOTIFICATIONS_ENABLED_KEY) || false
+    storage.getBoolean(NOTIFICATIONS_ENABLED_KEY) ?? false
   );
-  const [tempNotificationsEnabled, setTempNotificationsEnabled] = useState(
-    storage.getBoolean(NOTIFICATIONS_ENABLED_KEY) || false
-  );
+
   useEffect(() => {
-    // Check the current notification permission status
     const checkNotificationPermission = async () => {
       const { status } = await Notifications.getPermissionsAsync();
-      const enabled = status === "granted";
-      setNotificationsEnabled(enabled && tempNotificationsEnabled);
-      storage.set(
-        NOTIFICATIONS_ENABLED_KEY ||
-          storage.getBoolean(NOTIFICATIONS_ENABLED_KEY),
-        enabled
-      );
+      if (status !== "granted") {
+        setNotificationsEnabled(false);
+        storage.set(NOTIFICATIONS_ENABLED_KEY, false);
+      }
     };
 
     checkNotificationPermission();
@@ -55,7 +49,7 @@ export const useSettings = () => {
 
   const handleToggleNotifications = async (value) => {
     if (value) {
-      const { status } = await Notifications.getPermissionsAsync();
+      const { status } = await Notifications.requestPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
           "Give Permissions",
@@ -65,18 +59,13 @@ export const useSettings = () => {
             { text: "Open Settings", onPress: () => Linking.openSettings() },
           ]
         );
-        setNotificationsEnabled(false);
-        setTempNotificationsEnabled(false);
-        storage.set(NOTIFICATIONS_ENABLED_KEY, false);
         return;
       }
-      setNotificationsEnabled(true);
-      setTempNotificationsEnabled(true);
       storage.set(NOTIFICATIONS_ENABLED_KEY, true);
+      setNotificationsEnabled(true);
     } else {
-      setNotificationsEnabled(false);
-      setTempNotificationsEnabled(false);
       storage.set(NOTIFICATIONS_ENABLED_KEY, false);
+      setNotificationsEnabled(false);
     }
   };
 
