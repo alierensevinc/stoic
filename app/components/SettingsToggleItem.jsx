@@ -1,5 +1,4 @@
-import React from "react";
-import { View, Button, Switch, Text } from "react-native";
+import { View, Switch, Text } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 const SettingsToggleItem = ({

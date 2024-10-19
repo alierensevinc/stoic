@@ -7,18 +7,14 @@ import { useInterstitialAd } from "hooks/useInterstitialAd";
 import { ThemeContext } from "context/ThemeContext";
 import * as FileSystem from "expo-file-system";
 
-export const useBookmarks = () => {
-  const { bookmarks, removeFromBookmarks } = useBookmarksStore();
-  const { actionCount, incrementActionCount, resetActionCount } = useAdStore();
-  const { isAdLoaded, showAd } = useInterstitialAd();
-  const { theme } = useContext(ThemeContext);
-  const [shareState, setShareState] = useState({
-    showShareQuote: false,
-    quoteToShare: null,
-  });
-  const viewShotRef = useRef();
-
-  const handleAction = (callback) => {
+const useHandleAction = (
+  incrementActionCount,
+  actionCount,
+  isAdLoaded,
+  showAd,
+  resetActionCount
+) => {
+  return (callback) => {
     incrementActionCount();
     if ((actionCount + 1) % 5 === 0 && isAdLoaded) {
       showAd();
@@ -26,11 +22,13 @@ export const useBookmarks = () => {
     }
     callback();
   };
+};
 
-  const shareQuote = async (item) => {
+const useShareQuote = (viewShotRef, handleAction) => {
+  return async (item) => {
     handleAction(async () => {
       if (!(await Sharing.isAvailableAsync())) {
-        alert("Sharing isn't available on your platform");
+        Alert.alert("Sharing isn't available on your platform");
         return;
       }
 
@@ -41,10 +39,8 @@ export const useBookmarks = () => {
         const uri = await viewShotRef.current.capture();
         const extractedPath =
           FileSystem.cacheDirectory + "Quote by " + item.author + ".jpeg";
-        await FileSystem.copyAsync({
-          from: uri,
-          to: extractedPath,
-        });
+        await FileSystem.copyAsync({ from: uri, to: extractedPath });
+
         await Sharing.shareAsync("file://" + extractedPath, {
           mimeType: "image/jpeg",
           dialogTitle: "Share this quote",
@@ -56,8 +52,10 @@ export const useBookmarks = () => {
       }
     });
   };
+};
 
-  const confirmDelete = (item) => {
+const useConfirmDelete = (removeFromBookmarks, handleAction) => {
+  return (item) => {
     Alert.alert(
       "Delete Quote",
       "Are you sure you want to remove this quote from bookmarks?",
@@ -75,6 +73,28 @@ export const useBookmarks = () => {
       ]
     );
   };
+};
+
+export const useBookmarks = () => {
+  const { bookmarks, removeFromBookmarks } = useBookmarksStore();
+  const { actionCount, incrementActionCount, resetActionCount } = useAdStore();
+  const { isAdLoaded, showAd } = useInterstitialAd();
+  const { theme } = useContext(ThemeContext);
+  const [shareState, setShareState] = useState({
+    showShareQuote: false,
+    quoteToShare: null,
+  });
+  const viewShotRef = useRef();
+
+  const handleAction = useHandleAction(
+    incrementActionCount,
+    actionCount,
+    isAdLoaded,
+    showAd,
+    resetActionCount
+  );
+  const shareQuote = useShareQuote(viewShotRef, handleAction);
+  const confirmDelete = useConfirmDelete(removeFromBookmarks, handleAction);
 
   return {
     bookmarks,

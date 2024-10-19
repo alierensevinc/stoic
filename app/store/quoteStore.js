@@ -21,44 +21,36 @@ const loadFromStorage = (key) => {
   return storedData ? JSON.parse(storedData) : null;
 };
 
+const cancelAllNotifications = async () => {
+  await Notifications.cancelAllScheduledNotificationsAsync();
+};
+
 const scheduleNotification = async (quote) => {
-  try {
-    const notificationsEnabled = storage.getBoolean(NOTIFICATIONS_ENABLED_KEY);
-    if (!notificationsEnabled) {
-      return;
+  const notificationsEnabled = storage.getBoolean(NOTIFICATIONS_ENABLED_KEY);
+  if (!notificationsEnabled) return;
+
+  await cancelAllNotifications();
+
+  let triggerTime = new Date();
+  const currentHour = triggerTime.getHours();
+
+  if (currentHour >= 22 || currentHour < 9) {
+    triggerTime.setHours(9, 0, 0, 0);
+    if (triggerTime <= new Date()) {
+      triggerTime.setDate(triggerTime.getDate() + 1);
     }
-
-    await Notifications.cancelAllScheduledNotificationsAsync();
-
-    let triggerTime = new Date();
-    const currentHour = triggerTime.getHours();
-
-    if (currentHour >= 22 || currentHour < 9) {
-      triggerTime.setHours(9);
-      triggerTime.setMinutes(0);
-      triggerTime.setSeconds(0);
-
-      if (triggerTime <= new Date()) {
-        triggerTime.setDate(triggerTime.getDate() + 1);
-      }
-    } else {
-      triggerTime.setHours(triggerTime.getHours() + 1);
-    }
-
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: quote.text,
-        body: quote.author,
-        data: { type: "futureQuotes" },
-      },
-      trigger: triggerTime,
-    });
-  } catch (error) {
-    console.error(
-      "Gelecek alıntılar bildirimi planlanırken hata oluştu:",
-      error
-    );
+  } else {
+    triggerTime.setHours(triggerTime.getHours() + 1);
   }
+
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: quote.text,
+      body: quote.author,
+      data: { type: "futureQuotes" },
+    },
+    trigger: triggerTime,
+  });
 };
 
 const fetchQuotesFromAPI = async () => {
@@ -66,21 +58,21 @@ const fetchQuotesFromAPI = async () => {
     const response = await axios.get(QUOTES_API_URL);
     return response.data;
   } catch (error) {
-    console.error("API'den alıntılar çekilirken hata oluştu:", error);
+    console.error("Error fetching quotes from API:", error);
     return [];
   }
 };
 
-const fetchQuotes = async (setQuotes, setArchiveQuotes, setFutureQuotes) => {
+const fetchAndStoreQuotes = async (
+  setQuotes,
+  setArchiveQuotes,
+  setFutureQuotes
+) => {
   const oldQuotes = loadFromStorage(QUOTES_KEY)?.quotes || [];
   setArchiveQuotes(oldQuotes);
 
   const quotes = await fetchQuotesFromAPI();
-  const quotesObject = {
-    date: moment().format("YYYY-MM-DD HH"),
-    quotes,
-  };
-  saveToStorage(QUOTES_KEY, quotesObject);
+  saveToStorage(QUOTES_KEY, { date: moment().format("YYYY-MM-DD HH"), quotes });
   setQuotes(quotes);
 
   const futureQuotes = await fetchQuotesFromAPI();
@@ -97,6 +89,63 @@ const loadQuotesFromArchive = (setQuotes) => {
   if (archiveQuotes) {
     setQuotes(archiveQuotes);
   }
+};
+
+const handleFutureQuotesNotification = async () => {
+  const {
+    futureQuotes,
+    setQuotes,
+    setCameFromNotification,
+    setNotificationFutureQuote,
+    setPreventFetch,
+    setFutureQuotes,
+  } = useQuoteStore.getState();
+
+  if (!futureQuotes || futureQuotes.length === 0) {
+    const storedFutureQuotes = loadFromStorage(FUTURE_QUOTES_KEY);
+    if (storedFutureQuotes) {
+      setNotificationFutureQuote(storedFutureQuotes[0]);
+      setQuotes([storedFutureQuotes[0], ...storedFutureQuotes.slice(1)]);
+    }
+  } else {
+    setNotificationFutureQuote(futureQuotes[0]);
+    setQuotes([futureQuotes[0], ...futureQuotes.slice(1)]);
+  }
+
+  setCameFromNotification(true);
+  setPreventFetch(true);
+
+  const newFutureQuotes = await fetchQuotesFromAPI();
+  saveToStorage(FUTURE_QUOTES_KEY, newFutureQuotes);
+  setFutureQuotes(newFutureQuotes);
+
+  await cancelAllNotifications();
+
+  if (newFutureQuotes.length > 0) {
+    await scheduleNotification(newFutureQuotes[0]);
+  }
+};
+
+Notifications.addNotificationResponseReceivedListener((response) => {
+  if (response.notification.request.content.data.type === "futureQuotes") {
+    handleFutureQuotesNotification();
+  }
+});
+
+const initializeNotifications = async () => {
+  const { status } = await Notifications.requestPermissionsAsync();
+  if (status !== "granted") {
+    console.error("Notification permissions not granted");
+    return;
+  }
+
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
 };
 
 export const useQuoteStore = create((set) => ({
@@ -138,7 +187,7 @@ export const useQuoteStore = create((set) => ({
       setCameFromNotification(false);
       setNotificationFutureQuote(null);
     } else {
-      await fetchQuotes(setQuotes, setArchiveQuotes, setFutureQuotes);
+      await fetchAndStoreQuotes(setQuotes, setArchiveQuotes, setFutureQuotes);
     }
   },
 
@@ -156,61 +205,5 @@ useQuoteStore.subscribe(
   (state) => state.futureQuotes,
   (futureQuotes) => saveToStorage(FUTURE_QUOTES_KEY, futureQuotes)
 );
-
-const handleFutureQuotesNotification = async () => {
-  const {
-    futureQuotes,
-    setQuotes,
-    setCameFromNotification,
-    setNotificationFutureQuote,
-    setPreventFetch,
-    setFutureQuotes,
-  } = useQuoteStore.getState();
-
-  if (!futureQuotes || futureQuotes.length === 0) {
-    const storedFutureQuotes = loadFromStorage(FUTURE_QUOTES_KEY);
-    if (storedFutureQuotes) {
-      setNotificationFutureQuote(storedFutureQuotes[0]);
-      setQuotes([storedFutureQuotes[0], ...storedFutureQuotes.slice(1)]);
-    }
-  } else {
-    setNotificationFutureQuote(futureQuotes[0]);
-    setQuotes([futureQuotes[0], ...futureQuotes.slice(1)]);
-  }
-
-  setCameFromNotification(true);
-  setPreventFetch(true);
-
-  const newFutureQuotes = await fetchQuotesFromAPI();
-  saveToStorage(FUTURE_QUOTES_KEY, newFutureQuotes);
-  setFutureQuotes(newFutureQuotes);
-
-  await Notifications.cancelAllScheduledNotificationsAsync();
-
-  if (newFutureQuotes.length > 0) {
-    await scheduleNotification(newFutureQuotes[0]);
-  }
-};
-
-Notifications.addNotificationResponseReceivedListener((response) => {
-  if (response.notification.request.content.data.type === "futureQuotes") {
-    handleFutureQuotesNotification();
-  }
-});
-
-const initializeNotifications = async () => {
-  const { status } = await Notifications.requestPermissionsAsync();
-  if (status !== "granted") {
-    return;
-  }
-
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldPlaySound: true,
-      shouldSetBadge: false,
-    }),
-  });
-};
 
 export { initializeNotifications };

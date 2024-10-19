@@ -1,7 +1,7 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState } from "react";
 import { MMKV } from "react-native-mmkv";
+import { setAppIcon } from "expo-dynamic-app-icon";
 import { themes } from "utils/themes";
-import { getAppIcon, setAppIcon } from "expo-dynamic-app-icon";
 
 const storage = new MMKV();
 
