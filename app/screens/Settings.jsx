@@ -7,6 +7,7 @@ import InlineAd from "components/InlineAd";
 import SettingsItem from "components/SettingsItem";
 import SettingsToggleItem from "components/SettingsToggleItem";
 import AppInfo from "components/AppInfo";
+import Divider from "components/Divider";
 
 const SettingsScreen = () => {
   const {
@@ -44,6 +45,7 @@ const SettingsScreen = () => {
           onToggleChange={handleToggleNotifications}
           color={theme.textColor}
         />
+        <Divider color={theme.textColor} />
         <SettingsItem
           icon="mail-outline"
           title="Send me an email"
@@ -51,12 +53,12 @@ const SettingsScreen = () => {
           color={theme.buttonColor}
         />
         <SettingsItem
-          type="fontisto"
-          icon="linkedin"
+          icon="logo-linkedin"
           title="Reach me on LinkedIn"
           onPress={handleOpenLinkedin}
           color={theme.buttonColor}
         />
+        <Divider color={theme.textColor} />
         <SettingsItem
           icon="trash-outline"
           title="Delete All Bookmarks"
