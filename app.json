@@ -24,7 +24,7 @@
       },
       "package": "com.sevincaeren.stoic"
     },
-    "web": {
+    "web": {  
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
@@ -94,7 +94,20 @@
           ]
         }
       ],
-      ["expo-font"]
+      ["expo-font"],
+      [
+        "expo-dynamic-app-icon",
+        {
+          "default": {
+            "image": "./assets//icon.png",
+            "prerendered": true
+          },
+          "alternative": {
+            "image": "./assets//icon-alternative.png",
+            "prerendered": true
+          }
+        }
+      ]
     ],
     "extra": {
       "eas": {

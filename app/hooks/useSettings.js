@@ -5,6 +5,9 @@ import { useBookmarksStore } from "store/bookmarksStore";
 import { AppState, Alert, Linking } from "react-native";
 import * as Notifications from "expo-notifications";
 import { MMKV } from "react-native-mmkv";
+import * as MailComposer from "expo-mail-composer";
+import * as Application from "expo-application";
+import { Share } from "react-native";
 
 const storage = new MMKV();
 const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled";
@@ -69,11 +72,38 @@ export const useSettings = () => {
     }
   };
 
+  const handleSendEmail = async () => {
+    const isAvailable = await MailComposer.isAvailableAsync();
+    if (!isAvailable) {
+      Alert.alert("Mail Composer is not available on this device");
+      return;
+    }
+
+    const options = {
+      recipients: ["sevinc.aeren@gmail.com"],
+      subject: "Hello from Stoic App",
+      body: Application.nativeApplicationVersion,
+    };
+
+    try {
+      await MailComposer.composeAsync(options);
+      Alert.alert("Email sent successfully");
+    } catch (error) {
+      Alert.alert("Failed to send email", error.message);
+    }
+  };
+
+  const handleOpenLinkedin = () => {
+    Linking.openURL("https://www.linkedin.com/in/alierensevinc/");
+  };
+
   return {
     theme,
     navigation,
     removeAllBookmarks,
     notificationsEnabled,
     handleToggleNotifications,
+    handleSendEmail,
+    handleOpenLinkedin,
   };
 };

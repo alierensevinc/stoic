@@ -1,6 +1,7 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 import { MMKV } from "react-native-mmkv";
 import { themes } from "utils/themes";
+import { getAppIcon, setAppIcon } from "expo-dynamic-app-icon";
 
 const storage = new MMKV();
 
@@ -17,6 +18,7 @@ export const ThemeProvider = ({ children }) => {
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
     storage.set("theme", !isDarkMode ? "dark" : "light");
+    setAppIcon(isDarkMode ? "default" : "alternative");
   };
 
   return (

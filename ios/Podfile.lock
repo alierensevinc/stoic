@@ -223,11 +223,15 @@ PODS:
     - ExpoModulesCore
   - ExpoDevice (6.0.2):
     - ExpoModulesCore
+  - ExpoDynamicAppIcon (1.2.0):
+    - ExpoModulesCore
   - ExpoFileSystem (17.0.1):
     - ExpoModulesCore
   - ExpoFont (12.0.10):
     - ExpoModulesCore
   - ExpoKeepAwake (13.0.2):
+    - ExpoModulesCore
+  - ExpoMailComposer (13.0.1):
     - ExpoModulesCore
   - ExpoModulesCore (1.12.23):
     - DoubleConversion
@@ -1624,9 +1628,11 @@ DEPENDENCIES:
   - expo-dev-menu-interface (from `../node_modules/expo-dev-menu-interface/ios`)
   - ExpoAsset (from `../node_modules/expo-asset/ios`)
   - ExpoDevice (from `../node_modules/expo-device/ios`)
+  - ExpoDynamicAppIcon (from `../node_modules/expo-dynamic-app-icon/ios`)
   - ExpoFileSystem (from `../node_modules/expo-file-system/ios`)
   - ExpoFont (from `../node_modules/expo-font/ios`)
   - ExpoKeepAwake (from `../node_modules/expo-keep-awake/ios`)
+  - ExpoMailComposer (from `../node_modules/expo-mail-composer/ios`)
   - ExpoModulesCore (from `../node_modules/expo-modules-core`)
   - ExpoSharing (from `../node_modules/expo-sharing/ios`)
   - EXSplashScreen (from `../node_modules/expo-splash-screen/ios`)
@@ -1731,12 +1737,16 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-asset/ios"
   ExpoDevice:
     :path: "../node_modules/expo-device/ios"
+  ExpoDynamicAppIcon:
+    :path: "../node_modules/expo-dynamic-app-icon/ios"
   ExpoFileSystem:
     :path: "../node_modules/expo-file-system/ios"
   ExpoFont:
     :path: "../node_modules/expo-font/ios"
   ExpoKeepAwake:
     :path: "../node_modules/expo-keep-awake/ios"
+  ExpoMailComposer:
+    :path: "../node_modules/expo-mail-composer/ios"
   ExpoModulesCore:
     :path: "../node_modules/expo-modules-core"
   ExpoSharing:
@@ -1882,9 +1892,11 @@ SPEC CHECKSUMS:
   expo-dev-menu-interface: be32c09f1e03833050f0ee290dcc86b3ad0e73e4
   ExpoAsset: 323700f291684f110fb55f0d4022a3362ea9f875
   ExpoDevice: fc94f0e42ecdfd897e7590f2874fc64dfa7e9b1c
+  ExpoDynamicAppIcon: b0f96e53d0bf00412bbe97da0cfc15b8c94a54ce
   ExpoFileSystem: 80bfe850b1f9922c16905822ecbf97acd711dc51
   ExpoFont: 00756e6c796d8f7ee8d211e29c8b619e75cbf238
   ExpoKeepAwake: 3b8815d9dd1d419ee474df004021c69fdd316d08
+  ExpoMailComposer: e6da16de4682fba919051b2e680f804af00341f3
   ExpoModulesCore: e3c518e094990b3ad960edbd19c291f2a1b56b0a
   ExpoSharing: 8db05dd85081219f75989a3db2c92fe5e9741033
   EXSplashScreen: d8b3c547b9b18a41d80c6f6b274c4c26664febd4

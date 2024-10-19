@@ -15,6 +15,8 @@ const SettingsScreen = () => {
     removeAllBookmarks,
     notificationsEnabled,
     handleToggleNotifications,
+    handleSendEmail,
+    handleOpenLinkedin,
   } = useSettings();
 
   const handleDeleteAllBookmarks = () => {
@@ -34,17 +36,32 @@ const SettingsScreen = () => {
         >
           Settings
         </Text>
-        <SettingsItem
-          title="Delete All Bookmarks"
-          onPress={handleDeleteAllBookmarks}
-          color={theme.buttonColor}
-        />
         <SettingsToggleItem
-          title="Enable Notifications"
+          icon="time-outline"
+          title="Notifications"
           isToggle={true}
           toggleValue={notificationsEnabled}
           onToggleChange={handleToggleNotifications}
           color={theme.textColor}
+        />
+        <SettingsItem
+          icon="mail-outline"
+          title="Send me an email"
+          onPress={handleSendEmail}
+          color={theme.buttonColor}
+        />
+        <SettingsItem
+          type="fontisto"
+          icon="linkedin"
+          title="Reach me on LinkedIn"
+          onPress={handleOpenLinkedin}
+          color={theme.buttonColor}
+        />
+        <SettingsItem
+          icon="trash-outline"
+          title="Delete All Bookmarks"
+          onPress={handleDeleteAllBookmarks}
+          color={theme.buttonColor}
         />
       </View>
       <AppInfo theme={theme} />
