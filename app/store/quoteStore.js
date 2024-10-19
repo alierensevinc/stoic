@@ -12,7 +12,6 @@ const FUTURE_QUOTES_KEY = "futureQuotes";
 const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled";
 const QUOTES_API_URL = "https://stoic-quotes.com/api/quotes?num=20";
 
-// Utility functions
 const saveToStorage = (key, data) => {
   storage.set(key, JSON.stringify(data));
 };
@@ -31,41 +30,50 @@ const scheduleNotification = async (quote) => {
       return;
     }
 
-    const startHour = 9;
-    const endHour = 23;
+    // Cancel all previously scheduled notifications
+    await Notifications.cancelAllScheduledNotificationsAsync();
 
-    for (let hour = startHour; hour <= endHour; hour++) {
-      let triggerTime = new Date();
-      triggerTime.setHours(hour);
+    // Şu anki zamanı al
+    let triggerTime = new Date();
+    const currentHour = triggerTime.getHours();
+
+    // Eğer saat 22:00 ile 09:00 arasında ise, bildirimi sabah 9'a kur
+    if (currentHour >= 22 || currentHour < 9) {
+      triggerTime.setHours(9);
       triggerTime.setMinutes(0);
       triggerTime.setSeconds(0);
 
-      // If the trigger time is in the past, schedule it for the next day
+      // Eğer tetikleme zamanı geçmişse, bir sonraki gün için planla
       if (triggerTime <= new Date()) {
         triggerTime.setDate(triggerTime.getDate() + 1);
       }
-
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: quote.text,
-          body: quote.author,
-          data: { type: "futureQuotes" },
-        },
-        trigger: triggerTime,
-      });
+    } else {
+      // Aksi takdirde, bir saat sonraya kur
+      triggerTime.setHours(triggerTime.getHours() + 1);
     }
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: quote.text,
+        body: quote.author,
+        data: { type: "futureQuotes" },
+      },
+      trigger: triggerTime,
+    });
   } catch (error) {
-    console.error("Error scheduling future quotes notification:", error);
+    console.error(
+      "Gelecek alıntılar bildirimi planlanırken hata oluştu:",
+      error
+    );
   }
 };
 
-// Fetch functions
 const fetchQuotesFromAPI = async () => {
   try {
     const response = await axios.get(QUOTES_API_URL);
     return response.data;
   } catch (error) {
-    console.error("Error fetching quotes from API:", error);
+    console.error("API'den alıntılar çekilirken hata oluştu:", error);
     return [];
   }
 };
@@ -86,7 +94,10 @@ const fetchQuotes = async (setQuotes, setArchiveQuotes, setFutureQuotes) => {
   saveToStorage(FUTURE_QUOTES_KEY, futureQuotes);
   setFutureQuotes(futureQuotes);
 
-  await scheduleNotification(futureQuotes[0]);
+  // İlk gelecek alıntı için bildirim planla
+  if (futureQuotes.length > 0) {
+    await scheduleNotification(futureQuotes[0]);
+  }
 };
 
 const loadQuotesFromArchive = (setQuotes) => {
@@ -96,7 +107,6 @@ const loadQuotesFromArchive = (setQuotes) => {
   }
 };
 
-// Store creation
 export const useQuoteStore = create((set) => ({
   quotes: [],
   archiveQuotes: [],
@@ -145,7 +155,6 @@ export const useQuoteStore = create((set) => ({
   },
 }));
 
-// Subscriptions
 useQuoteStore.subscribe(
   (state) => state.archiveQuotes,
   (archiveQuotes) => saveToStorage(ARCHIVE_QUOTES_KEY, archiveQuotes)
@@ -156,7 +165,6 @@ useQuoteStore.subscribe(
   (futureQuotes) => saveToStorage(FUTURE_QUOTES_KEY, futureQuotes)
 );
 
-// Notification handler
 const handleFutureQuotesNotification = async () => {
   const {
     futureQuotes,
@@ -181,12 +189,18 @@ const handleFutureQuotesNotification = async () => {
   setCameFromNotification(true);
   setPreventFetch(true);
 
-  // Fetch new future quotes before scheduling the next notification
+  // Yeni gelecek alıntıları çek ve bir sonraki bildirim için planla
   const newFutureQuotes = await fetchQuotesFromAPI();
   saveToStorage(FUTURE_QUOTES_KEY, newFutureQuotes);
   setFutureQuotes(newFutureQuotes);
 
-  await scheduleNotification(newFutureQuotes[0]);
+  // Önceden planlanmış tüm bildirimleri iptal et
+  await Notifications.cancelAllScheduledNotificationsAsync();
+
+  // İlk yeni gelecek alıntı için bildirim planla
+  if (newFutureQuotes.length > 0) {
+    await scheduleNotification(newFutureQuotes[0]);
+  }
 };
 
 Notifications.addNotificationResponseReceivedListener((response) => {
@@ -198,7 +212,7 @@ Notifications.addNotificationResponseReceivedListener((response) => {
 const initializeNotifications = async () => {
   const { status } = await Notifications.requestPermissionsAsync();
   if (status !== "granted") {
-    console.error("Notification permissions not granted");
+    console.error("Bildirim izinleri verilmedi");
     return;
   }
 
