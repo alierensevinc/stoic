@@ -48,6 +48,8 @@ export const useHome = () => {
   const viewShotRef = useRef();
   const navigation = useNavigation();
   const [loaded, setLoaded] = useState(false);
+  const [initialSlideShown, setInitialSlideShown] = useState(false);
+  const slideOffset = useSharedValue(0);
 
   useEffect(() => {
     const unsubscribeLoaded = interstitial.addAdEventListener(
@@ -88,6 +90,19 @@ export const useHome = () => {
       setCameFromNotification(false);
     };
   }, [cameFromNotification, preventFetch]);
+
+  useEffect(() => {
+    if (!initialSlideShown && quotes.length > 0) {
+      slideOffset.value = withTiming(
+        -screenWidth / 4,
+        { duration: 500 },
+        () => {
+          slideOffset.value = withTiming(0, { duration: 500 });
+        }
+      );
+      setInitialSlideShown(true);
+    }
+  }, [initialSlideShown, quotes]);
 
   const handleAction = (callback) => {
     incrementActionCount();
@@ -179,6 +194,7 @@ export const useHome = () => {
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: textOpacity.value,
+    transform: [{ translateX: slideOffset.value }],
   }));
 
   const navigateToBookmarks = () => {
@@ -187,17 +203,13 @@ export const useHome = () => {
     });
   };
 
+  const handleNextQuoteClick = () => {
+    changeQuote("next");
+  };
+
   const isBookmarked = bookmarks.some(
     (bookmark) => bookmark.text === quotes[0]?.text
   );
-
-  const extractPathUntilReactNative = (fullPath) => {
-    const reactNativeIndex = fullPath.indexOf("ReactNative/");
-    if (reactNativeIndex !== -1) {
-      return fullPath.substring(0, reactNativeIndex + "ReactNative/".length);
-    }
-    return fullPath;
-  };
 
   return {
     theme,
@@ -208,6 +220,7 @@ export const useHome = () => {
     shareQuote,
     navigateToBookmarks,
     toggleBookmark,
+    handleNextQuoteClick,
     isBookmarked,
   };
 };

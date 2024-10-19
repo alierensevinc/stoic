@@ -1,5 +1,5 @@
 import React from "react";
-import { StatusBar } from "expo-status-bar";
+import { StatusBar, Pressable } from "react-native";
 import { useHome } from "hooks/useHome";
 import ThemeToggle from "components/ThemeToggle";
 import ActionButtons from "components/ActionButtons";
@@ -17,6 +17,7 @@ const HomeScreen = () => {
     shareQuote,
     navigateToBookmarks,
     toggleBookmark,
+    handleNextQuoteClick,
     isBookmarked,
   } = useHome();
 
@@ -27,14 +28,16 @@ const HomeScreen = () => {
         backgroundColor={theme.statusBarBackgroundColor}
       />
       {quotes.length > 0 && (
-        <QuoteViewShot
-          viewShotRef={viewShotRef}
-          gestureHandler={gestureHandler} // Pass gesture handler
-          animatedStyle={animatedStyle} // Pass animated style
-          theme={theme}
-          quote={quotes[0]} // Pass only the current quote
-          captureOnReady={false} // Ensure it doesn't capture automatically
-        />
+        <Pressable onPress={handleNextQuoteClick}>
+          <QuoteViewShot
+            viewShotRef={viewShotRef}
+            gestureHandler={gestureHandler} // Pass gesture handler
+            animatedStyle={animatedStyle} // Pass animated style
+            theme={theme}
+            quote={quotes[0]} // Pass only the current quote
+            captureOnReady={false} // Ensure it doesn't capture automatically
+          />
+        </Pressable>
       )}
       <ActionButtons
         theme={theme}
