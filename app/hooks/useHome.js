@@ -13,21 +13,10 @@ import * as Sharing from "expo-sharing";
 import { useNavigation } from "@react-navigation/native";
 import { useBookmarksStore } from "store/bookmarksStore";
 import { useAdStore } from "store/adStore";
-import {
-  AdEventType,
-  InterstitialAd,
-  TestIds,
-} from "react-native-google-mobile-ads";
 import { useQuoteStore } from "store/quoteStore";
 import NetInfo from "@react-native-community/netinfo";
-import { IOS_ADMOB_INTERSTITIAL } from "@env";
 import * as FileSystem from "expo-file-system";
-
-const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : IOS_ADMOB_INTERSTITIAL;
-const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
-  keywords: ["food", "cooking", "fruit"],
-  requestNonPersonalizedAdsOnly: true,
-});
+import { useInterstitialAd } from "hooks/useInterstitialAd"; // Import the hook
 
 export const useHome = () => {
   const { theme } = useContext(ThemeContext);
@@ -47,34 +36,10 @@ export const useHome = () => {
   const screenWidth = Dimensions.get("window").width;
   const viewShotRef = useRef();
   const navigation = useNavigation();
-  const [loaded, setLoaded] = useState(false);
   const [initialSlideShown, setInitialSlideShown] = useState(false);
   const slideOffset = useSharedValue(0);
 
-  useEffect(() => {
-    const unsubscribeLoaded = interstitial.addAdEventListener(
-      AdEventType.LOADED,
-      () => {
-        setLoaded(true);
-      }
-    );
-
-    const unsubscribeClosed = interstitial.addAdEventListener(
-      AdEventType.CLOSED,
-      () => {
-        setLoaded(false);
-        interstitial.load();
-      }
-    );
-
-    interstitial.load();
-
-    return () => {
-      unsubscribeLoaded();
-      unsubscribeClosed();
-    };
-  }, []);
-
+  const { isAdLoaded, showAd } = useInterstitialAd();
   useEffect(() => {
     if (!cameFromNotification && !preventFetch) {
       NetInfo.fetch().then((state) => {
@@ -106,8 +71,8 @@ export const useHome = () => {
 
   const handleAction = (callback) => {
     incrementActionCount();
-    if ((actionCount + 1) % 5 === 0 && loaded) {
-      interstitial.show();
+    if ((actionCount + 1) % 5 === 0 && isAdLoaded) {
+      showAd();
       resetActionCount();
     }
     callback();

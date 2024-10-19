@@ -21,34 +21,27 @@ const loadFromStorage = (key) => {
   return storedData ? JSON.parse(storedData) : null;
 };
 
-// Notification functions
 const scheduleNotification = async (quote) => {
   try {
     const notificationsEnabled = storage.getBoolean(NOTIFICATIONS_ENABLED_KEY);
     if (!notificationsEnabled) {
-      console.log("Notifications are disabled. Skipping scheduling.");
       return;
     }
 
-    // Cancel all previously scheduled notifications
     await Notifications.cancelAllScheduledNotificationsAsync();
 
-    // Şu anki zamanı al
     let triggerTime = new Date();
     const currentHour = triggerTime.getHours();
 
-    // Eğer saat 22:00 ile 09:00 arasında ise, bildirimi sabah 9'a kur
     if (currentHour >= 22 || currentHour < 9) {
       triggerTime.setHours(9);
       triggerTime.setMinutes(0);
       triggerTime.setSeconds(0);
 
-      // Eğer tetikleme zamanı geçmişse, bir sonraki gün için planla
       if (triggerTime <= new Date()) {
         triggerTime.setDate(triggerTime.getDate() + 1);
       }
     } else {
-      // Aksi takdirde, bir saat sonraya kur
       triggerTime.setHours(triggerTime.getHours() + 1);
     }
 
@@ -94,7 +87,6 @@ const fetchQuotes = async (setQuotes, setArchiveQuotes, setFutureQuotes) => {
   saveToStorage(FUTURE_QUOTES_KEY, futureQuotes);
   setFutureQuotes(futureQuotes);
 
-  // İlk gelecek alıntı için bildirim planla
   if (futureQuotes.length > 0) {
     await scheduleNotification(futureQuotes[0]);
   }
@@ -189,15 +181,12 @@ const handleFutureQuotesNotification = async () => {
   setCameFromNotification(true);
   setPreventFetch(true);
 
-  // Yeni gelecek alıntıları çek ve bir sonraki bildirim için planla
   const newFutureQuotes = await fetchQuotesFromAPI();
   saveToStorage(FUTURE_QUOTES_KEY, newFutureQuotes);
   setFutureQuotes(newFutureQuotes);
 
-  // Önceden planlanmış tüm bildirimleri iptal et
   await Notifications.cancelAllScheduledNotificationsAsync();
 
-  // İlk yeni gelecek alıntı için bildirim planla
   if (newFutureQuotes.length > 0) {
     await scheduleNotification(newFutureQuotes[0]);
   }
@@ -212,7 +201,6 @@ Notifications.addNotificationResponseReceivedListener((response) => {
 const initializeNotifications = async () => {
   const { status } = await Notifications.requestPermissionsAsync();
   if (status !== "granted") {
-    console.error("Bildirim izinleri verilmedi");
     return;
   }
 

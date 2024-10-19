@@ -9,7 +9,7 @@ import { IOS_ADMOB_INTERSTITIAL } from "@env";
 const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : IOS_ADMOB_INTERSTITIAL;
 
 const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
-  keywords: ["food", "cooking", "fruit"],
+  keywords: ["stoic", "stoicism", "motivation", "inspiration"],
   requestNonPersonalizedAdsOnly: true,
 });
 
