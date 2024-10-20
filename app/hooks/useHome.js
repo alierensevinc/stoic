@@ -16,7 +16,7 @@ import { useAdStore } from "store/adStore";
 import { useQuoteStore } from "store/quoteStore";
 import NetInfo from "@react-native-community/netinfo";
 import * as FileSystem from "expo-file-system";
-import { useInterstitialAd } from "hooks/useInterstitialAd"; // Import the hook
+import { useInterstitialAd } from "hooks/useInterstitialAd";
 
 export const useHome = () => {
   const { theme } = useContext(ThemeContext);

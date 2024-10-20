@@ -1,4 +1,3 @@
-import React from "react";
 import { Text, View } from "react-native";
 import { useSettings } from "hooks/useSettings";
 import Container from "components/Container";

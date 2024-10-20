@@ -7,17 +7,16 @@ import Animated from "react-native-reanimated";
 const QuoteViewShot = ({
   viewShotRef,
   theme,
-  quote, // Accept a single quote
+  quote, 
   captureOnReady = false,
-  gestureHandler, // Accept gesture handler
-  animatedStyle, // Accept animated style
+  gestureHandler, 
+  animatedStyle, 
 }) => {
   const [viewReady, setViewReady] = useState(false);
   const internalRef = useRef();
 
   useEffect(() => {
     if (viewReady && captureOnReady && viewShotRef?.current) {
-      // Trigger the capture when the view is ready
       viewShotRef.current.capture();
     }
   }, [viewReady, captureOnReady, viewShotRef]);

@@ -1,4 +1,3 @@
-import React from "react";
 import { StatusBar, Pressable } from "react-native";
 import { useHome } from "hooks/useHome";
 import ThemeToggle from "components/ThemeToggle";
@@ -31,11 +30,11 @@ const HomeScreen = () => {
         <Pressable onPress={handleNextQuoteClick}>
           <QuoteViewShot
             viewShotRef={viewShotRef}
-            gestureHandler={gestureHandler} // Pass gesture handler
-            animatedStyle={animatedStyle} // Pass animated style
+            gestureHandler={gestureHandler}
+            animatedStyle={animatedStyle}
             theme={theme}
-            quote={quotes[0]} // Pass only the current quote
-            captureOnReady={false} // Ensure it doesn't capture automatically
+            quote={quotes[0]}
+            captureOnReady={false}
           />
         </Pressable>
       )}
