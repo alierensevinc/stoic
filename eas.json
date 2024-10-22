@@ -28,6 +28,12 @@
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "appleId": "sevinc.aeren@gmail.com",
+        "ascAppId": "6737173970",
+        "appleTeamId": "EF8VE8N587"
+      }
+    }
   }
 }

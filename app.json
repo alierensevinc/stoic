@@ -2,7 +2,7 @@
   "expo": {
     "name": "stoic",
     "slug": "stoic",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -15,7 +15,7 @@
       "bundleIdentifier": "com.sevincaeren.stoic",
       "supportsTablet": false,
       "infoPlist": {
-        "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
+        "NSUserTrackingUsageDescription": "Your data will be used to provide you with a better and personalized ad experience."
       }
     },
     "android": {
@@ -107,6 +107,12 @@
             "image": "./assets//icon-alternative.png",
             "prerendered": true
           }
+        }
+      ],
+      [
+        "expo-tracking-transparency",
+        {
+          "NSUserTrackingUsageDescription": "Your data will be used to provide you with a better and personalized ad experience."
         }
       ]
     ],

@@ -10,6 +10,8 @@
     "eas-build-ios-simulator": "eas build --profile development-simulator --platform ios",
     "eas-build-ios-development": "eas build --profile development --platform ios",
     "eas-build-ios-preview": "NODE_ENV=development eas build --profile preview --platform ios",
+    "eas-build-ios-production": "NODE_ENV=production eas build --profile production --platform ios",
+    "eas-submit-ios": "eas submit -p ios --latest",
     "android": "expo run:android",
     "ios": "expo run:ios"
   },
@@ -34,6 +36,7 @@
     "expo-sharing": "~12.0.1",
     "expo-splash-screen": "~0.27.5",
     "expo-status-bar": "~1.12.1",
+    "expo-tracking-transparency": "~4.0.2",
     "moment": "^2.30.1",
     "nativewind": "^2.0.11",
     "react": "18.2.0",
