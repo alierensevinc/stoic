@@ -2,7 +2,7 @@
   "expo": {
     "name": "stoic",
     "slug": "stoic",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,7 +14,7 @@
     "ios": {
       "bundleIdentifier": "com.sevincaeren.stoic",
       "supportsTablet": false,
-      "buildNumber": "5",
+      "buildNumber": "6",
       "infoPlist": {
         "NSUserTrackingUsageDescription": "Your data will be used to provide you with a better and personalized ad experience."
       }
@@ -41,7 +41,7 @@
       [
         "react-native-google-mobile-ads",
         {
-          "iosAppId": "ca-app-pub-4954831375392388~6035696472",
+          "iosAppId": "ca-app-pub-4954831375392388~9046599086",
           "userTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you.",
           "skAdNetworkItems": [
             "cstr6suwn9.skadnetwork",
