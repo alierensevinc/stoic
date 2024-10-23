@@ -13,6 +13,7 @@ export const useInterstitialAd = () => {
   const [isAdLoaded, setIsAdLoaded] = useState(false);
   const [requestNonPersonalizedAdsOnly, setRequestNonPersonalizedAdsOnly] =
     useState(false);
+  let interstitial;
 
   useEffect(() => {
     const requestTrackingPermission = async () => {
@@ -27,7 +28,7 @@ export const useInterstitialAd = () => {
 
     requestTrackingPermission();
 
-    const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
+    interstitial = InterstitialAd.createForAdRequest(adUnitId, {
       keywords: ["stoic", "stoicism", "motivation", "inspiration"],
       requestNonPersonalizedAdsOnly,
     });
@@ -56,7 +57,7 @@ export const useInterstitialAd = () => {
   }, [requestNonPersonalizedAdsOnly]);
 
   const showAd = () => {
-    if (isAdLoaded) {
+    if (isAdLoaded && interstitial) {
       interstitial.show();
     }
   };
