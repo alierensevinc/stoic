@@ -7,6 +7,7 @@ import * as Notifications from "expo-notifications";
 import { MMKV } from "react-native-mmkv";
 import * as MailComposer from "expo-mail-composer";
 import * as Application from "expo-application";
+import { Share } from "react-native";
 
 const storage = new MMKV();
 const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled";
@@ -44,8 +45,10 @@ const handleToggleNotifications = async (value, setNotificationsEnabled) => {
 const handleSendEmail = async () => {
   const isAvailable = await MailComposer.isAvailableAsync();
   if (!isAvailable) {
-    Alert.alert("Mail Composer is not available on this device");
-    return;
+    Linking.openURL(
+      "mailto:sevinc.aeren@gmail.com?subject=Hello from Stoic App&body=" +
+        Application.nativeApplicationVersion
+    );
   }
 
   const options = {
@@ -64,6 +67,23 @@ const handleSendEmail = async () => {
 
 const handleOpenLinkedin = () => {
   Linking.openURL("https://www.linkedin.com/in/alierensevinc/");
+};
+
+const handleShare = async () => {
+  try {
+    await Share.share({
+      message:
+        "Stoic - Daily Quotes : itms-apps://itunes.apple.com/app/6737173970",
+    });
+  } catch (error) {
+    Alert.alert("Failed to share", error.message);
+  }
+};
+
+const handleRate = () => {
+  Linking.openURL(
+    "itms-apps://itunes.apple.com/app/viewContentsUserReviews/id6737173970?action=write-review"
+  );
 };
 
 export const useSettings = () => {
@@ -103,5 +123,7 @@ export const useSettings = () => {
       handleToggleNotifications(value, setNotificationsEnabled),
     handleSendEmail,
     handleOpenLinkedin,
+    handleShare,
+    handleRate,
   };
 };

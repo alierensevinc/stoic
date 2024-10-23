@@ -17,6 +17,8 @@ const SettingsScreen = () => {
     handleToggleNotifications,
     handleSendEmail,
     handleOpenLinkedin,
+    handleShare,
+    handleRate
   } = useSettings();
 
   const handleDeleteAllBookmarks = () => {
@@ -55,6 +57,19 @@ const SettingsScreen = () => {
           icon="logo-linkedin"
           title="Reach me on LinkedIn"
           onPress={handleOpenLinkedin}
+          color={theme.buttonColor}
+        />
+        <Divider color={theme.textColor} />
+        <SettingsItem
+          icon="share-social-outline"
+          title="Share Stoic - Daily Quotes"
+          onPress={handleShare}
+          color={theme.buttonColor}
+        />
+        <SettingsItem
+          icon="star-outline"
+          title="Rate Stoic - Daily Quotes"
+          onPress={handleRate}
           color={theme.buttonColor}
         />
         <Divider color={theme.textColor} />
