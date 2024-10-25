@@ -2,7 +2,7 @@ export const bookmarkScreenInterpolator = ({ current }) => {
   const progress = current.progress;
 
   const opacity = progress.interpolate({
-    inputRange: [0, 1],
+    inputRange: [0, 0.5],
     outputRange: [0, 1],
   });
 
@@ -24,7 +24,7 @@ export const settingsScreenInterpolator = ({ current }) => {
   const progress = current.progress;
 
   const opacity = progress.interpolate({
-    inputRange: [0, 1],
+    inputRange: [0, 0.5],
     outputRange: [0, 1],
   });
 

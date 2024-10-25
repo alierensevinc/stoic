@@ -1,6 +1,5 @@
-import { useEffect, useContext, useRef, useState } from "react";
+import { useEffect, useContext, useRef } from "react";
 import { Dimensions } from "react-native";
-import { MMKV } from "react-native-mmkv";
 import { ThemeContext } from "context/ThemeContext";
 import {
   useAnimatedGestureHandler,
@@ -14,6 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useBookmarksStore } from "store/bookmarksStore";
 import { useAdStore } from "store/adStore";
 import { useQuoteStore } from "store/quoteStore";
+import { useAnimationStore } from "store/animationStore";
 import NetInfo from "@react-native-community/netinfo";
 import * as FileSystem from "expo-file-system";
 import { useInterstitialAd } from "hooks/useInterstitialAd";
@@ -29,15 +29,15 @@ export const useHome = () => {
     setCameFromNotification,
     preventFetch,
   } = useQuoteStore();
-  const { bookmarks, addToBookmarks, removeFromBookmarks } =
-    useBookmarksStore();
+  const { bookmarks, addToBookmarks, removeFromBookmarks } = useBookmarksStore();
   const { actionCount, incrementActionCount, resetActionCount } = useAdStore();
+  const { hasShownAnimation, setHasShownAnimation } = useAnimationStore();
   const textOpacity = useSharedValue(1);
   const screenWidth = Dimensions.get("window").width;
   const viewShotRef = useRef();
   const navigation = useNavigation();
-  const [initialSlideShown, setInitialSlideShown] = useState(false);
   const slideOffset = useSharedValue(0);
+  const fadeOpacity = useSharedValue(1);
 
   const { isAdLoaded, showAd } = useInterstitialAd();
   useEffect(() => {
@@ -57,17 +57,24 @@ export const useHome = () => {
   }, [cameFromNotification, preventFetch]);
 
   useEffect(() => {
-    if (!initialSlideShown && quotes.length > 0) {
+    if (!hasShownAnimation && quotes.length > 0) {
       slideOffset.value = withTiming(
-        -screenWidth / 4,
-        { duration: 500 },
-        () => {
-          slideOffset.value = withTiming(0, { duration: 500 });
-        }
+          -screenWidth / 4,
+          { duration: 500 },
+          () => {
+            slideOffset.value = withTiming(screenWidth / 4, { duration: 500 }, () => {
+              slideOffset.value = withTiming(0, { duration: 500 }, () => {
+                fadeOpacity.value = withTiming(0, { duration: 500 }, () => {
+                  fadeOpacity.value = withTiming(1, { duration: 500 }, () => {
+                    runOnJS(setHasShownAnimation)(true);
+                  });
+                });
+              });
+            });
+          }
       );
-      setInitialSlideShown(true);
     }
-  }, [initialSlideShown, quotes]);
+  }, [hasShownAnimation, quotes]);
 
   const handleAction = (callback) => {
     incrementActionCount();
@@ -100,8 +107,7 @@ export const useHome = () => {
         await new Promise((resolve) => setTimeout(resolve, 100));
 
         const uri = await viewShotRef.current.capture();
-        const extractedPath =
-          FileSystem.cacheDirectory + "Quote by " + author + ".jpeg";
+        const extractedPath = FileSystem.cacheDirectory + "Quote by " + author + ".jpeg";
         await FileSystem.copyAsync({
           from: uri,
           to: extractedPath,
@@ -145,8 +151,8 @@ export const useHome = () => {
   const gestureHandler = useAnimatedGestureHandler({
     onEnd: (event, context) => {
       if (
-        Math.abs(event.velocityX) > 400 ||
-        Math.abs(event.translationX) > screenWidth / 5
+          Math.abs(event.velocityX) > 400 ||
+          Math.abs(event.translationX) > screenWidth / 5
       ) {
         if (event.translationX > 0) {
           runOnJS(changeQuote)("previous");
@@ -162,6 +168,10 @@ export const useHome = () => {
     transform: [{ translateX: slideOffset.value }],
   }));
 
+  const fadeStyle = useAnimatedStyle(() => ({
+    opacity: fadeOpacity.value,
+  }));
+
   const navigateToBookmarks = () => {
     handleAction(() => {
       navigation.navigate("Bookmarks");
@@ -173,7 +183,7 @@ export const useHome = () => {
   };
 
   const isBookmarked = bookmarks.some(
-    (bookmark) => bookmark.text === quotes[0]?.text
+      (bookmark) => bookmark.text === quotes[0]?.text
   );
 
   return {
@@ -182,6 +192,7 @@ export const useHome = () => {
     viewShotRef,
     gestureHandler,
     animatedStyle,
+    fadeStyle,
     shareQuote,
     navigateToBookmarks,
     toggleBookmark,
