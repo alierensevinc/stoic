@@ -3,14 +3,13 @@
 Stoic is a mobile application that brings you daily quotes and insights from Stoic philosophers like Marcus Aurelius, Seneca, and Epictetus. The app aims to inspire and guide users through life's challenges by providing timeless wisdom and motivational quotes.
 
 ## Features
-
 - **Daily Quotes**: Receive daily wisdom from the greatest Stoic philosophers.
 - **Personalized Notifications**: Get timely reminders to reflect on Stoic teachings.
 - **Beautiful Interface**: Enjoy a clean, user-friendly design that enhances your reading experience.
 - **Offline Access**: Access your favorite quotes anytime, anywhere, even without an internet connection.
+- **Seamless Animations**: Smooth animations managed with `Reanimated` and persistent state with `MMKV`.
 
 ## Tech Stack
-
 - **React Native**: For building the mobile application.
 - **Expo**: For development, building, and deploying the app.
 - **Zustand**: For state management.
@@ -24,6 +23,7 @@ Stoic is a mobile application that brings you daily quotes and insights from Sto
 - **Expo Sharing**: For sharing content.
 - **Expo Mail Composer**: For composing emails.
 - **Expo Application**: For accessing application details.
+- **Tailwind CSS**: For styling the application.
 
 ## Reach Me
 

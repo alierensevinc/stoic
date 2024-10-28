@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { Text, View, ScrollView } from "react-native";
 import { useSettings } from "hooks/useSettings";
 import Container from "components/Container";
 import BackButton from "components/BackButton";
@@ -31,13 +31,13 @@ const SettingsScreen = () => {
         onPress={() => navigation.goBack()}
         color={theme.buttonColor}
       />
-      <View className="flex-1 justify-start w-100">
-        <Text
+      <Text
           className="text-2xl font-bold mb-5 text-center"
           style={{ color: theme.textColor, fontFamily: "Montserrat-Medium" }}
-        >
-          Settings
-        </Text>
+      >
+        Settings
+      </Text>
+      <ScrollView className="flex-1 w-100">
         <SettingsToggleItem
           icon="time-outline"
           title="Notifications"
@@ -79,7 +79,7 @@ const SettingsScreen = () => {
           onPress={handleDeleteAllBookmarks}
           color={theme.buttonColor}
         />
-      </View>
+      </ScrollView>
       <AppInfo theme={theme} />
       <InlineAd className="absolute bottom-0 left-0 right-0 self-center" />
     </Container>
