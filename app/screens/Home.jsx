@@ -1,5 +1,5 @@
-import { StatusBar, Pressable } from "react-native";
-import { useHome } from "hooks/useHome";
+import {Pressable, StatusBar} from "react-native";
+import {useHome} from "hooks/useHome";
 import ThemeToggle from "components/ThemeToggle";
 import ActionButtons from "components/ActionButtons";
 import QuoteViewShot from "components/QuoteViewShot";
@@ -49,8 +49,8 @@ const HomeScreen = () => {
                 addToBookmarks={toggleBookmark}
                 isBookmarked={isBookmarked}
             />
-            <ThemeToggle />
-            <SettingsButton theme={theme} />
+            <ThemeToggle/>
+            <SettingsButton theme={theme}/>
         </Container>
     );
 };

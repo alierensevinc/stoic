@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@react-native-community/netinfo": "^11.4.0",
+    "@react-native-firebase/analytics": "^21.2.0",
     "@react-native-firebase/app": "^21.2.0",
     "@react-native-firebase/crashlytics": "^21.2.0",
     "@react-navigation/native": "^6.1.18",

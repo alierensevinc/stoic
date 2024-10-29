@@ -1,13 +1,12 @@
-import {useContext, useState, useEffect} from "react";
+import {useContext, useEffect, useState} from "react";
 import {ThemeContext} from "context/ThemeContext";
 import {useNavigation} from "@react-navigation/native";
 import {useBookmarksStore} from "store/bookmarksStore";
-import {AppState, Alert, Linking} from "react-native";
+import {Alert, AppState, Linking, Share} from "react-native";
 import * as Notifications from "expo-notifications";
 import {MMKV} from "react-native-mmkv";
 import * as MailComposer from "expo-mail-composer";
 import * as Application from "expo-application";
-import {Share} from "react-native";
 
 const storage = new MMKV();
 const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled";

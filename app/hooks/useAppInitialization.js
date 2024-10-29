@@ -1,21 +1,21 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import mobileAds from "react-native-google-mobile-ads";
 
 export const useAppInitialization = () => {
-  const [appIsReady, setAppIsReady] = useState(false);
+    const [appIsReady, setAppIsReady] = useState(false);
 
-  useEffect(() => {
-    async function prepare() {
-      try {
-        await mobileAds().initialize();
-        setAppIsReady(true);
-      } catch (e) {
-        console.warn(e);
-      }
-    }
+    useEffect(() => {
+        async function prepare() {
+            try {
+                await mobileAds().initialize();
+                setAppIsReady(true);
+            } catch (e) {
+                console.warn(e);
+            }
+        }
 
-    prepare();
-  }, []);
+        prepare();
+    }, []);
 
-  return appIsReady;
+    return appIsReady;
 };

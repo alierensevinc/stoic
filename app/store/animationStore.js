@@ -1,5 +1,5 @@
-import { MMKV } from "react-native-mmkv";
-import { create } from "zustand";
+import {MMKV} from "react-native-mmkv";
+import {create} from "zustand";
 
 const storage = new MMKV();
 
@@ -19,6 +19,6 @@ export const useAnimationStore = create((set) => ({
 
     setHasShownAnimation: (value) => {
         saveToStorage(ANIMATION_SHOWN_KEY, value);
-        set({ hasShownAnimation: value });
+        set({hasShownAnimation: value});
     },
 }));
