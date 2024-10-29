@@ -17,7 +17,8 @@
       "buildNumber": "6",
       "infoPlist": {
         "NSUserTrackingUsageDescription": "Your data will be used to provide you with a better and personalized ad experience."
-      }
+      },
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
@@ -30,6 +31,8 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      "@react-native-firebase/app",
+      "@react-native-firebase/crashlytics",
       [
         "expo-build-properties",
         {
