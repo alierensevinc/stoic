@@ -1,6 +1,6 @@
-import {useContext, useEffect, useRef} from "react";
-import {Dimensions} from "react-native";
-import {ThemeContext} from "context/ThemeContext";
+import { useContext, useEffect, useRef } from "react";
+import { Dimensions } from "react-native";
+import { ThemeContext } from "context/ThemeContext";
 import {
     runOnJS,
     useAnimatedGestureHandler,
@@ -9,17 +9,18 @@ import {
     withTiming,
 } from "react-native-reanimated";
 import * as Sharing from "expo-sharing";
-import {useNavigation} from "@react-navigation/native";
-import {useBookmarksStore} from "store/bookmarksStore";
-import {useAdStore} from "store/adStore";
-import {useQuoteStore} from "store/quoteStore";
-import {useAnimationStore} from "store/animationStore";
+import { useNavigation } from "@react-navigation/native";
+import { useBookmarksStore } from "store/bookmarksStore";
+import { useAdStore } from "store/adStore";
+import { useQuoteStore } from "store/quoteStore";
+import { useAnimationStore } from "store/animationStore";
 import NetInfo from "@react-native-community/netinfo";
 import * as FileSystem from "expo-file-system";
-import {useInterstitialAd} from "hooks/useInterstitialAd";
+import { useInterstitialAd } from "hooks/useInterstitialAd";
+import analytics from '@react-native-firebase/analytics';
 
 export const useHome = () => {
-    const {theme} = useContext(ThemeContext);
+    const { theme } = useContext(ThemeContext);
     const {
         quotes,
         setQuotes,
@@ -29,9 +30,9 @@ export const useHome = () => {
         setCameFromNotification,
         preventFetch,
     } = useQuoteStore();
-    const {bookmarks, addToBookmarks, removeFromBookmarks} = useBookmarksStore();
-    const {actionCount, incrementActionCount, resetActionCount} = useAdStore();
-    const {hasShownAnimation, setHasShownAnimation} = useAnimationStore();
+    const { bookmarks, addToBookmarks, removeFromBookmarks } = useBookmarksStore();
+    const { actionCount, incrementActionCount, resetActionCount } = useAdStore();
+    const { hasShownAnimation, setHasShownAnimation } = useAnimationStore();
     const textOpacity = useSharedValue(1);
     const screenWidth = Dimensions.get("window").width;
     const viewShotRef = useRef();
@@ -39,7 +40,7 @@ export const useHome = () => {
     const slideOffset = useSharedValue(0);
     const fadeOpacity = useSharedValue(1);
 
-    const {isAdLoaded, showAd} = useInterstitialAd();
+    const { isAdLoaded, showAd } = useInterstitialAd();
     useEffect(() => {
         if (!cameFromNotification && !preventFetch) {
             NetInfo.fetch().then((state) => {
@@ -60,12 +61,12 @@ export const useHome = () => {
         if (!hasShownAnimation && quotes.length > 0) {
             slideOffset.value = withTiming(
                 -screenWidth / 4,
-                {duration: 500},
+                { duration: 500 },
                 () => {
-                    slideOffset.value = withTiming(screenWidth / 4, {duration: 500}, () => {
-                        slideOffset.value = withTiming(0, {duration: 500}, () => {
-                            fadeOpacity.value = withTiming(0, {duration: 500}, () => {
-                                fadeOpacity.value = withTiming(1, {duration: 500}, () => {
+                    slideOffset.value = withTiming(screenWidth / 4, { duration: 500 }, () => {
+                        slideOffset.value = withTiming(0, { duration: 500 }, () => {
+                            fadeOpacity.value = withTiming(0, { duration: 500 }, () => {
+                                fadeOpacity.value = withTiming(1, { duration: 500 }, () => {
                                     runOnJS(setHasShownAnimation)(true);
                                 });
                             });
@@ -90,8 +91,10 @@ export const useHome = () => {
             const currentQuote = quotes[0];
             if (bookmarks.some((bookmark) => bookmark.text === currentQuote.text)) {
                 removeFromBookmarks(currentQuote);
+                analytics().logEvent('remove_bookmark', { quote: currentQuote.text });
             } else {
                 addToBookmarks(currentQuote);
+                analytics().logEvent('add_bookmark', { quote: currentQuote.text });
             }
         });
     };
@@ -118,6 +121,7 @@ export const useHome = () => {
                     dialogTitle: "Share this quote",
                     UTI: "public.jpeg",
                 });
+                analytics().logEvent('share_quote', { author });
             } catch (error) {
                 console.error("Error sharing quote:", error);
             }
@@ -127,7 +131,7 @@ export const useHome = () => {
     const changeQuote = (direction) => {
         handleAction(() => {
             if (quotes.length > 1) {
-                textOpacity.value = withTiming(0, {duration: 500}, () => {
+                textOpacity.value = withTiming(0, { duration: 500 }, () => {
                     runOnJS(updateQuotes)(direction);
                 });
             }
@@ -145,7 +149,8 @@ export const useHome = () => {
             ];
             setQuotes(previousQuotes);
         }
-        textOpacity.value = withTiming(1, {duration: 500});
+        textOpacity.value = withTiming(1, { duration: 500 });
+        analytics().logEvent('change_quote', { direction });
     };
 
     const gestureHandler = useAnimatedGestureHandler({
@@ -165,7 +170,7 @@ export const useHome = () => {
 
     const animatedStyle = useAnimatedStyle(() => ({
         opacity: textOpacity.value,
-        transform: [{translateX: slideOffset.value}],
+        transform: [{ translateX: slideOffset.value }],
     }));
 
     const fadeStyle = useAnimatedStyle(() => ({
@@ -175,6 +180,7 @@ export const useHome = () => {
     const navigateToBookmarks = () => {
         handleAction(() => {
             navigation.navigate("Bookmarks");
+            analytics().logEvent('navigate_to_bookmarks');
         });
     };
 

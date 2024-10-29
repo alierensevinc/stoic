@@ -7,6 +7,7 @@ import * as Notifications from "expo-notifications";
 import {MMKV} from "react-native-mmkv";
 import * as MailComposer from "expo-mail-composer";
 import * as Application from "expo-application";
+import analytics from '@react-native-firebase/analytics';
 
 const storage = new MMKV();
 const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled";
@@ -35,9 +36,11 @@ const handleToggleNotifications = async (value, setNotificationsEnabled) => {
         }
         storage.set(NOTIFICATIONS_ENABLED_KEY, true);
         setNotificationsEnabled(true);
+        await analytics().logEvent('notifications_enabled');
     } else {
         storage.set(NOTIFICATIONS_ENABLED_KEY, false);
         setNotificationsEnabled(false);
+        await analytics().logEvent('notifications_disabled');
     }
 };
 
@@ -57,24 +60,26 @@ const handleSendEmail = async () => {
     };
 
     await MailComposer.composeAsync(options);
-
+    await analytics().logEvent('send_email');
 };
 
-const handleOpenLinkedin = () => {
+const handleOpenLinkedin = async () => {
     Linking.openURL("https://www.linkedin.com/in/alierensevinc/");
+    await analytics().logEvent('open_linkedin');
 };
 
 const handleShare = async () => {
     await Share.share({
-        message:
-            "Stoic - Daily Quotes : https://itunes.apple.com/app/6737173970",
+        message: "Stoic - Daily Quotes : https://itunes.apple.com/app/6737173970",
     });
+    await analytics().logEvent('share_app');
 };
 
-const handleRate = () => {
+const handleRate = async () => {
     Linking.openURL(
         "itms-apps://itunes.apple.com/app/viewContentsUserReviews/id6737173970?action=write-review"
     );
+    await analytics().logEvent('rate_app');
 };
 
 export const useSettings = () => {
