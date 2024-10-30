@@ -16,7 +16,9 @@
       "supportsTablet": false,
       "buildNumber": "6",
       "infoPlist": {
-        "NSUserTrackingUsageDescription": "Your data will be used to provide you with a better and personalized ad experience."
+        "NSUserTrackingUsageDescription": "Your data will be used to provide you with a better and personalized ad experience.",
+        "NSPhotoLibraryAddUsageDescription": "Stoic needs access to your photo library to save images.",
+        "NSPhotoLibraryUsageDescription": "Stoic needs access to your photo library to save images.",
       },
       "googleServicesFile": "./GoogleService-Info.plist"
     },

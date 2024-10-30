@@ -114,6 +114,10 @@
       <key>NSAllowsLocalNetworking</key>
       <true/>
     </dict>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Stoic needs access to your photo library to save images.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Stoic needs access to your photo library to save images.</string>
     <key>NSUserTrackingUsageDescription</key>
     <string>This identifier will be used to deliver personalized ads to you.</string>
     <key>SKAdNetworkItems</key>
