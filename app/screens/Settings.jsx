@@ -18,7 +18,8 @@ const SettingsScreen = () => {
         handleSendEmail,
         handleOpenLinkedin,
         handleShare,
-        handleRate
+        handleRate,
+        handleVisitPrivacyPolicy
     } = useSettings();
 
     return (
@@ -66,6 +67,13 @@ const SettingsScreen = () => {
                     icon="star-outline"
                     title="Rate Stoic - Daily Quotes"
                     onPress={handleRate}
+                    color={theme.buttonColor}
+                />
+                <Divider color={theme.textColor}/>
+                <SettingsItem
+                    icon="accessibility-outline"
+                    title="Visit Privacy Policy"
+                    onPress={handleVisitPrivacyPolicy}
                     color={theme.buttonColor}
                 />
                 <Divider color={theme.textColor}/>

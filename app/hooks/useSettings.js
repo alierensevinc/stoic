@@ -8,6 +8,7 @@ import {MMKV} from "react-native-mmkv";
 import * as MailComposer from "expo-mail-composer";
 import * as Application from "expo-application";
 import analytics from '@react-native-firebase/analytics';
+import * as WebBrowser from 'expo-web-browser';
 
 const storage = new MMKV();
 const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled";
@@ -82,6 +83,10 @@ const handleRate = async () => {
     await analytics().logEvent('rate_app');
 };
 
+const handleVisitPrivacyPolicy = async () => {
+    await WebBrowser.openBrowserAsync('https://alierensevinc.github.io/stoic-website/privacy-policy/');
+};
+
 export const useSettings = () => {
     const {theme} = useContext(ThemeContext);
     const navigation = useNavigation();
@@ -121,5 +126,6 @@ export const useSettings = () => {
         handleOpenLinkedin,
         handleShare,
         handleRate,
+        handleVisitPrivacyPolicy
     };
 };
