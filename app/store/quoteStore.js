@@ -1,8 +1,8 @@
-import {MMKV} from "react-native-mmkv";
-import axios from "axios";
+import { MMKV } from "react-native-mmkv";
 import moment from "moment";
-import {create} from "zustand";
+import { create } from "zustand";
 import * as Notifications from "expo-notifications";
+import axiosInstance from "utils/axiosInstance";
 
 const storage = new MMKV();
 
@@ -47,7 +47,7 @@ const scheduleNotification = async (quote) => {
         content: {
             title: quote.text,
             body: quote.author,
-            data: {type: "futureQuotes"},
+            data: { type: "futureQuotes" },
         },
         trigger: triggerTime,
     });
@@ -55,7 +55,7 @@ const scheduleNotification = async (quote) => {
 
 const fetchQuotesFromAPI = async () => {
     try {
-        const response = await axios.get(QUOTES_API_URL);
+        const response = await axiosInstance.get(QUOTES_API_URL);
         return response.data;
     } catch (error) {
         console.error("Error fetching quotes from API:", error);
@@ -63,16 +63,12 @@ const fetchQuotesFromAPI = async () => {
     }
 };
 
-const fetchAndStoreQuotes = async (
-    setQuotes,
-    setArchiveQuotes,
-    setFutureQuotes
-) => {
+const fetchAndStoreQuotes = async (setQuotes, setArchiveQuotes, setFutureQuotes) => {
     const oldQuotes = loadFromStorage(QUOTES_KEY)?.quotes || [];
     setArchiveQuotes(oldQuotes);
 
     const quotes = await fetchQuotesFromAPI();
-    saveToStorage(QUOTES_KEY, {date: moment().format("YYYY-MM-DD HH"), quotes});
+    saveToStorage(QUOTES_KEY, { date: moment().format("YYYY-MM-DD HH"), quotes });
     setQuotes(quotes);
 
     const futureQuotes = await fetchQuotesFromAPI();
@@ -133,7 +129,7 @@ Notifications.addNotificationResponseReceivedListener((response) => {
 });
 
 const initializeNotifications = async () => {
-    const {status} = await Notifications.requestPermissionsAsync();
+    const { status } = await Notifications.requestPermissionsAsync();
     if (status !== "granted") {
         console.error("Notification permissions not granted");
         return;
@@ -156,13 +152,12 @@ export const useQuoteStore = create((set) => ({
     notificationFutureQuote: null,
     preventFetch: false,
 
-    setQuotes: (quotes) => set({quotes}),
-    setArchiveQuotes: (archiveQuotes) => set({archiveQuotes}),
-    setFutureQuotes: (futureQuotes) => set({futureQuotes}),
-    setCameFromNotification: (value) => set({cameFromNotification: value}),
-    setNotificationFutureQuote: (quote) =>
-        set({notificationFutureQuote: quote}),
-    setPreventFetch: (value) => set({preventFetch: value}),
+    setQuotes: (quotes) => set({ quotes }),
+    setArchiveQuotes: (archiveQuotes) => set({ archiveQuotes }),
+    setFutureQuotes: (futureQuotes) => set({ futureQuotes }),
+    setCameFromNotification: (value) => set({ cameFromNotification: value }),
+    setNotificationFutureQuote: (quote) => set({ notificationFutureQuote: quote }),
+    setPreventFetch: (value) => set({ preventFetch: value }),
 
     fetchQuotes: async () => {
         const {
@@ -206,4 +201,4 @@ useQuoteStore.subscribe(
     (futureQuotes) => saveToStorage(FUTURE_QUOTES_KEY, futureQuotes)
 );
 
-export {initializeNotifications};
+export { initializeNotifications };
