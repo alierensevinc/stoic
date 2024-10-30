@@ -116,7 +116,7 @@ export const useHome = () => {
                     to: extractedPath,
                 });
 
-                navigation.navigate("ShareModal", { uri: "file://" + extractedPath, quote: quotes[0] });
+                navigation.navigate("Share", { uri: "file://" + extractedPath, quote: quotes[0] });
 
                 analytics().logEvent('share_quote', { author });
             } catch (error) {

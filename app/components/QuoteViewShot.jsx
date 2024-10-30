@@ -23,7 +23,7 @@ const QuoteViewShot = ({
 
     return (
         <SafeAreaView
-            className="flex-1 items-center justify-center p-8"
+            className="flex-1 items-center justify-center p-8 w-full h-full"
             style={{backgroundColor: theme.backgroundColor}}
         >
             <PanGestureHandler onGestureEvent={gestureHandler}>

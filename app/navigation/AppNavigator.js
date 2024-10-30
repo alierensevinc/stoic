@@ -2,7 +2,7 @@ import {createStackNavigator, TransitionSpecs} from "@react-navigation/stack";
 import HomeScreen from "screens/Home";
 import BookmarksScreen from "screens/Bookmarks";
 import SettingsScreen from "screens/Settings";
-import ShareModal from "screens/ShareModal";
+import ShareModal from "screens/Share";
 import {bookmarkScreenInterpolator, settingsScreenInterpolator,} from "utils/animations";
 
 const Stack = createStackNavigator();
@@ -41,7 +41,14 @@ const AppNavigator = () => (
                 cardStyleInterpolator: settingsScreenInterpolator,
             }}
         />
-        <Stack.Screen name="ShareModal" component={ShareModal} options={{headerShown: false, presentation: "modal"}}/>
+        <Stack.Screen
+            name="Share"
+            component={ShareModal}
+            options={{
+                headerShown: false,
+                presentation: "modal",
+            }}
+        />
     </Stack.Navigator>
 );
 
