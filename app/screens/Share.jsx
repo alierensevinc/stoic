@@ -1,12 +1,12 @@
 import {useContext} from 'react';
 import {Dimensions, Image, TouchableOpacity, View} from 'react-native';
-import Share from 'react-native-share';
 import Toast, {BaseToast} from 'react-native-toast-message';
 import Clipboard from '@react-native-clipboard/clipboard';
 import {CameraRoll} from "@react-native-camera-roll/camera-roll";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {ThemeContext} from "context/ThemeContext";
 import Container from "components/Container";
+import * as Sharing from "expo-sharing";
 
 const ShareModal = ({route, navigation}) => {
     const {uri, quote} = route.params;
@@ -40,9 +40,10 @@ const ShareModal = ({route, navigation}) => {
     };
 
     const onShare = async () => {
-        await ShareModal.open({
-            url: uri,
-            title: "Share this quote",
+        await Sharing.shareAsync(uri, {
+            mimeType: "image/jpeg",
+            dialogTitle: "Share this quote",
+            UTI: "public.jpeg",
         });
     };
 

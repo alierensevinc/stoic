@@ -7,6 +7,7 @@ import { useInterstitialAd } from "hooks/useInterstitialAd";
 import { ThemeContext } from "context/ThemeContext";
 import * as FileSystem from "expo-file-system";
 import analytics from '@react-native-firebase/analytics';
+import {useNavigation} from "@react-navigation/native";
 
 export const useBookmarks = () => {
     const { bookmarks, removeFromBookmarks } = useBookmarksStore();
@@ -18,6 +19,8 @@ export const useBookmarks = () => {
         quoteToShare: null,
     });
     const viewShotRef = useRef();
+    const navigation = useNavigation();
+
 
     const handleAction = (callback) => {
         incrementActionCount();
@@ -45,12 +48,9 @@ export const useBookmarks = () => {
                     from: uri,
                     to: extractedPath,
                 });
-                await Sharing.shareAsync("file://" + extractedPath, {
-                    mimeType: "image/jpeg",
-                    dialogTitle: "Share this quote",
-                    UTI: "public.jpeg",
-                });
-                setShareState({ showShareQuote: false, quoteToShare: null });
+
+                navigation.navigate("Share", { uri: "file://" + extractedPath, quote: item });
+
                 await analytics().logEvent('share_quote', { author: item.author });
             } catch (error) {
                 console.error("Error sharing quote:", error);
