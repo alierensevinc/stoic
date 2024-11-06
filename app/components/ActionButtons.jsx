@@ -1,4 +1,4 @@
-import {View} from "react-native";
+import {Platform, View} from "react-native";
 import ActionButton from "./ActionButton";
 
 const ActionButtons = ({
@@ -9,7 +9,7 @@ const ActionButtons = ({
                            isBookmarked,
                        }) => {
     return (
-        <View className="absolute bottom-12 left-8 right-8  p-1 flex-row justify-between items-center">
+        <View className={`absolute ${Platform.OS === 'android' ? 'bottom-4' : 'bottom-12'} left-8 right-8  p-1 flex-row justify-between items-center`}>
             <ActionButton
                 onPress={navigateToBookmarks}
                 theme={theme}

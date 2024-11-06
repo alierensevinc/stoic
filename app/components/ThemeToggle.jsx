@@ -1,5 +1,5 @@
 import {useContext} from "react";
-import {Switch, View} from "react-native";
+import {Platform, Switch, View} from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {ThemeContext} from "context/ThemeContext";
 
@@ -7,7 +7,7 @@ const ThemeToggle = () => {
     const {theme, isDarkMode, toggleTheme} = useContext(ThemeContext);
 
     return (
-        <View className="absolute flex-row items-center rounded-2xl p-1 top-16 right-8 z-10">
+        <View className={`absolute flex-row items-center rounded-2xl p-1 ${Platform.OS === 'android' ? 'top-4' : 'top-16'} right-8 z-10`}>
             <View className="mr-1.5">
                 <Ionicons
                     name="sunny"

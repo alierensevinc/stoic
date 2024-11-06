@@ -1,4 +1,4 @@
-import {TouchableOpacity, View} from "react-native";
+import {Platform, TouchableOpacity, View} from "react-native";
 import {useNavigation} from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
 
@@ -10,7 +10,8 @@ const SettingsButton = ({theme}) => {
     };
 
     return (
-        <View className="absolute flex-row items-center rounded-2xl p-1 top-16 left-8 z-10">
+        <View
+            className={`absolute flex-row items-center rounded-2xl p-1 ${Platform.OS === 'android' ? 'top-4' : 'top-16'} left-8 z-10`}>
             <TouchableOpacity onPress={navigateToSettings}>
                 <Icon name="settings-outline" size={24} color={theme.buttonColor}/>
             </TouchableOpacity>
