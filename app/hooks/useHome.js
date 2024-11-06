@@ -1,5 +1,5 @@
 import {useContext, useEffect, useRef} from "react";
-import {Dimensions} from "react-native";
+import {Dimensions, Platform} from "react-native";
 import {ThemeContext} from "context/ThemeContext";
 import {
     runOnJS,
@@ -116,9 +116,13 @@ export const useHome = () => {
                     to: extractedPath,
                 });
 
-                navigation.navigate("Share", { uri: "file://" + extractedPath, quote: quotes[0] });
+                if (Platform.OS === 'android') {
+                    navigation.navigate("Share", {uri: uri, quote: quotes[0]});
+                } else {
+                    navigation.navigate("Share", {uri: "file://" + extractedPath, quote: quotes[0]});
+                }
 
-                analytics().logEvent('share_quote', { author });
+                analytics().logEvent('share_quote', {author});
             } catch (error) {
                 console.error("Error sharing quote:", error);
             }

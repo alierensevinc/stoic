@@ -1,5 +1,5 @@
 import { useContext, useRef, useState } from "react";
-import { Alert } from "react-native";
+import { Alert, Platform } from "react-native";
 import * as Sharing from "expo-sharing";
 import { useBookmarksStore } from "store/bookmarksStore";
 import { useAdStore } from "store/adStore";
@@ -49,7 +49,11 @@ export const useBookmarks = () => {
                     to: extractedPath,
                 });
 
-                navigation.navigate("Share", { uri: "file://" + extractedPath, quote: item });
+                if(Platform.OS === 'android') {
+                    navigation.navigate("Share", { uri: uri, quote: item });
+                } else {
+                    navigation.navigate("Share", { uri: "file://" + extractedPath, quote: item });
+                }
 
                 await analytics().logEvent('share_quote', { author: item.author });
             } catch (error) {
