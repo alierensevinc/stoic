@@ -1,4 +1,4 @@
-package com.sevincaeren.stoic
+package com.alierensevinc.stoic
 
 import android.os.Build
 import android.os.Bundle

@@ -27,7 +27,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#151b24"
       },
-      "package": "com.sevincaeren.stoic"
+      "googleServicesFile": "./google-services.json",
+      "package": "com.alierensevinc.stoic"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -48,6 +49,7 @@
         "react-native-google-mobile-ads",
         {
           "iosAppId": "ca-app-pub-4954831375392388~9046599086",
+          "androidAppId": "ca-app-pub-4954831375392388~9046599086",
           "userTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you.",
           "skAdNetworkItems": [
             "cstr6suwn9.skadnetwork",
@@ -108,7 +110,7 @@
       [
         "expo-dynamic-app-icon",
         {
-          "default": {
+          "main": {
             "image": "./assets//icon.png",
             "prerendered": true
           },

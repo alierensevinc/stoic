@@ -18,7 +18,7 @@ export const ThemeProvider = ({children}) => {
     const toggleTheme = () => {
         setIsDarkMode(!isDarkMode);
         storage.set("theme", !isDarkMode ? "dark" : "light");
-        setAppIcon(isDarkMode ? "default" : "alternative");
+        setAppIcon(isDarkMode ? "main" : "alternative");
     };
 
     return (
