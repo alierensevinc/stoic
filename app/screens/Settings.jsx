@@ -1,4 +1,4 @@
-import {ScrollView, Text} from "react-native";
+import {ScrollView, Text, Platform} from "react-native";
 import {useSettings} from "hooks/useSettings";
 import Container from "components/Container";
 import BackButton from "components/BackButton";
@@ -56,19 +56,23 @@ const SettingsScreen = () => {
                     onPress={handleOpenLinkedin}
                     color={theme.buttonColor}
                 />
-                <Divider color={theme.textColor}/>
-                <SettingsItem
-                    icon="share-social-outline"
-                    title="Share Stoic - Daily Quotes"
-                    onPress={handleShare}
-                    color={theme.buttonColor}
-                />
-                <SettingsItem
-                    icon="star-outline"
-                    title="Rate Stoic - Daily Quotes"
-                    onPress={handleRate}
-                    color={theme.buttonColor}
-                />
+                {Platform.OS === 'ios' && (
+                    <>
+                        <Divider color={theme.textColor}/>
+                        <SettingsItem
+                            icon="share-social-outline"
+                            title="Share Stoic - Daily Quotes"
+                            onPress={handleShare}
+                            color={theme.buttonColor}
+                        />
+                        <SettingsItem
+                            icon="star-outline"
+                            title="Rate Stoic - Daily Quotes"
+                            onPress={handleRate}
+                            color={theme.buttonColor}
+                        />
+                    </>
+                )}
                 <Divider color={theme.textColor}/>
                 <SettingsItem
                     icon="accessibility-outline"
