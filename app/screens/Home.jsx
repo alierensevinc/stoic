@@ -1,4 +1,4 @@
-import {Pressable, StatusBar} from "react-native";
+import {Platform, Pressable, StatusBar} from "react-native";
 import {useHome} from "hooks/useHome";
 import ThemeToggle from "components/ThemeToggle";
 import ActionButtons from "components/ActionButtons";
@@ -10,6 +10,7 @@ import Animated from "react-native-reanimated";
 const HomeScreen = () => {
     const {
         theme,
+        isDarkMode,
         quotes,
         viewShotRef,
         gestureHandler,
@@ -21,6 +22,12 @@ const HomeScreen = () => {
         handleNextQuoteClick,
         isBookmarked,
     } = useHome();
+
+    if (Platform.OS === "android" && !isDarkMode) {
+        StatusBar.setBarStyle('dark-content')
+    } else if (Platform.OS === "android" && isDarkMode) {
+        StatusBar.setBarStyle('light-content')
+    }
 
     return (
         <Container>

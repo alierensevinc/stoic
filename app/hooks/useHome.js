@@ -20,7 +20,7 @@ import {useInterstitialAd} from "hooks/useInterstitialAd";
 import analytics from '@react-native-firebase/analytics';
 
 export const useHome = () => {
-    const {theme} = useContext(ThemeContext);
+    const {theme, isDarkMode} = useContext(ThemeContext);
     const {
         quotes,
         setQuotes,
@@ -191,6 +191,7 @@ export const useHome = () => {
 
     return {
         theme,
+        isDarkMode,
         quotes,
         viewShotRef,
         gestureHandler,
