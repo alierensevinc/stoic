@@ -1,4 +1,4 @@
-import {ScrollView, Text, Platform} from "react-native";
+import {Platform, ScrollView, Text, View} from "react-native";
 import {useSettings} from "hooks/useSettings";
 import Container from "components/Container";
 import BackButton from "components/BackButton";
@@ -24,16 +24,18 @@ const SettingsScreen = () => {
 
     return (
         <Container>
-            <BackButton
-                onPress={() => navigation.goBack()}
-                color={theme.buttonColor}
-            />
-            <Text
-                className="text-2xl font-bold mb-5 text-center"
-                style={{color: theme.textColor, fontFamily: "Montserrat-Medium"}}
-            >
-                Settings
-            </Text>
+            <View className="flex-row justify-start items-center w-full pl-4 pt-4">
+                <BackButton
+                    onPress={() => navigation.goBack()}
+                    color={theme.buttonColor}
+                />
+                <Text
+                    className="text-2xl font-bold text-center ml-2"
+                    style={{color: theme.textColor, fontFamily: "Montserrat-Medium"}}
+                >
+                    Settings
+                </Text>
+            </View>
             <ScrollView className="flex-1 w-100">
                 <SettingsToggleItem
                     icon="time-outline"
@@ -87,8 +89,8 @@ const SettingsScreen = () => {
                     onPress={removeAllBookmarks}
                     color={theme.buttonColor}
                 />
+                <AppInfo theme={theme}/>
             </ScrollView>
-            <AppInfo theme={theme}/>
             <InlineAd className="absolute bottom-0 left-0 right-0 self-center"/>
         </Container>
     );

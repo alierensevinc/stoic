@@ -21,16 +21,18 @@ const BookmarksScreen = () => {
 
     return (
         <Container>
-            <BackButton
-                onPress={() => navigation.goBack()}
-                color={theme.buttonColor}
-            />
-            <Text
-                className="text-2xl font-bold mb-5 text-center"
-                style={{color: theme.textColor, fontFamily: "Montserrat-Medium"}}
-            >
-                Bookmarks
-            </Text>
+            <View className="flex-row justify-start items-center w-full pl-4 pt-4">
+                <BackButton
+                    onPress={() => navigation.goBack()}
+                    color={theme.buttonColor}
+                />
+                <Text
+                    className="text-2xl font-bold text-center ml-2"
+                    style={{color: theme.textColor, fontFamily: "Montserrat-Medium"}}
+                >
+                    Bookmarks
+                </Text>
+            </View>
             {bookmarks.length > 0 ? (
                 <QuoteList
                     data={bookmarks}
