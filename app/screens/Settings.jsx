@@ -30,7 +30,7 @@ const SettingsScreen = () => {
                     color={theme.buttonColor}
                 />
                 <Text
-                    className="text-2xl font-bold text-center ml-2"
+                    className="text-3xl font-bold text-center ml-2"
                     style={{color: theme.textColor, fontFamily: "Montserrat-Medium"}}
                 >
                     Settings

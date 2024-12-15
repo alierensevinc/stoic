@@ -9,6 +9,7 @@ import * as MailComposer from "expo-mail-composer";
 import * as Application from "expo-application";
 import analytics from '@react-native-firebase/analytics';
 import * as WebBrowser from 'expo-web-browser';
+import * as Haptics from "expo-haptics";
 
 const storage = new MMKV();
 const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled";
@@ -35,10 +36,12 @@ const handleToggleNotifications = async (value, setNotificationsEnabled) => {
             );
             return;
         }
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         storage.set(NOTIFICATIONS_ENABLED_KEY, true);
         setNotificationsEnabled(true);
         await analytics().logEvent('notifications_enabled');
     } else {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         storage.set(NOTIFICATIONS_ENABLED_KEY, false);
         setNotificationsEnabled(false);
         await analytics().logEvent('notifications_disabled');
@@ -47,6 +50,8 @@ const handleToggleNotifications = async (value, setNotificationsEnabled) => {
 
 const handleSendEmail = async () => {
     const isAvailable = await MailComposer.isAvailableAsync();
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+
     if (!isAvailable) {
         Linking.openURL(
             "mailto:sevinc.aeren@gmail.com?subject=Hello from Stoic App&body=" +
@@ -66,6 +71,7 @@ const handleSendEmail = async () => {
 
 const handleOpenLinkedin = async () => {
     Linking.openURL("https://www.linkedin.com/in/alierensevinc/");
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
     await analytics().logEvent('open_linkedin');
 };
 
@@ -73,6 +79,7 @@ const handleShare = async () => {
     await Share.share({
         message: "Stoic - Daily Quotes : https://itunes.apple.com/app/6737173970",
     });
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
     await analytics().logEvent('share_app');
 };
 
@@ -80,10 +87,12 @@ const handleRate = async () => {
     Linking.openURL(
         "itms-apps://itunes.apple.com/app/viewContentsUserReviews/id6737173970?action=write-review"
     );
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
     await analytics().logEvent('rate_app');
 };
 
 const handleVisitPrivacyPolicy = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
     await WebBrowser.openBrowserAsync('https://alierensevinc.github.io/stoic-website/privacy-policy/');
 };
 

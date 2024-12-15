@@ -31,26 +31,30 @@ const scheduleNotification = async (quote) => {
 
     await cancelAllNotifications();
 
-    let triggerTime = new Date();
-    const currentHour = triggerTime.getHours();
-
-    if (currentHour >= 22 || currentHour < 9) {
-        triggerTime.setHours(9, 0, 0, 0);
-        if (triggerTime <= new Date()) {
-            triggerTime.setDate(triggerTime.getDate() + 1);
+    const triggerTimes = [];
+    for (let i = 0; i < 7; i++) {
+        for (let hour = 9; hour <= 21; hour += 3) {
+            let triggerTime = new Date();
+            triggerTime.setHours(hour, 0, 0, 0);
+            triggerTime.setDate(triggerTime.getDate() + i);
+            triggerTimes.push(triggerTime);
         }
-    } else {
-        triggerTime.setHours(triggerTime.getHours() + 1);
     }
 
-    await Notifications.scheduleNotificationAsync({
-        content: {
-            title: quote.text,
-            body: quote.author,
-            data: { type: "futureQuotes" },
-        },
-        trigger: triggerTime,
-    });
+    for (const triggerTime of triggerTimes) {
+        await Notifications.scheduleNotificationAsync({
+            content: {
+                title: quote.text,
+                body: quote.author,
+                data: { type: "futureQuotes" },
+            },
+            trigger: {
+                hour: triggerTime.getHours(),
+                minute: triggerTime.getMinutes(),
+                repeats: true,
+            },
+        });
+    }
 };
 
 const fetchQuotesFromAPI = async () => {

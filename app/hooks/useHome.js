@@ -18,6 +18,7 @@ import NetInfo from "@react-native-community/netinfo";
 import * as FileSystem from "expo-file-system";
 import {useInterstitialAd} from "hooks/useInterstitialAd";
 import analytics from '@react-native-firebase/analytics';
+import * as Haptics from "expo-haptics";
 
 export const useHome = () => {
     const {theme, isDarkMode} = useContext(ThemeContext);
@@ -90,9 +91,11 @@ export const useHome = () => {
         handleAction(() => {
             const currentQuote = quotes[0];
             if (bookmarks.some((bookmark) => bookmark.text === currentQuote.text)) {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 removeFromBookmarks(currentQuote);
                 analytics().logEvent('remove_bookmark', {quote: currentQuote.text});
             } else {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
                 addToBookmarks(currentQuote);
                 analytics().logEvent('add_bookmark', {quote: currentQuote.text});
             }
@@ -115,7 +118,7 @@ export const useHome = () => {
                     from: uri,
                     to: extractedPath,
                 });
-
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 if (Platform.OS === 'android') {
                     navigation.navigate("Share", {uri: uri, quote: quotes[0]});
                 } else {
@@ -150,6 +153,7 @@ export const useHome = () => {
             ];
             setQuotes(previousQuotes);
         }
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         textOpacity.value = withTiming(1, {duration: 500});
         analytics().logEvent('change_quote', {direction});
     };

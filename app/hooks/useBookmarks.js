@@ -8,6 +8,7 @@ import { ThemeContext } from "context/ThemeContext";
 import * as FileSystem from "expo-file-system";
 import analytics from '@react-native-firebase/analytics';
 import {useNavigation} from "@react-navigation/native";
+import * as Haptics from "expo-haptics";
 
 export const useBookmarks = () => {
     const { bookmarks, removeFromBookmarks } = useBookmarksStore();
@@ -48,7 +49,7 @@ export const useBookmarks = () => {
                     from: uri,
                     to: extractedPath,
                 });
-
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 if(Platform.OS === 'android') {
                     navigation.navigate("Share", { uri: uri, quote: item });
                 } else {
@@ -63,6 +64,7 @@ export const useBookmarks = () => {
     };
 
     const confirmDelete = (item) => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         Alert.alert(
             "Delete Quote",
             "Are you sure you want to remove this quote from bookmarks?",
@@ -74,6 +76,7 @@ export const useBookmarks = () => {
                     onPress: () => {
                         handleAction(() => {
                             removeFromBookmarks(item);
+                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                             analytics().logEvent('remove_bookmark', { quote: item.text });
                         });
                     },

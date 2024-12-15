@@ -67,7 +67,8 @@
     "react-native-view-shot": "3.8.0",
     "react-navigation": "^5.0.0",
     "yarn": "^1.22.22",
-    "zustand": "^4.5.5"
+    "zustand": "^4.5.5",
+    "expo-haptics": "~13.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

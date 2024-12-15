@@ -3,6 +3,7 @@ import {MMKV} from "react-native-mmkv";
 import {setAppIcon} from "expo-dynamic-app-icon";
 import {themes} from "utils/themes";
 import {Platform} from "react-native";
+import * as Haptics from "expo-haptics";
 
 const storage = new MMKV();
 
@@ -17,6 +18,7 @@ export const ThemeProvider = ({children}) => {
     const theme = isDarkMode ? themes.dark : themes.light;
 
     const toggleTheme = () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         setIsDarkMode(!isDarkMode);
         storage.set("theme", !isDarkMode ? "dark" : "light");
         if (Platform.OS === "ios") {

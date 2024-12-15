@@ -15,12 +15,12 @@
 		9372D018142C467DBDF2B646 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 226C9828226945D893D5E31E /* GoogleService-Info.plist */; };
 		96B35F29648742A9B095555C /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC56C0719CD64094B753C0EF /* noop-file.swift */; };
 		B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */; };
-		B49F8E61CF3C407793B1F4FE /* alternative-Icon-60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = B80C04F7B8474CD8972B55F4 /* alternative-Icon-60x60@3x.png */; };
 		B8FF8C777B491E6EF4EE38ED /* Pods_stoic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22D3F32E9909DAA24A1F0FB7 /* Pods_stoic.framework */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		D46F3B366F2649E6B7331584 /* alternative-Icon-60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A2CE179890B465EB6224417 /* alternative-Icon-60x60@2x.png */; };
-		DB5A3EF8F3E54BF08FC8AB44 /* main-Icon-60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4917B22118BE47B9BEC9D91B /* main-Icon-60x60@2x.png */; };
-		EE434583653643388CA72EE8 /* main-Icon-60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 278833B017A54B4BB42CDC0E /* main-Icon-60x60@3x.png */; };
+		1AC2DDE58DBB4280ADBEC4DB /* main-Icon-60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 150A44584CCF440ABD08109E /* main-Icon-60x60@2x.png */; };
+		FC941AE8ADCD493EA7A384B5 /* main-Icon-60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 08581C6D08B74BD7B0E91816 /* main-Icon-60x60@3x.png */; };
+		AF08EE73644D4FD79B6D27FB /* alternative-Icon-60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F1DC25ECF7934CB28E46CBFC /* alternative-Icon-60x60@2x.png */; };
+		6DF26E4110D04B8AA2B165BE /* alternative-Icon-60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8164B426EDBA43AD9B628751 /* alternative-Icon-60x60@3x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,19 +32,19 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = stoic/main.m; sourceTree = "<group>"; };
 		226C9828226945D893D5E31E /* GoogleService-Info.plist */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "stoic/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		22D3F32E9909DAA24A1F0FB7 /* Pods_stoic.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_stoic.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		278833B017A54B4BB42CDC0E /* main-Icon-60x60@3x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "main-Icon-60x60@3x.png"; path = "stoic/DynamicAppIcons/main-Icon-60x60@3x.png"; sourceTree = "<group>"; };
-		4917B22118BE47B9BEC9D91B /* main-Icon-60x60@2x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "main-Icon-60x60@2x.png"; path = "stoic/DynamicAppIcons/main-Icon-60x60@2x.png"; sourceTree = "<group>"; };
 		6C2E3173556A471DD304B334 /* Pods-stoic.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-stoic.debug.xcconfig"; path = "Target Support Files/Pods-stoic/Pods-stoic.debug.xcconfig"; sourceTree = "<group>"; };
 		7A4D352CD337FB3A3BF06240 /* Pods-stoic.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-stoic.release.xcconfig"; path = "Target Support Files/Pods-stoic/Pods-stoic.release.xcconfig"; sourceTree = "<group>"; };
-		8A2CE179890B465EB6224417 /* alternative-Icon-60x60@2x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "alternative-Icon-60x60@2x.png"; path = "stoic/DynamicAppIcons/alternative-Icon-60x60@2x.png"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = stoic/SplashScreen.storyboard; sourceTree = "<group>"; };
-		B80C04F7B8474CD8972B55F4 /* alternative-Icon-60x60@3x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "alternative-Icon-60x60@3x.png"; path = "stoic/DynamicAppIcons/alternative-Icon-60x60@3x.png"; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		BB92563E1054FC93DA85AE97 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = stoic/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		CC56C0719CD64094B753C0EF /* noop-file.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = "noop-file.swift"; path = "stoic/noop-file.swift"; sourceTree = "<group>"; };
 		DAB8D32D4D8A4382AFE3A36E /* stoic-Bridging-Header.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = "stoic-Bridging-Header.h"; path = "stoic/stoic-Bridging-Header.h"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-stoic/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		150A44584CCF440ABD08109E /* main-Icon-60x60@2x.png */ = {isa = PBXFileReference; name = "main-Icon-60x60@2x.png"; path = "stoic/DynamicAppIcons/main-Icon-60x60@2x.png"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		08581C6D08B74BD7B0E91816 /* main-Icon-60x60@3x.png */ = {isa = PBXFileReference; name = "main-Icon-60x60@3x.png"; path = "stoic/DynamicAppIcons/main-Icon-60x60@3x.png"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		F1DC25ECF7934CB28E46CBFC /* alternative-Icon-60x60@2x.png */ = {isa = PBXFileReference; name = "alternative-Icon-60x60@2x.png"; path = "stoic/DynamicAppIcons/alternative-Icon-60x60@2x.png"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		8164B426EDBA43AD9B628751 /* alternative-Icon-60x60@3x.png */ = {isa = PBXFileReference; name = "alternative-Icon-60x60@3x.png"; path = "stoic/DynamicAppIcons/alternative-Icon-60x60@3x.png"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,10 +62,10 @@
 		12E78C2963304BAEBF622F6C /* DynamicAppIcons */ = {
 			isa = PBXGroup;
 			children = (
-				4917B22118BE47B9BEC9D91B /* main-Icon-60x60@2x.png */,
-				278833B017A54B4BB42CDC0E /* main-Icon-60x60@3x.png */,
-				8A2CE179890B465EB6224417 /* alternative-Icon-60x60@2x.png */,
-				B80C04F7B8474CD8972B55F4 /* alternative-Icon-60x60@3x.png */,
+				150A44584CCF440ABD08109E /* main-Icon-60x60@2x.png */,
+				08581C6D08B74BD7B0E91816 /* main-Icon-60x60@3x.png */,
+				F1DC25ECF7934CB28E46CBFC /* alternative-Icon-60x60@2x.png */,
+				8164B426EDBA43AD9B628751 /* alternative-Icon-60x60@3x.png */,
 			);
 			name = DynamicAppIcons;
 			path = "";
@@ -231,11 +231,11 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
 				9372D018142C467DBDF2B646 /* GoogleService-Info.plist in Resources */,
-				DB5A3EF8F3E54BF08FC8AB44 /* main-Icon-60x60@2x.png in Resources */,
-				EE434583653643388CA72EE8 /* main-Icon-60x60@3x.png in Resources */,
-				D46F3B366F2649E6B7331584 /* alternative-Icon-60x60@2x.png in Resources */,
-				B49F8E61CF3C407793B1F4FE /* alternative-Icon-60x60@3x.png in Resources */,
 				191EA3CB0C1276A88529ECC9 /* PrivacyInfo.xcprivacy in Resources */,
+				1AC2DDE58DBB4280ADBEC4DB /* main-Icon-60x60@2x.png in Resources */,
+				FC941AE8ADCD493EA7A384B5 /* main-Icon-60x60@3x.png in Resources */,
+				AF08EE73644D4FD79B6D27FB /* alternative-Icon-60x60@2x.png in Resources */,
+				6DF26E4110D04B8AA2B165BE /* alternative-Icon-60x60@3x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -461,11 +461,11 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.sevincaeren.stoic;
-				PRODUCT_NAME = stoic;
+				PRODUCT_NAME = "stoic";
 				SWIFT_OBJC_BRIDGING_HEADER = "stoic/stoic-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -489,10 +489,10 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.sevincaeren.stoic;
-				PRODUCT_NAME = stoic;
+				PRODUCT_NAME = "stoic";
 				SWIFT_OBJC_BRIDGING_HEADER = "stoic/stoic-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
@@ -666,6 +666,9 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin PBXVariantGroup section */
+/* End PBXVariantGroup section */
 	};
 	rootObject = 83CBB9F71A601CBA00E9B192 /* Project object */;
 }

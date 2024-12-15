@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, useRef} from "react";
 import {AdEventType, InterstitialAd, TestIds,} from "react-native-google-mobile-ads";
 import {IOS_ADMOB_INTERSTITIAL} from "@env";
 import * as TrackingTransparency from "expo-tracking-transparency";
@@ -9,7 +9,7 @@ export const useInterstitialAd = () => {
     const [isAdLoaded, setIsAdLoaded] = useState(false);
     const [requestNonPersonalizedAdsOnly, setRequestNonPersonalizedAdsOnly] =
         useState(false);
-    let interstitial;
+    const interstitial = useRef(null);
 
     useEffect(() => {
         const requestTrackingPermission = async () => {
@@ -24,27 +24,27 @@ export const useInterstitialAd = () => {
 
         requestTrackingPermission();
 
-        interstitial = InterstitialAd.createForAdRequest(adUnitId, {
+        interstitial.current = InterstitialAd.createForAdRequest(adUnitId, {
             keywords: ["stoic", "stoicism", "motivation", "inspiration"],
             requestNonPersonalizedAdsOnly,
         });
 
-        const unsubscribeLoaded = interstitial.addAdEventListener(
+        const unsubscribeLoaded = interstitial.current.addAdEventListener(
             AdEventType.LOADED,
             () => {
                 setIsAdLoaded(true);
             }
         );
 
-        const unsubscribeClosed = interstitial.addAdEventListener(
+        const unsubscribeClosed = interstitial.current.addAdEventListener(
             AdEventType.CLOSED,
             () => {
                 setIsAdLoaded(false);
-                interstitial.load();
+                interstitial.current.load();
             }
         );
 
-        interstitial.load();
+        interstitial.current.load();
 
         return () => {
             unsubscribeLoaded();
@@ -53,8 +53,8 @@ export const useInterstitialAd = () => {
     }, [requestNonPersonalizedAdsOnly]);
 
     const showAd = () => {
-        if (isAdLoaded && interstitial) {
-            interstitial.show();
+        if (isAdLoaded && interstitial.current) {
+            interstitial.current.show();
         }
     };
 
