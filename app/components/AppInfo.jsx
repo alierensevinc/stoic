@@ -3,7 +3,7 @@ import * as Application from "expo-application";
 
 const AppInfo = ({theme}) => {
     return (
-        <View className="bottom-8 w-full" style={[
+        <View className="bottom-8 w-full pt-4" style={[
             {
                 backgroundColor: theme.backgroundColor,
             },

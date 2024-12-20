@@ -80,7 +80,7 @@ export const useHome = () => {
 
     const handleAction = (callback) => {
         incrementActionCount();
-        if ((actionCount + 1) % 5 === 0 && isAdLoaded) {
+        if ((actionCount + 1) % 7 === 0 && isAdLoaded) {
             showAd();
             resetActionCount();
         }
@@ -135,6 +135,7 @@ export const useHome = () => {
     const changeQuote = (direction) => {
         handleAction(() => {
             if (quotes.length > 1) {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 textOpacity.value = withTiming(0, {duration: 500}, () => {
                     runOnJS(updateQuotes)(direction);
                 });
@@ -153,7 +154,6 @@ export const useHome = () => {
             ];
             setQuotes(previousQuotes);
         }
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         textOpacity.value = withTiming(1, {duration: 500});
         analytics().logEvent('change_quote', {direction});
     };

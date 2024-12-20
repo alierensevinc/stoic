@@ -25,7 +25,7 @@ export const useBookmarks = () => {
 
     const handleAction = (callback) => {
         incrementActionCount();
-        if ((actionCount + 1) % 5 === 0 && isAdLoaded) {
+        if ((actionCount + 1) % 7 === 0 && isAdLoaded) {
             showAd();
             resetActionCount();
         }
