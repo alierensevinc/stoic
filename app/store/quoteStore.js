@@ -47,14 +47,12 @@ const scheduleNotification = async (quotes) => {
             content: {
                 title: quote.text,
                 body: quote.author,
-                data: {type: "futureQuotes"},
+                data: {type: "futureQuotes", quote: quote},
             },
             trigger: {
                 hour: time.getHours(),
                 minute: time.getMinutes(),
                 day: time.getDate(),
-                month: time.getMonth() + 1,
-                year: time.getFullYear(),
                 repeats: false,
             },
         });
@@ -96,7 +94,7 @@ const loadQuotesFromArchive = (setQuotes) => {
     }
 };
 
-const handleFutureQuotesNotification = async () => {
+const handleFutureQuotesNotification = async (quote) => {
     const {
         futureQuotes,
         setQuotes,
@@ -106,17 +104,19 @@ const handleFutureQuotesNotification = async () => {
         setFutureQuotes,
     } = useQuoteStore.getState();
 
+    let notificationQuote;
     if (!futureQuotes || futureQuotes.length === 0) {
         const storedFutureQuotes = loadFromStorage(FUTURE_QUOTES_KEY);
         if (storedFutureQuotes) {
-            setNotificationFutureQuote(storedFutureQuotes[0]);
-            setQuotes([storedFutureQuotes[0], ...storedFutureQuotes.slice(1)]);
+            notificationQuote = storedFutureQuotes[0];
+            setQuotes([notificationQuote, ...storedFutureQuotes.slice(1)]);
         }
     } else {
-        setNotificationFutureQuote(futureQuotes[0]);
-        setQuotes([futureQuotes[0], ...futureQuotes.slice(1)]);
+        notificationQuote = quote;
+        setQuotes([notificationQuote, ...futureQuotes.slice(1)]);
     }
 
+    setNotificationFutureQuote(notificationQuote);
     setCameFromNotification(true);
     setPreventFetch(true);
 
@@ -132,8 +132,9 @@ const handleFutureQuotesNotification = async () => {
 };
 
 Notifications.addNotificationResponseReceivedListener((response) => {
-    if (response.notification.request.content.data.type === "futureQuotes") {
-        handleFutureQuotesNotification();
+    const {type, quote} = response.notification.request.content.data;
+    if (type === "futureQuotes") {
+        handleFutureQuotesNotification(quote);
     }
 });
 
