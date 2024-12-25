@@ -152,6 +152,11 @@ const initializeNotifications = async () => {
             shouldSetBadge: false,
         }),
     });
+
+    if(status === 'granted') {
+        console.log(status);
+        storage.set(NOTIFICATIONS_ENABLED_KEY, true);
+    }
 };
 
 export const useQuoteStore = create((set) => ({
