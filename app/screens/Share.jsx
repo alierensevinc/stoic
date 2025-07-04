@@ -48,7 +48,6 @@ const ShareModal = ({route, navigation}) => {
     };
 
     const onCopy = () => {
-        console.log(quote);
         Clipboard.setString(`${quote.text} - ${quote.author}`);
         Toast.show({
             type: "success",

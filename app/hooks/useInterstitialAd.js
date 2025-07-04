@@ -1,4 +1,4 @@
-import {useEffect, useState, useRef} from "react";
+import {useEffect, useRef, useState} from "react";
 import {AdEventType, InterstitialAd, TestIds,} from "react-native-google-mobile-ads";
 import {IOS_ADMOB_INTERSTITIAL} from "@env";
 import * as TrackingTransparency from "expo-tracking-transparency";

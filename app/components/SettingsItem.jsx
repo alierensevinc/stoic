@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, View, Text, TouchableOpacity, Platform} from "react-native";
+import {Button, Platform, Text, TouchableOpacity, View} from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Fontisto from "@expo/vector-icons/Fontisto";
 

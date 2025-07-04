@@ -12,19 +12,36 @@ const FUTURE_QUOTES_KEY = "futureQuotes";
 const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled";
 const QUOTES_API_URL = "https://stoic-quotes.com/api/quotes?num=20";
 
+/**
+ * Verilen anahtara karşılık veriyi JSON formatında MMKV storage'a kaydeder.
+ * @param {string} key - Storage anahtarı
+ * @param {any} data - Kaydedilecek veri
+ */
 const saveToStorage = (key, data) => {
     storage.set(key, JSON.stringify(data));
 };
 
+/**
+ * Verilen anahtara karşılık MMKV storage'tan veriyi JSON olarak çözüp döner.
+ * @param {string} key - Storage anahtarı
+ * @returns {any|null} - Çözümlenmiş veri ya da null
+ */
 const loadFromStorage = (key) => {
     const storedData = storage.getString(key);
     return storedData ? JSON.parse(storedData) : null;
 };
 
+/**
+ * Planlanmış tüm bildirimleri iptal eder.
+ */
 const cancelAllNotifications = async () => {
     await Notifications.cancelAllScheduledNotificationsAsync();
 };
 
+/**
+ * Bildirim izni verilmişse, 7 gün boyunca her 3 saatte bir alıntı bildirimleri planlar.
+ * @param {Array} quotes - Gönderilecek alıntılar
+ */
 const scheduleNotification = async (quotes) => {
     const notificationsEnabled = storage.getBoolean(NOTIFICATIONS_ENABLED_KEY);
     if (!notificationsEnabled) return;
@@ -41,7 +58,6 @@ const scheduleNotification = async (quotes) => {
         }
     }
 
-
     for (const {time, quote} of triggerTimes) {
         await Notifications.scheduleNotificationAsync({
             content: {
@@ -50,16 +66,19 @@ const scheduleNotification = async (quotes) => {
                 data: {type: "futureQuotes", quote: quote},
             },
             trigger: {
+                type: Notifications.SchedulableTriggerInputTypes.DAILY,
                 hour: time.getHours(),
                 minute: time.getMinutes(),
-                day: time.getDate(),
-                repeats: false,
+                repeats: true
             },
         });
     }
-
 };
 
+/**
+ * API'den yeni alıntılar çeker.
+ * @returns {Promise<Array>} - API'den dönen alıntılar
+ */
 const fetchQuotesFromAPI = async () => {
     try {
         const response = await axiosInstance.get(QUOTES_API_URL);
@@ -70,6 +89,10 @@ const fetchQuotesFromAPI = async () => {
     }
 };
 
+/**
+ * Yeni alıntıları API'den çekip store'a ve storage'a kaydeder.
+ * Arşiv, güncel ve gelecekteki alıntılar güncellenir.
+ */
 const fetchAndStoreQuotes = async (setQuotes, setArchiveQuotes, setFutureQuotes) => {
     const oldQuotes = loadFromStorage(QUOTES_KEY)?.quotes || [];
     setArchiveQuotes(oldQuotes);
@@ -87,6 +110,10 @@ const fetchAndStoreQuotes = async (setQuotes, setArchiveQuotes, setFutureQuotes)
     }
 };
 
+/**
+ * Storage'tan arşivlenmiş alıntıları yükleyip store'a aktarır.
+ * @param {Function} setQuotes - Zustand store'daki setQuotes fonksiyonu
+ */
 const loadQuotesFromArchive = (setQuotes) => {
     const archiveQuotes = loadFromStorage(ARCHIVE_QUOTES_KEY);
     if (archiveQuotes) {
@@ -94,6 +121,10 @@ const loadQuotesFromArchive = (setQuotes) => {
     }
 };
 
+/**
+ * Bildirimle gelen alıntıya göre store'u günceller, yeni future quotes çeker ve bildirimleri yeniden planlar.
+ * @param {Object} quote - Bildirimle gelen alıntı
+ */
 const handleFutureQuotesNotification = async (quote) => {
     const {
         futureQuotes,
@@ -138,6 +169,9 @@ Notifications.addNotificationResponseReceivedListener((response) => {
     }
 });
 
+/**
+ * Bildirim izinlerini ister ve handler'ı tanımlar. İzin verilirse storage'da flag saklanır.
+ */
 const initializeNotifications = async () => {
     const {status} = await Notifications.requestPermissionsAsync();
     if (status !== "granted") {
@@ -147,18 +181,22 @@ const initializeNotifications = async () => {
 
     Notifications.setNotificationHandler({
         handleNotification: async () => ({
-            shouldShowAlert: true,
+            shouldShowBanner: true,
+            shouldShowList: true,
             shouldPlaySound: true,
             shouldSetBadge: false,
         }),
     });
 
-    if(status === 'granted') {
-        console.log(status);
+    if (status === 'granted') {
         storage.set(NOTIFICATIONS_ENABLED_KEY, true);
     }
 };
 
+/**
+ * Zustand ile alıntıların tutulduğu store.
+ * quotes, archiveQuotes, futureQuotes gibi state'leri ve alıntı yönetim fonksiyonlarını içerir.
+ */
 export const useQuoteStore = create((set) => ({
     quotes: [],
     archiveQuotes: [],
@@ -206,11 +244,13 @@ export const useQuoteStore = create((set) => ({
     },
 }));
 
+// Arşiv alıntıları değiştiğinde storage'a kaydeder
 useQuoteStore.subscribe(
     (state) => state.archiveQuotes,
     (archiveQuotes) => saveToStorage(ARCHIVE_QUOTES_KEY, archiveQuotes)
 );
 
+// Gelecek alıntılar değiştiğinde storage'a kaydeder
 useQuoteStore.subscribe(
     (state) => state.futureQuotes,
     (futureQuotes) => saveToStorage(FUTURE_QUOTES_KEY, futureQuotes)
