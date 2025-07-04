@@ -14,7 +14,7 @@
     "eas-build-ios-production": "NODE_ENV=production eas build --profile production --platform ios",
     "eas-submit-ios": "eas submit -p ios --latest",
     "build-android": "npx expo prebuild --platform android",
-    "clean-build-android": "npx a prebuild --clean --platform android",
+    "clean-build-android": "npx expo prebuild --clean --platform android",
     "run-android": "expo run:android",
     "android": "expo run:android",
     "ios": "expo run:ios"
