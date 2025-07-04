@@ -125,7 +125,9 @@
         {
           "NSUserTrackingUsageDescription": "Your data will be used to provide you with a better and personalized ad experience."
         }
-      ]
+      ],
+      "expo-mail-composer",
+      "expo-web-browser"
     ],
     "extra": {
       "eas": {
