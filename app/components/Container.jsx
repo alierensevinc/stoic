@@ -1,21 +1,11 @@
-import { useEffect, useContext } from "react";
-import { View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ThemeContext } from "context/ThemeContext";
-import perf from '@react-native-firebase/perf';
+import {useContext} from "react";
+import {View} from "react-native";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
+import {ThemeContext} from "context/ThemeContext";
 
-const Container = ({ children, style }) => {
+const Container = ({children, style}) => {
     const insets = useSafeAreaInsets();
-    const { theme } = useContext(ThemeContext);
-
-    useEffect(() => {
-        const trace = perf().newTrace('screen_rendering');
-        trace.start();
-
-        return () => {
-            trace.stop();
-        };
-    }, []);
+    const {theme} = useContext(ThemeContext);
 
     return (
         <View

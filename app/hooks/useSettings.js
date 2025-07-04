@@ -7,7 +7,6 @@ import * as Notifications from "expo-notifications";
 import {MMKV} from "react-native-mmkv";
 import * as MailComposer from "expo-mail-composer";
 import * as Application from "expo-application";
-import analytics from '@react-native-firebase/analytics';
 import * as WebBrowser from 'expo-web-browser';
 import * as Haptics from "expo-haptics";
 
@@ -39,12 +38,10 @@ const handleToggleNotifications = async (value, setNotificationsEnabled) => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         storage.set(NOTIFICATIONS_ENABLED_KEY, true);
         setNotificationsEnabled(true);
-        await analytics().logEvent('notifications_enabled');
     } else {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         storage.set(NOTIFICATIONS_ENABLED_KEY, false);
         setNotificationsEnabled(false);
-        await analytics().logEvent('notifications_disabled');
     }
 };
 
@@ -66,13 +63,11 @@ const handleSendEmail = async () => {
     };
 
     await MailComposer.composeAsync(options);
-    await analytics().logEvent('send_email');
 };
 
 const handleOpenLinkedin = async () => {
     Linking.openURL("https://www.linkedin.com/in/alierensevinc/");
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
-    await analytics().logEvent('open_linkedin');
 };
 
 const handleShare = async () => {
@@ -80,7 +75,6 @@ const handleShare = async () => {
         message: "Stoic - Daily Quotes : https://itunes.apple.com/app/6737173970",
     });
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
-    await analytics().logEvent('share_app');
 };
 
 const handleRate = async () => {
@@ -88,7 +82,6 @@ const handleRate = async () => {
         "itms-apps://itunes.apple.com/app/viewContentsUserReviews/id6737173970?action=write-review"
     );
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
-    await analytics().logEvent('rate_app');
 };
 
 const handleVisitPrivacyPolicy = async () => {

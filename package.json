@@ -6,6 +6,7 @@
     "build-ios": "npx expo prebuild --platform ios",
     "clean-build-ios": "npx expo prebuild --clean --platform ios",
     "run-ios": "npx expo run:ios",
+    "pod-install": "cd ios && pod install",
     "build-and-run-ios": "npx expo prebuild --platform ios && npx expo run:ios",
     "eas-build-ios-simulator": "eas build --profile development-simulator --platform ios",
     "eas-build-ios-development": "eas build --profile development --platform ios",
@@ -53,12 +54,13 @@
     "expo-web-browser": "~14.2.0",
     "moment": "^2.30.1",
     "nativewind": "^2.0.11",
+    "prop-types": "^15.8.1",
     "react": "19.0.0",
     "react-native": "0.79.5",
     "react-native-dotenv": "^3.4.11",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-google-mobile-ads": "^14.2.3",
-    "react-native-mmkv": "^2.12.2",
+    "react-native-mmkv": "3.3.0",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
@@ -73,7 +75,7 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "babel-plugin-module-resolver": "^5.0.2",
-    "tailwindcss": "^3.3.2"
+    "tailwindcss": "3.3.2"
   },
   "private": true
 }

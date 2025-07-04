@@ -7,32 +7,32 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		11A923A7AF144B1D9570DC3B /* main-Icon-60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 35F7B48EB6194B5CA34FDA6C /* main-Icon-60x60@2x.png */; };
+		05DA1CFA01E24A398A73BA81 /* alternative-Icon-60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9E84EF0B279D49F79C2A0ECA /* alternative-Icon-60x60@2x.png */; };
 		11D94D092E66DFD5B4B73F15 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D85CAF69DCF2D5BB6CA37AF /* ExpoModulesProvider.swift */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		39568780F4284D838B6C6444 /* alternative-Icon-60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = B69963A473C149E68AF6B713 /* alternative-Icon-60x60@3x.png */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		450F947C104F4EE3A0047ACE /* alternative-Icon-60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 021FA02A098C45FCAD14983A /* alternative-Icon-60x60@3x.png */; };
 		493D5F225898494AA7621D78 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5772054E67BF4760927FC26A /* GoogleService-Info.plist */; };
 		57587E5C06BDAE2FBD9D1FD0 /* Pods_stoic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFEEE71DC5957A1F0AD1B4E5 /* Pods_stoic.framework */; };
 		59C7D532BE46C2BB14431297 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 1FB3F0EDF35EBFB7F300B9CE /* PrivacyInfo.xcprivacy */; };
-		6AF0B640DD994D4980673C9A /* alternative-Icon-60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A5E40ECD414E4DEDBC5518A9 /* alternative-Icon-60x60@2x.png */; };
+		B83ED989028E4188B4C4B45B /* main-Icon-60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 266408304CF249F292FA8AE9 /* main-Icon-60x60@3x.png */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		BFCA9887E41F4F479531326B /* main-Icon-60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 20A10D599DAD4665A01A614E /* main-Icon-60x60@3x.png */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
+		F833449B771647B195E2CDED /* main-Icon-60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A6684FE5B55E4601B7D9ABDA /* main-Icon-60x60@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		021FA02A098C45FCAD14983A /* alternative-Icon-60x60@3x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "alternative-Icon-60x60@3x.png"; path = "stoic/DynamicAppIcons/alternative-Icon-60x60@3x.png"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* stoic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = stoic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = stoic/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = stoic/Info.plist; sourceTree = "<group>"; };
 		1FB3F0EDF35EBFB7F300B9CE /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = stoic/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		20A10D599DAD4665A01A614E /* main-Icon-60x60@3x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "main-Icon-60x60@3x.png"; path = "stoic/DynamicAppIcons/main-Icon-60x60@3x.png"; sourceTree = "<group>"; };
-		35F7B48EB6194B5CA34FDA6C /* main-Icon-60x60@2x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "main-Icon-60x60@2x.png"; path = "stoic/DynamicAppIcons/main-Icon-60x60@2x.png"; sourceTree = "<group>"; };
+		266408304CF249F292FA8AE9 /* main-Icon-60x60@3x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "main-Icon-60x60@3x.png"; path = "stoic/DynamicAppIcons/main-Icon-60x60@3x.png"; sourceTree = "<group>"; };
 		5772054E67BF4760927FC26A /* GoogleService-Info.plist */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "stoic/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6D85CAF69DCF2D5BB6CA37AF /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-stoic/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		A5E40ECD414E4DEDBC5518A9 /* alternative-Icon-60x60@2x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "alternative-Icon-60x60@2x.png"; path = "stoic/DynamicAppIcons/alternative-Icon-60x60@2x.png"; sourceTree = "<group>"; };
+		9E84EF0B279D49F79C2A0ECA /* alternative-Icon-60x60@2x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "alternative-Icon-60x60@2x.png"; path = "stoic/DynamicAppIcons/alternative-Icon-60x60@2x.png"; sourceTree = "<group>"; };
+		A6684FE5B55E4601B7D9ABDA /* main-Icon-60x60@2x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "main-Icon-60x60@2x.png"; path = "stoic/DynamicAppIcons/main-Icon-60x60@2x.png"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = stoic/SplashScreen.storyboard; sourceTree = "<group>"; };
+		B69963A473C149E68AF6B713 /* alternative-Icon-60x60@3x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "alternative-Icon-60x60@3x.png"; path = "stoic/DynamicAppIcons/alternative-Icon-60x60@3x.png"; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		DDBAF128F6C83173A42BC3C3 /* Pods-stoic.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-stoic.release.xcconfig"; path = "Target Support Files/Pods-stoic/Pods-stoic.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -73,10 +73,10 @@
 		1A2239C40A904C8BBDED519A /* DynamicAppIcons */ = {
 			isa = PBXGroup;
 			children = (
-				35F7B48EB6194B5CA34FDA6C /* main-Icon-60x60@2x.png */,
-				20A10D599DAD4665A01A614E /* main-Icon-60x60@3x.png */,
-				A5E40ECD414E4DEDBC5518A9 /* alternative-Icon-60x60@2x.png */,
-				021FA02A098C45FCAD14983A /* alternative-Icon-60x60@3x.png */,
+				A6684FE5B55E4601B7D9ABDA /* main-Icon-60x60@2x.png */,
+				266408304CF249F292FA8AE9 /* main-Icon-60x60@3x.png */,
+				9E84EF0B279D49F79C2A0ECA /* alternative-Icon-60x60@2x.png */,
+				B69963A473C149E68AF6B713 /* alternative-Icon-60x60@3x.png */,
 			);
 			name = DynamicAppIcons;
 			path = "";
@@ -224,11 +224,11 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
 				493D5F225898494AA7621D78 /* GoogleService-Info.plist in Resources */,
-				11A923A7AF144B1D9570DC3B /* main-Icon-60x60@2x.png in Resources */,
-				BFCA9887E41F4F479531326B /* main-Icon-60x60@3x.png in Resources */,
-				6AF0B640DD994D4980673C9A /* alternative-Icon-60x60@2x.png in Resources */,
-				450F947C104F4EE3A0047ACE /* alternative-Icon-60x60@3x.png in Resources */,
 				59C7D532BE46C2BB14431297 /* PrivacyInfo.xcprivacy in Resources */,
+				F833449B771647B195E2CDED /* main-Icon-60x60@2x.png in Resources */,
+				B83ED989028E4188B4C4B45B /* main-Icon-60x60@3x.png in Resources */,
+				05DA1CFA01E24A398A73BA81 /* alternative-Icon-60x60@2x.png in Resources */,
+				39568780F4284D838B6C6444 /* alternative-Icon-60x60@3x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

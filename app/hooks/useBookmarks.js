@@ -6,7 +6,6 @@ import { useAdStore } from "store/adStore";
 import { useInterstitialAd } from "hooks/useInterstitialAd";
 import { ThemeContext } from "context/ThemeContext";
 import * as FileSystem from "expo-file-system";
-import analytics from '@react-native-firebase/analytics';
 import {useNavigation} from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 
@@ -56,7 +55,6 @@ export const useBookmarks = () => {
                     navigation.navigate("Share", { uri: "file://" + extractedPath, quote: item });
                 }
 
-                await analytics().logEvent('share_quote', { author: item.author });
             } catch (error) {
                 console.error("Error sharing quote:", error);
             }
@@ -77,7 +75,6 @@ export const useBookmarks = () => {
                         handleAction(() => {
                             removeFromBookmarks(item);
                             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                            analytics().logEvent('remove_bookmark', { quote: item.text });
                         });
                     },
                 },

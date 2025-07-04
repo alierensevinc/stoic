@@ -17,7 +17,6 @@ import {useAnimationStore} from "store/animationStore";
 import NetInfo from "@react-native-community/netinfo";
 import * as FileSystem from "expo-file-system";
 import {useInterstitialAd} from "hooks/useInterstitialAd";
-import analytics from '@react-native-firebase/analytics';
 import * as Haptics from "expo-haptics";
 
 export const useHome = () => {
@@ -93,11 +92,9 @@ export const useHome = () => {
             if (bookmarks.some((bookmark) => bookmark.text === currentQuote.text)) {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 removeFromBookmarks(currentQuote);
-                analytics().logEvent('remove_bookmark', {quote: currentQuote.text});
             } else {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
                 addToBookmarks(currentQuote);
-                analytics().logEvent('add_bookmark', {quote: currentQuote.text});
             }
         });
     };
@@ -125,7 +122,6 @@ export const useHome = () => {
                     navigation.navigate("Share", {uri: "file://" + extractedPath, quote: quotes[0]});
                 }
 
-                analytics().logEvent('share_quote', {author});
             } catch (error) {
                 console.error("Error sharing quote:", error);
             }
@@ -155,7 +151,6 @@ export const useHome = () => {
             setQuotes(previousQuotes);
         }
         textOpacity.value = withTiming(1, {duration: 500});
-        analytics().logEvent('change_quote', {direction});
     };
 
     const gestureHandler = useAnimatedGestureHandler({
@@ -185,7 +180,6 @@ export const useHome = () => {
     const navigateToBookmarks = () => {
         handleAction(() => {
             navigation.navigate("Bookmarks");
-            analytics().logEvent('navigate_to_bookmarks');
         });
     };
 
