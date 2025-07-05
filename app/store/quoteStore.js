@@ -66,9 +66,10 @@ const scheduleNotification = async (quotes) => {
                 data: {type: "futureQuotes", quote: quote},
             },
             trigger: {
-                type: Notifications.SchedulableTriggerInputTypes.DAILY,
+                type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
                 hour: time.getHours(),
                 minute: time.getMinutes(),
+                weekday: ((time.getDay() + 1) % 7) + 1,
                 repeats: true
             },
         });
