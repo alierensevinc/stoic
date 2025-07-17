@@ -75,21 +75,41 @@ export const useQuoteStore = create((set) => ({
         storage.set(QUOTES_KEY, JSON.stringify(quotes));
     },
     loadQuotes: () => {
-        // 1. Storage'dan oku
         const storedQuotes = storage.getString(QUOTES_KEY);
         if (storedQuotes) {
             try {
-                const parsed = JSON.parse(storedQuotes);
-                set({quotes: parsed || []});
+                let parsed = JSON.parse(storedQuotes);
+                if (Array.isArray(parsed)) {
+                    // Her açılışta karıştır
+                    parsed = shuffle(parsed);
+                    set({quotes: parsed});
+                } else {
+                    set({quotes: localQuotes.quotes ? shuffle([...localQuotes.quotes]) : []});
+                    storage.set(QUOTES_KEY, JSON.stringify(localQuotes.quotes || []));
+                }
             } catch (err) {
-                // Eğer parse hatası varsa local'den yükle
-                set({quotes: localQuotes.quotes || []});
+                set({quotes: localQuotes.quotes ? shuffle([...localQuotes.quotes]) : []});
                 storage.set(QUOTES_KEY, JSON.stringify(localQuotes.quotes || []));
             }
         } else {
-            // 2. Eğer storage boşsa local'den oku ve kaydet
-            set({quotes: localQuotes.quotes || []});
-            storage.set(QUOTES_KEY, JSON.stringify(localQuotes.quotes || []));
+            const shuffled = localQuotes.quotes ? shuffle([...localQuotes.quotes]) : [];
+            set({quotes: shuffled});
+            storage.set(QUOTES_KEY, JSON.stringify(shuffled));
         }
     },
 }));
+
+function shuffle(array) {
+    let currentIndex = array.length, randomIndex;
+
+    // Kalan eleman kalmayana kadar karıştır
+    while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        // Swap
+        [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+    }
+    return array;
+}

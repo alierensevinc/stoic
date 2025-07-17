@@ -1,6 +1,5 @@
 import {useContext, useEffect, useRef} from "react";
 import {Dimensions, Platform} from "react-native";
-import {ThemeContext} from "context/ThemeContext";
 import {
     runOnJS,
     useAnimatedGestureHandler,
@@ -9,14 +8,15 @@ import {
     withTiming,
 } from "react-native-reanimated";
 import * as Sharing from "expo-sharing";
+import * as FileSystem from "expo-file-system";
+import * as Haptics from "expo-haptics";
 import {useNavigation} from "@react-navigation/native";
+import {ThemeContext} from "context/ThemeContext";
 import {useBookmarksStore} from "store/bookmarksStore";
 import {useAdStore} from "store/adStore";
 import {useQuoteStore} from "store/quoteStore";
 import {useAnimationStore} from "store/animationStore";
-import * as FileSystem from "expo-file-system";
 import {useInterstitialAd} from "hooks/useInterstitialAd";
-import * as Haptics from "expo-haptics";
 
 export const useHome = () => {
     const {theme, isDarkMode} = useContext(ThemeContext);
