@@ -14,22 +14,13 @@ import {useBookmarksStore} from "store/bookmarksStore";
 import {useAdStore} from "store/adStore";
 import {useQuoteStore} from "store/quoteStore";
 import {useAnimationStore} from "store/animationStore";
-import NetInfo from "@react-native-community/netinfo";
 import * as FileSystem from "expo-file-system";
 import {useInterstitialAd} from "hooks/useInterstitialAd";
 import * as Haptics from "expo-haptics";
 
 export const useHome = () => {
     const {theme, isDarkMode} = useContext(ThemeContext);
-    const {
-        quotes,
-        setQuotes,
-        fetchQuotes,
-        loadQuotesFromArchive,
-        cameFromNotification,
-        setCameFromNotification,
-        preventFetch,
-    } = useQuoteStore();
+    const {quotes, setQuotes, loadQuotes} = useQuoteStore();
     const {bookmarks, addToBookmarks, removeFromBookmarks} = useBookmarksStore();
     const {actionCount, incrementActionCount, resetActionCount} = useAdStore();
     const {hasShownAnimation, setHasShownAnimation} = useAnimationStore();
@@ -39,23 +30,11 @@ export const useHome = () => {
     const navigation = useNavigation();
     const slideOffset = useSharedValue(0);
     const fadeOpacity = useSharedValue(1);
-
     const {isAdLoaded, showAd} = useInterstitialAd();
-    useEffect(() => {
-        if (!cameFromNotification && !preventFetch) {
-            NetInfo.fetch().then((state) => {
-                if (state.isConnected) {
-                    fetchQuotes();
-                } else {
-                    loadQuotesFromArchive();
-                }
-            });
-        }
 
-        return () => {
-            setCameFromNotification(false);
-        };
-    }, [cameFromNotification, preventFetch]);
+    useEffect(() => {
+        loadQuotes(); // Asenkron değil, senkron fonksiyon
+    }, []);
 
     useEffect(() => {
         if (!hasShownAnimation && quotes.length > 0) {
@@ -194,7 +173,6 @@ export const useHome = () => {
     return {
         theme,
         isDarkMode,
-        quotes,
         viewShotRef,
         gestureHandler,
         animatedStyle,
@@ -204,5 +182,7 @@ export const useHome = () => {
         toggleBookmark,
         handleNextQuoteClick,
         isBookmarked,
+        quotes,
+        setQuotes,
     };
 };

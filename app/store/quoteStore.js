@@ -1,52 +1,21 @@
 import {MMKV} from "react-native-mmkv";
-import moment from "moment";
 import {create} from "zustand";
 import * as Notifications from "expo-notifications";
-import axiosInstance from "utils/axiosInstance";
+import localQuotes from '../../assets/quotes.json';
 
 const storage = new MMKV();
 
-const QUOTES_KEY = "quotes";
-const ARCHIVE_QUOTES_KEY = "archiveQuotes";
-const FUTURE_QUOTES_KEY = "futureQuotes";
 const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled";
-const QUOTES_API_URL = "https://stoic-quotes.com/api/quotes?num=20";
 
-/**
- * Verilen anahtara karşılık veriyi JSON formatında MMKV storage'a kaydeder.
- * @param {string} key - Storage anahtarı
- * @param {any} data - Kaydedilecek veri
- */
-const saveToStorage = (key, data) => {
-    storage.set(key, JSON.stringify(data));
-};
+Notifications.addNotificationResponseReceivedListener((response) => {
+    const {type, quote} = response.notification.request.content.data;
+});
 
-/**
- * Verilen anahtara karşılık MMKV storage'tan veriyi JSON olarak çözüp döner.
- * @param {string} key - Storage anahtarı
- * @returns {any|null} - Çözümlenmiş veri ya da null
- */
-const loadFromStorage = (key) => {
-    const storedData = storage.getString(key);
-    return storedData ? JSON.parse(storedData) : null;
-};
-
-/**
- * Planlanmış tüm bildirimleri iptal eder.
- */
-const cancelAllNotifications = async () => {
-    await Notifications.cancelAllScheduledNotificationsAsync();
-};
-
-/**
- * Bildirim izni verilmişse, 7 gün boyunca her 3 saatte bir alıntı bildirimleri planlar.
- * @param {Array} quotes - Gönderilecek alıntılar
- */
 const scheduleNotification = async (quotes) => {
     const notificationsEnabled = storage.getBoolean(NOTIFICATIONS_ENABLED_KEY);
     if (!notificationsEnabled) return;
 
-    await cancelAllNotifications();
+    await Notifications.cancelAllScheduledNotificationsAsync();
 
     const triggerTimes = [];
     for (let i = 0; i < 7; i++) {
@@ -76,104 +45,7 @@ const scheduleNotification = async (quotes) => {
     }
 };
 
-/**
- * API'den yeni alıntılar çeker.
- * @returns {Promise<Array>} - API'den dönen alıntılar
- */
-const fetchQuotesFromAPI = async () => {
-    try {
-        const response = await axiosInstance.get(QUOTES_API_URL);
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching quotes from API:", error);
-        return [];
-    }
-};
-
-/**
- * Yeni alıntıları API'den çekip store'a ve storage'a kaydeder.
- * Arşiv, güncel ve gelecekteki alıntılar güncellenir.
- */
-const fetchAndStoreQuotes = async (setQuotes, setArchiveQuotes, setFutureQuotes) => {
-    const oldQuotes = loadFromStorage(QUOTES_KEY)?.quotes || [];
-    setArchiveQuotes(oldQuotes);
-
-    const quotes = await fetchQuotesFromAPI();
-    saveToStorage(QUOTES_KEY, {date: moment().format("YYYY-MM-DD HH"), quotes});
-    setQuotes(quotes);
-
-    const futureQuotes = await fetchQuotesFromAPI();
-    saveToStorage(FUTURE_QUOTES_KEY, futureQuotes);
-    setFutureQuotes(futureQuotes);
-
-    if (futureQuotes.length > 0) {
-        await scheduleNotification(futureQuotes);
-    }
-};
-
-/**
- * Storage'tan arşivlenmiş alıntıları yükleyip store'a aktarır.
- * @param {Function} setQuotes - Zustand store'daki setQuotes fonksiyonu
- */
-const loadQuotesFromArchive = (setQuotes) => {
-    const archiveQuotes = loadFromStorage(ARCHIVE_QUOTES_KEY);
-    if (archiveQuotes) {
-        setQuotes(archiveQuotes);
-    }
-};
-
-/**
- * Bildirimle gelen alıntıya göre store'u günceller, yeni future quotes çeker ve bildirimleri yeniden planlar.
- * @param {Object} quote - Bildirimle gelen alıntı
- */
-const handleFutureQuotesNotification = async (quote) => {
-    const {
-        futureQuotes,
-        setQuotes,
-        setCameFromNotification,
-        setNotificationFutureQuote,
-        setPreventFetch,
-        setFutureQuotes,
-    } = useQuoteStore.getState();
-
-    let notificationQuote;
-    if (!futureQuotes || futureQuotes.length === 0) {
-        const storedFutureQuotes = loadFromStorage(FUTURE_QUOTES_KEY);
-        if (storedFutureQuotes) {
-            notificationQuote = storedFutureQuotes[0];
-            setQuotes([notificationQuote, ...storedFutureQuotes.slice(1)]);
-        }
-    } else {
-        notificationQuote = quote;
-        setQuotes([notificationQuote, ...futureQuotes.slice(1)]);
-    }
-
-    setNotificationFutureQuote(notificationQuote);
-    setCameFromNotification(true);
-    setPreventFetch(true);
-
-    const newFutureQuotes = await fetchQuotesFromAPI();
-    saveToStorage(FUTURE_QUOTES_KEY, newFutureQuotes);
-    setFutureQuotes(newFutureQuotes);
-
-    await cancelAllNotifications();
-
-    if (newFutureQuotes.length > 0) {
-        await scheduleNotification(newFutureQuotes);
-    }
-};
-
-Notifications.addNotificationResponseReceivedListener((response) => {
-    const {type, quote} = response.notification.request.content.data;
-    if (type === "futureQuotes") {
-        handleFutureQuotesNotification(quote);
-    }
-});
-
-/**
- * Bildirim izinlerini ister ve handler'ı tanımlar. İzin verilirse storage'da flag saklanır.
- */
-const initializeNotifications = async () => {
+export const initializeNotifications = async () => {
     const {status} = await Notifications.requestPermissionsAsync();
     if (status !== "granted") {
         console.error("Notification permissions not granted");
@@ -194,67 +66,30 @@ const initializeNotifications = async () => {
     }
 };
 
-/**
- * Zustand ile alıntıların tutulduğu store.
- * quotes, archiveQuotes, futureQuotes gibi state'leri ve alıntı yönetim fonksiyonlarını içerir.
- */
+const QUOTES_KEY = "quotes";
+
 export const useQuoteStore = create((set) => ({
     quotes: [],
-    archiveQuotes: [],
-    futureQuotes: [],
-    cameFromNotification: false,
-    notificationFutureQuote: null,
-    preventFetch: false,
-
-    setQuotes: (quotes) => set({quotes}),
-    setArchiveQuotes: (archiveQuotes) => set({archiveQuotes}),
-    setFutureQuotes: (futureQuotes) => set({futureQuotes}),
-    setCameFromNotification: (value) => set({cameFromNotification: value}),
-    setNotificationFutureQuote: (quote) => set({notificationFutureQuote: quote}),
-    setPreventFetch: (value) => set({preventFetch: value}),
-
-    fetchQuotes: async () => {
-        const {
-            cameFromNotification,
-            notificationFutureQuote,
-            preventFetch,
-            setQuotes,
-            setArchiveQuotes,
-            setFutureQuotes,
-            setCameFromNotification,
-            setNotificationFutureQuote,
-            setPreventFetch,
-        } = useQuoteStore.getState();
-
-        if (preventFetch) {
-            setPreventFetch(false);
-            return;
-        }
-
-        if (cameFromNotification && notificationFutureQuote) {
-            setQuotes([notificationFutureQuote, ...futureQuotes.slice(1)]);
-            setCameFromNotification(false);
-            setNotificationFutureQuote(null);
-        } else {
-            await fetchAndStoreQuotes(setQuotes, setArchiveQuotes, setFutureQuotes);
-        }
+    setQuotes: (quotes) => {
+        set({quotes});
+        storage.set(QUOTES_KEY, JSON.stringify(quotes));
     },
-
-    loadQuotesFromArchive: () => {
-        loadQuotesFromArchive(useQuoteStore.getState().setQuotes);
+    loadQuotes: () => {
+        // 1. Storage'dan oku
+        const storedQuotes = storage.getString(QUOTES_KEY);
+        if (storedQuotes) {
+            try {
+                const parsed = JSON.parse(storedQuotes);
+                set({quotes: parsed || []});
+            } catch (err) {
+                // Eğer parse hatası varsa local'den yükle
+                set({quotes: localQuotes.quotes || []});
+                storage.set(QUOTES_KEY, JSON.stringify(localQuotes.quotes || []));
+            }
+        } else {
+            // 2. Eğer storage boşsa local'den oku ve kaydet
+            set({quotes: localQuotes.quotes || []});
+            storage.set(QUOTES_KEY, JSON.stringify(localQuotes.quotes || []));
+        }
     },
 }));
-
-// Arşiv alıntıları değiştiğinde storage'a kaydeder
-useQuoteStore.subscribe(
-    (state) => state.archiveQuotes,
-    (archiveQuotes) => saveToStorage(ARCHIVE_QUOTES_KEY, archiveQuotes)
-);
-
-// Gelecek alıntılar değiştiğinde storage'a kaydeder
-useQuoteStore.subscribe(
-    (state) => state.futureQuotes,
-    (futureQuotes) => saveToStorage(FUTURE_QUOTES_KEY, futureQuotes)
-);
-
-export {initializeNotifications};
