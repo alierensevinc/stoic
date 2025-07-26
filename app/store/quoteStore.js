@@ -11,19 +11,23 @@ Notifications.addNotificationResponseReceivedListener((response) => {
     const {type, quote} = response.notification.request.content.data;
 });
 
-const scheduleNotification = async (quotes) => {
+export const scheduleNotification = async (quotes) => {
     const notificationsEnabled = storage.getBoolean(NOTIFICATIONS_ENABLED_KEY);
     if (!notificationsEnabled) return;
 
     await Notifications.cancelAllScheduledNotificationsAsync();
 
     const triggerTimes = [];
-    for (let i = 0; i < 7; i++) {
+    // 5 gün boyunca, her gün 5 saat
+    for (let i = 0; i < 5; i++) {
         for (let hour = 9; hour <= 21; hour += 3) {
             let triggerTime = new Date();
-            triggerTime.setHours(hour, 0, 0, 0);
             triggerTime.setDate(triggerTime.getDate() + i);
-            triggerTimes.push({time: triggerTime, quote: quotes[(i * 5 + (hour - 9) / 3) % quotes.length]});
+            triggerTime.setHours(hour, 0, 0, 0);
+            triggerTimes.push({
+                time: new Date(triggerTime), // Kopyasını tut
+                quote: quotes[(i * 5 + (hour - 9) / 3) % quotes.length]
+            });
         }
     }
 
@@ -35,11 +39,14 @@ const scheduleNotification = async (quotes) => {
                 data: {type: "futureQuotes", quote: quote},
             },
             trigger: {
+                // Lokal saate göre gün/saat
                 type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
                 hour: time.getHours(),
                 minute: time.getMinutes(),
-                weekday: ((time.getDay() + 1) % 7) + 1,
-                repeats: true
+                day: time.getDate(),
+                month: time.getMonth() + 1, // JS'de month 0-indexli, Expo'da 1-indexli!
+                year: time.getFullYear(),
+                repeats: false // Tek seferlik
             },
         });
     }
@@ -82,6 +89,7 @@ export const useQuoteStore = create((set) => ({
                 if (Array.isArray(parsed)) {
                     // Her açılışta karıştır
                     parsed = shuffle(parsed);
+                    scheduleNotification(parsed);
                     set({quotes: parsed});
                 } else {
                     set({quotes: localQuotes.quotes ? shuffle([...localQuotes.quotes]) : []});
