@@ -20,7 +20,13 @@ import {useInterstitialAd} from "hooks/useInterstitialAd";
 
 export const useHome = () => {
     const {theme, isDarkMode} = useContext(ThemeContext);
-    const {quotes, setQuotes, loadQuotes} = useQuoteStore();
+    const {
+        quotes,
+        setQuotes,
+        loadQuotes,
+        notificationQuote,      // Yeni state'i store'dan al
+        clearNotificationQuote, // Temizleme fonksiyonunu store'dan al
+    } = useQuoteStore();
     const {bookmarks, addToBookmarks, removeFromBookmarks} = useBookmarksStore();
     const {actionCount, incrementActionCount, resetActionCount} = useAdStore();
     const {hasShownAnimation, setHasShownAnimation} = useAnimationStore();
@@ -35,6 +41,30 @@ export const useHome = () => {
     useEffect(() => {
         loadQuotes(); // Asenkron değil, senkron fonksiyon
     }, []);
+
+    useEffect(() => {
+        // Eğer notificationQuote doluysa (yani bir bildirime tıklandıysa)
+        if (notificationQuote) {
+            // Mevcut söz listesinde bu sözün olup olmadığını kontrol et
+            const existingQuoteIndex = quotes.findIndex(q => q.text === notificationQuote.text);
+
+            let newQuotes = [...quotes];
+
+            // Eğer söz listede varsa, önce onu listeden çıkar
+            if (existingQuoteIndex > -1) {
+                newQuotes.splice(existingQuoteIndex, 1);
+            }
+
+            // Gelen yeni sözü listenin en başına ekle
+            newQuotes.unshift(notificationQuote);
+
+            // Ana ekrandaki söz listesini güncelle
+            setQuotes(newQuotes);
+
+            // İşimiz bittiği için notificationQuote state'ini temizle
+            clearNotificationQuote();
+        }
+    }, [notificationQuote]);
 
     useEffect(() => {
         if (!hasShownAnimation && quotes.length > 0) {

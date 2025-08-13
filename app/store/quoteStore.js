@@ -7,50 +7,41 @@ const storage = new MMKV();
 
 const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled";
 
-Notifications.addNotificationResponseReceivedListener((response) => {
-    const {type, quote} = response.notification.request.content.data;
-});
-
 export const scheduleNotification = async (quotes) => {
     const notificationsEnabled = storage.getBoolean(NOTIFICATIONS_ENABLED_KEY);
     if (!notificationsEnabled) return;
 
     await Notifications.cancelAllScheduledNotificationsAsync();
 
-    const triggerTimes = [];
-    // 5 gün boyunca, her gün 5 saat
     for (let i = 0; i < 5; i++) {
         for (let hour = 9; hour <= 21; hour += 3) {
-            let triggerTime = new Date();
-            triggerTime.setDate(triggerTime.getDate() + i);
-            triggerTime.setHours(hour, 0, 0, 0);
-            triggerTimes.push({
-                time: new Date(triggerTime), // Kopyasını tut
-                quote: quotes[(i * 5 + (hour - 9) / 3) % quotes.length]
+            const quoteIndex = (i * 5 + (hour - 9) / 3) % quotes.length;
+            const quote = quotes[quoteIndex];
+
+            const triggerDate = new Date();
+            triggerDate.setDate(triggerDate.getDate() + i);
+            triggerDate.setHours(hour, 0, 0, 0);
+
+            if (triggerDate.getTime() < new Date().getTime()) {
+                continue;
+            }
+
+            await Notifications.scheduleNotificationAsync({
+                content: {
+                    title: "Günün Stoacı Sözü",
+                    body: `"${quote.text}" - ${quote.author}`,
+                    data: {type: "futureQuotes", quote: quote},
+                },
+                // DEĞİŞİKLİK: 'deprecated' uyarısını gidermek için trigger formatı güncellendi.
+                trigger: {
+                    type: 'date',
+                    date: triggerDate,
+                },
             });
         }
     }
-
-    for (const {time, quote} of triggerTimes) {
-        await Notifications.scheduleNotificationAsync({
-            content: {
-                title: quote.text,
-                body: quote.author,
-                data: {type: "futureQuotes", quote: quote},
-            },
-            trigger: {
-                // Lokal saate göre gün/saat
-                type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
-                hour: time.getHours(),
-                minute: time.getMinutes(),
-                day: time.getDate(),
-                month: time.getMonth() + 1, // JS'de month 0-indexli, Expo'da 1-indexli!
-                year: time.getFullYear(),
-                repeats: false // Tek seferlik
-            },
-        });
-    }
 };
+
 
 export const initializeNotifications = async () => {
     const {status} = await Notifications.requestPermissionsAsync();
@@ -77,6 +68,9 @@ const QUOTES_KEY = "quotes";
 
 export const useQuoteStore = create((set) => ({
     quotes: [],
+    notificationQuote: null, // Tıklanan bildirimdeki sözü tutacak yeni state
+    setNotificationQuote: (quote) => set({ notificationQuote: quote }), // Bu sözü state'e yazacak fonksiyon
+    clearNotificationQuote: () => set({ notificationQuote: null }), // Söz işlendikten sonra state'i temizleyecek fonksiyon
     setQuotes: (quotes) => {
         set({quotes});
         storage.set(QUOTES_KEY, JSON.stringify(quotes));
@@ -87,17 +81,18 @@ export const useQuoteStore = create((set) => ({
             try {
                 let parsed = JSON.parse(storedQuotes);
                 if (Array.isArray(parsed)) {
-                    // Her açılışta karıştır
                     parsed = shuffle(parsed);
                     scheduleNotification(parsed);
                     set({quotes: parsed});
                 } else {
-                    set({quotes: localQuotes.quotes ? shuffle([...localQuotes.quotes]) : []});
-                    storage.set(QUOTES_KEY, JSON.stringify(localQuotes.quotes || []));
+                    const shuffled = localQuotes.quotes ? shuffle([...localQuotes.quotes]) : [];
+                    set({quotes: shuffled});
+                    storage.set(QUOTES_KEY, JSON.stringify(shuffled));
                 }
             } catch (err) {
-                set({quotes: localQuotes.quotes ? shuffle([...localQuotes.quotes]) : []});
-                storage.set(QUOTES_KEY, JSON.stringify(localQuotes.quotes || []));
+                const shuffled = localQuotes.quotes ? shuffle([...localQuotes.quotes]) : [];
+                set({quotes: shuffled});
+                storage.set(QUOTES_KEY, JSON.stringify(shuffled));
             }
         } else {
             const shuffled = localQuotes.quotes ? shuffle([...localQuotes.quotes]) : [];
@@ -106,6 +101,14 @@ export const useQuoteStore = create((set) => ({
         }
     },
 }));
+
+Notifications.addNotificationResponseReceivedListener((response) => {
+    const { quote } = response.notification.request.content.data;
+    if (quote) {
+        // Zustand store'daki state'i gelen söz ile güncelle
+        useQuoteStore.getState().setNotificationQuote(quote);
+    }
+});
 
 function shuffle(array) {
     let currentIndex = array.length, randomIndex;
