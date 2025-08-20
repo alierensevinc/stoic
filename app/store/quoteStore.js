@@ -28,8 +28,8 @@ export const scheduleNotification = async (quotes) => {
 
             await Notifications.scheduleNotificationAsync({
                 content: {
-                    title: "Günün Stoacı Sözü",
-                    body: `"${quote.text}" - ${quote.author}`,
+                    title: `"${quote.author}"`,
+                    body: `"${quote.text}"`,
                     data: {type: "futureQuotes", quote: quote},
                 },
                 // DEĞİŞİKLİK: 'deprecated' uyarısını gidermek için trigger formatı güncellendi.
@@ -69,8 +69,8 @@ const QUOTES_KEY = "quotes";
 export const useQuoteStore = create((set) => ({
     quotes: [],
     notificationQuote: null, // Tıklanan bildirimdeki sözü tutacak yeni state
-    setNotificationQuote: (quote) => set({ notificationQuote: quote }), // Bu sözü state'e yazacak fonksiyon
-    clearNotificationQuote: () => set({ notificationQuote: null }), // Söz işlendikten sonra state'i temizleyecek fonksiyon
+    setNotificationQuote: (quote) => set({notificationQuote: quote}), // Bu sözü state'e yazacak fonksiyon
+    clearNotificationQuote: () => set({notificationQuote: null}), // Söz işlendikten sonra state'i temizleyecek fonksiyon
     setQuotes: (quotes) => {
         set({quotes});
         storage.set(QUOTES_KEY, JSON.stringify(quotes));
@@ -103,7 +103,7 @@ export const useQuoteStore = create((set) => ({
 }));
 
 Notifications.addNotificationResponseReceivedListener((response) => {
-    const { quote } = response.notification.request.content.data;
+    const {quote} = response.notification.request.content.data;
     if (quote) {
         // Zustand store'daki state'i gelen söz ile güncelle
         useQuoteStore.getState().setNotificationQuote(quote);
