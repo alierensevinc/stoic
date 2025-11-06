@@ -9,9 +9,8 @@ import * as MailComposer from "expo-mail-composer";
 import * as Application from "expo-application";
 import * as WebBrowser from 'expo-web-browser';
 import * as Haptics from "expo-haptics";
-
-// GÜNCELLENDİ: Doğru (hatası düzeltilmiş) fonksiyonu import et
-import { scheduleNextDailyNotification } from "store/quoteStore";
+// MODIFIED: Import the new ritual scheduler
+import { scheduleDailyRitualNotifications } from "store/quoteStore";
 
 const storage = new MMKV();
 const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled";
@@ -30,11 +29,11 @@ const handleToggleNotifications = async (value, setNotificationsEnabled) => {
         const {status} = await Notifications.requestPermissionsAsync();
         if (status !== "granted") {
             Alert.alert(
-                "Permissions Required", // Çeviri
-                "To enable notifications, please go to your device settings and grant notification permissions for this app.", // Çeviri
+                "Permissions Required",
+                "To enable notifications, please go to your device settings and grant notification permissions for this app.",
                 [
-                    {text: "Cancel", style: "cancel"}, // Çeviri
-                    {text: "Open Settings", onPress: () => Linking.openSettings()}, // Çeviri
+                    {text: "Cancel", style: "cancel"},
+                    {text: "Open Settings", onPress: () => Linking.openSettings()},
                 ]
             );
             return;
@@ -43,9 +42,10 @@ const handleToggleNotifications = async (value, setNotificationsEnabled) => {
         storage.set(NOTIFICATIONS_ENABLED_KEY, true);
         setNotificationsEnabled(true);
 
-        // GÜNCELLENDİ: Bir sonraki 15:00 için planla
-        await scheduleNextDailyNotification();
-        console.log("Notifications enabled and scheduled by user.");
+        // MODIFIED: Call the ritual scheduler directly.
+        // DO NOT call loadQuotes() here.
+        await scheduleDailyRitualNotifications();
+        console.log("Notifications enabled and rituals scheduled by user.");
 
     } else {
         // User turned notifications OFF
@@ -53,7 +53,7 @@ const handleToggleNotifications = async (value, setNotificationsEnabled) => {
         storage.set(NOTIFICATIONS_ENABLED_KEY, false);
         setNotificationsEnabled(false);
 
-        // GÜNCELLENDİ: Planlanmış tüm bildirimleri iptal et
+        // MODIFIED: Cancel all (both morning and evening) notifications
         await Notifications.cancelAllScheduledNotificationsAsync();
         console.log("Notifications disabled and all scheduled notifications cancelled.");
     }
