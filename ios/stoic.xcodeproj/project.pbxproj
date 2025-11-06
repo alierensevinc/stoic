@@ -8,17 +8,17 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		2E09175E07E04AD1AEDBF750 /* main-Icon-60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 800D81E6FA034C14A6FEA456 /* main-Icon-60x60@2x.png */; };
 		3B7893631224C95186BD65A9 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AA98D7FF090EC0A19A5B1B3 /* ExpoModulesProvider.swift */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		80BD6D3C6A514D0C98CC1F41 /* alternative-Icon-60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 56E2DDDB13E849AE9711C697 /* alternative-Icon-60x60@3x.png */; };
 		956396F0266C6A70327547B2 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 275FA973FA3B12BECDF39361 /* PrivacyInfo.xcprivacy */; };
-		A83BCD537C63499299C31C42 /* alternative-Icon-60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 70C6E2FBC23B4E59A7599AFE /* alternative-Icon-60x60@2x.png */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		CC965C4BD45343E5B3702CB8 /* main-Icon-60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC5A9072A8294D4494332E9B /* main-Icon-60x60@3x.png */; };
 		CE0C250B5E9C477C84DEDA68 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 83C268D38E704747A99CB0AC /* GoogleService-Info.plist */; };
 		D7272FB32828357B66A28085 /* Pods_stoic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A454732A3B8C3EB861F66E9F /* Pods_stoic.framework */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
+		B4B78CAB715442B694B2A67E /* main-Icon-60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C0BF4B9392064F4D9FE60309 /* main-Icon-60x60@2x.png */; };
+		DCFBCC3A6A6B4A3AB5EAA700 /* main-Icon-60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1A61177DAAFB4C2286E6B682 /* main-Icon-60x60@3x.png */; };
+		6F8F629BB08E41D78D1A3578 /* alternative-Icon-60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E1F14F41E034682AAC8D741 /* alternative-Icon-60x60@2x.png */; };
+		BA873FCB6C004503A5785528 /* alternative-Icon-60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 991CC2EB4589458A829AF864 /* alternative-Icon-60x60@3x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,19 +27,19 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = stoic/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = stoic/Info.plist; sourceTree = "<group>"; };
 		275FA973FA3B12BECDF39361 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = stoic/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		56E2DDDB13E849AE9711C697 /* alternative-Icon-60x60@3x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "alternative-Icon-60x60@3x.png"; path = "stoic/DynamicAppIcons/alternative-Icon-60x60@3x.png"; sourceTree = "<group>"; };
 		5EB65163F21CEFC064C4CB1C /* Pods-stoic.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-stoic.debug.xcconfig"; path = "Target Support Files/Pods-stoic/Pods-stoic.debug.xcconfig"; sourceTree = "<group>"; };
-		70C6E2FBC23B4E59A7599AFE /* alternative-Icon-60x60@2x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "alternative-Icon-60x60@2x.png"; path = "stoic/DynamicAppIcons/alternative-Icon-60x60@2x.png"; sourceTree = "<group>"; };
 		7AA98D7FF090EC0A19A5B1B3 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-stoic/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		800D81E6FA034C14A6FEA456 /* main-Icon-60x60@2x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "main-Icon-60x60@2x.png"; path = "stoic/DynamicAppIcons/main-Icon-60x60@2x.png"; sourceTree = "<group>"; };
 		83C268D38E704747A99CB0AC /* GoogleService-Info.plist */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "stoic/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		A454732A3B8C3EB861F66E9F /* Pods_stoic.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_stoic.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = stoic/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		CC5A9072A8294D4494332E9B /* main-Icon-60x60@3x.png */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "main-Icon-60x60@3x.png"; path = "stoic/DynamicAppIcons/main-Icon-60x60@3x.png"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = stoic/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* stoic-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "stoic-Bridging-Header.h"; path = "stoic/stoic-Bridging-Header.h"; sourceTree = "<group>"; };
+		C0BF4B9392064F4D9FE60309 /* main-Icon-60x60@2x.png */ = {isa = PBXFileReference; name = "main-Icon-60x60@2x.png"; path = "stoic/DynamicAppIcons/main-Icon-60x60@2x.png"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		1A61177DAAFB4C2286E6B682 /* main-Icon-60x60@3x.png */ = {isa = PBXFileReference; name = "main-Icon-60x60@3x.png"; path = "stoic/DynamicAppIcons/main-Icon-60x60@3x.png"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		5E1F14F41E034682AAC8D741 /* alternative-Icon-60x60@2x.png */ = {isa = PBXFileReference; name = "alternative-Icon-60x60@2x.png"; path = "stoic/DynamicAppIcons/alternative-Icon-60x60@2x.png"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		991CC2EB4589458A829AF864 /* alternative-Icon-60x60@3x.png */ = {isa = PBXFileReference; name = "alternative-Icon-60x60@3x.png"; path = "stoic/DynamicAppIcons/alternative-Icon-60x60@3x.png"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,10 +147,10 @@
 		FE0E01DA418B4DC585FF5650 /* DynamicAppIcons */ = {
 			isa = PBXGroup;
 			children = (
-				800D81E6FA034C14A6FEA456 /* main-Icon-60x60@2x.png */,
-				CC5A9072A8294D4494332E9B /* main-Icon-60x60@3x.png */,
-				70C6E2FBC23B4E59A7599AFE /* alternative-Icon-60x60@2x.png */,
-				56E2DDDB13E849AE9711C697 /* alternative-Icon-60x60@3x.png */,
+				C0BF4B9392064F4D9FE60309 /* main-Icon-60x60@2x.png */,
+				1A61177DAAFB4C2286E6B682 /* main-Icon-60x60@3x.png */,
+				5E1F14F41E034682AAC8D741 /* alternative-Icon-60x60@2x.png */,
+				991CC2EB4589458A829AF864 /* alternative-Icon-60x60@3x.png */,
 			);
 			name = DynamicAppIcons;
 			path = "";
@@ -225,10 +225,10 @@
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
 				CE0C250B5E9C477C84DEDA68 /* GoogleService-Info.plist in Resources */,
 				956396F0266C6A70327547B2 /* PrivacyInfo.xcprivacy in Resources */,
-				2E09175E07E04AD1AEDBF750 /* main-Icon-60x60@2x.png in Resources */,
-				CC965C4BD45343E5B3702CB8 /* main-Icon-60x60@3x.png in Resources */,
-				A83BCD537C63499299C31C42 /* alternative-Icon-60x60@2x.png in Resources */,
-				80BD6D3C6A514D0C98CC1F41 /* alternative-Icon-60x60@3x.png in Resources */,
+				B4B78CAB715442B694B2A67E /* main-Icon-60x60@2x.png in Resources */,
+				DCFBCC3A6A6B4A3AB5EAA700 /* main-Icon-60x60@3x.png in Resources */,
+				6F8F629BB08E41D78D1A3578 /* alternative-Icon-60x60@2x.png in Resources */,
+				BA873FCB6C004503A5785528 /* alternative-Icon-60x60@3x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -463,11 +463,11 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.sevincaeren.stoic;
-				PRODUCT_NAME = stoic;
+				PRODUCT_NAME = "stoic";
 				SWIFT_OBJC_BRIDGING_HEADER = "stoic/stoic-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -494,10 +494,10 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.sevincaeren.stoic;
-				PRODUCT_NAME = stoic;
+				PRODUCT_NAME = "stoic";
 				SWIFT_OBJC_BRIDGING_HEADER = "stoic/stoic-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
@@ -670,6 +670,9 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin PBXVariantGroup section */
+/* End PBXVariantGroup section */
 	};
 	rootObject = 83CBB9F71A601CBA00E9B192 /* Project object */;
 }

@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.4",
+    "@niondigital/widgets-expo-config-plugin": "^1.1.1",
     "@react-native-camera-roll/camera-roll": "^7.8.3",
     "@react-native-clipboard/clipboard": "^1.14.3",
     "@react-native-community/netinfo": "11.4.1",
