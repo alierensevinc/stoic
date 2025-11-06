@@ -7,10 +7,10 @@ import {ThemeProvider} from "context/ThemeContext";
 import AppNavigator from "navigation/AppNavigator";
 import {useAppInitialization} from "hooks/useAppInitialization";
 import {useFontsLoading} from "hooks/useFontsLoading";
-import {initializeNotifications} from "store/quoteStore";
+import {initializeNotifications} from "store/quoteStore"; // Fonksiyonu import et
 
 SplashScreen.preventAutoHideAsync();
-initializeNotifications();
+// initializeNotifications(); // <--- BU SATIRI BURADAN SİLİYORUZ
 
 export default function App() {
     const appIsReady = useAppInitialization();
@@ -20,6 +20,8 @@ export default function App() {
         const hideSplashScreen = async () => {
             if (appIsReady && (fontsLoaded || fontsError)) {
                 await SplashScreen.hideAsync();
+
+                await initializeNotifications();
                 await TrackingTransparency.requestTrackingPermissionsAsync();
             }
         };

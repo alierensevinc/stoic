@@ -10,6 +10,9 @@ import * as Application from "expo-application";
 import * as WebBrowser from 'expo-web-browser';
 import * as Haptics from "expo-haptics";
 
+// GÜNCELLENDİ: Doğru (hatası düzeltilmiş) fonksiyonu import et
+import { scheduleNextDailyNotification } from "store/quoteStore";
+
 const storage = new MMKV();
 const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled";
 
@@ -23,14 +26,15 @@ const checkNotificationPermission = async (setNotificationsEnabled) => {
 
 const handleToggleNotifications = async (value, setNotificationsEnabled) => {
     if (value) {
+        // User turned notifications ON
         const {status} = await Notifications.requestPermissionsAsync();
         if (status !== "granted") {
             Alert.alert(
-                "Give Permissions",
-                "To enable notifications, please go to your device settings and grant the notification permissions for this app.",
+                "Permissions Required", // Çeviri
+                "To enable notifications, please go to your device settings and grant notification permissions for this app.", // Çeviri
                 [
-                    {text: "Cancel", style: "cancel"},
-                    {text: "Open Settings", onPress: () => Linking.openSettings()},
+                    {text: "Cancel", style: "cancel"}, // Çeviri
+                    {text: "Open Settings", onPress: () => Linking.openSettings()}, // Çeviri
                 ]
             );
             return;
@@ -38,10 +42,20 @@ const handleToggleNotifications = async (value, setNotificationsEnabled) => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         storage.set(NOTIFICATIONS_ENABLED_KEY, true);
         setNotificationsEnabled(true);
+
+        // GÜNCELLENDİ: Bir sonraki 15:00 için planla
+        await scheduleNextDailyNotification();
+        console.log("Notifications enabled and scheduled by user.");
+
     } else {
+        // User turned notifications OFF
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         storage.set(NOTIFICATIONS_ENABLED_KEY, false);
         setNotificationsEnabled(false);
+
+        // GÜNCELLENDİ: Planlanmış tüm bildirimleri iptal et
+        await Notifications.cancelAllScheduledNotificationsAsync();
+        console.log("Notifications disabled and all scheduled notifications cancelled.");
     }
 };
 
