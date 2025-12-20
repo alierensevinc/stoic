@@ -45,6 +45,7 @@ const BookmarksScreen = () => {
           <EmptyState text="No bookmarks yet" color={theme.textColor} />
         </View>
       )}
+      <InlineAd className="absolute bottom-0 left-0 right-0 self-center" />
 
       {shareState.showShareQuote && shareState.quoteToShare && (
         <View className="absolute top-[-1000px] left-[-1000px] w-full h-full opacity-0">
