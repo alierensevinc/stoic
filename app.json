@@ -125,7 +125,22 @@
         }
       ],
       "expo-mail-composer",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "@niondigital/widgets-expo-config-plugin",
+        {
+          "path": "widgets",
+          "name": "QuoteWidget",
+          "entitlements": {
+            "com.apple.security.application-groups": [
+              "group.com.sevincaeren.stoic.QuoteWidget"
+            ]
+          },
+          "buildSettings": {
+            "IPHONEOS_DEPLOYMENT_TARGET": "16.0"
+          }
+        }
+      ]
     ],
     "extra": {
       "eas": {
