@@ -7,9 +7,10 @@ import * as Notifications from "expo-notifications";
 import {MMKV} from "react-native-mmkv";
 import * as MailComposer from "expo-mail-composer";
 import * as Application from "expo-application";
-import analytics from '@react-native-firebase/analytics';
 import * as WebBrowser from 'expo-web-browser';
 import * as Haptics from "expo-haptics";
+// MODIFIED: Import the new ritual scheduler
+import { scheduleDailyRitualNotifications } from "store/quoteStore";
 
 const storage = new MMKV();
 const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled";
@@ -24,11 +25,12 @@ const checkNotificationPermission = async (setNotificationsEnabled) => {
 
 const handleToggleNotifications = async (value, setNotificationsEnabled) => {
     if (value) {
+        // User turned notifications ON
         const {status} = await Notifications.requestPermissionsAsync();
         if (status !== "granted") {
             Alert.alert(
-                "Give Permissions",
-                "To enable notifications, please go to your device settings and grant the notification permissions for this app.",
+                "Permissions Required",
+                "To enable notifications, please go to your device settings and grant notification permissions for this app.",
                 [
                     {text: "Cancel", style: "cancel"},
                     {text: "Open Settings", onPress: () => Linking.openSettings()},
@@ -39,12 +41,21 @@ const handleToggleNotifications = async (value, setNotificationsEnabled) => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         storage.set(NOTIFICATIONS_ENABLED_KEY, true);
         setNotificationsEnabled(true);
-        await analytics().logEvent('notifications_enabled');
+
+        // MODIFIED: Call the ritual scheduler directly.
+        // DO NOT call loadQuotes() here.
+        await scheduleDailyRitualNotifications();
+        console.log("Notifications enabled and rituals scheduled by user.");
+
     } else {
+        // User turned notifications OFF
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         storage.set(NOTIFICATIONS_ENABLED_KEY, false);
         setNotificationsEnabled(false);
-        await analytics().logEvent('notifications_disabled');
+
+        // MODIFIED: Cancel all (both morning and evening) notifications
+        await Notifications.cancelAllScheduledNotificationsAsync();
+        console.log("Notifications disabled and all scheduled notifications cancelled.");
     }
 };
 
@@ -66,13 +77,11 @@ const handleSendEmail = async () => {
     };
 
     await MailComposer.composeAsync(options);
-    await analytics().logEvent('send_email');
 };
 
 const handleOpenLinkedin = async () => {
     Linking.openURL("https://www.linkedin.com/in/alierensevinc/");
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
-    await analytics().logEvent('open_linkedin');
 };
 
 const handleShare = async () => {
@@ -80,7 +89,6 @@ const handleShare = async () => {
         message: "Stoic - Daily Quotes : https://itunes.apple.com/app/6737173970",
     });
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
-    await analytics().logEvent('share_app');
 };
 
 const handleRate = async () => {
@@ -88,7 +96,6 @@ const handleRate = async () => {
         "itms-apps://itunes.apple.com/app/viewContentsUserReviews/id6737173970?action=write-review"
     );
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
-    await analytics().logEvent('rate_app');
 };
 
 const handleVisitPrivacyPolicy = async () => {

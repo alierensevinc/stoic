@@ -1,6 +1,5 @@
 import {useContext, useEffect, useRef} from "react";
 import {Dimensions, Platform} from "react-native";
-import {ThemeContext} from "context/ThemeContext";
 import {
     runOnJS,
     useAnimatedGestureHandler,
@@ -9,27 +8,24 @@ import {
     withTiming,
 } from "react-native-reanimated";
 import * as Sharing from "expo-sharing";
+import * as FileSystem from "expo-file-system";
+import * as Haptics from "expo-haptics";
 import {useNavigation} from "@react-navigation/native";
+import {ThemeContext} from "context/ThemeContext";
 import {useBookmarksStore} from "store/bookmarksStore";
 import {useAdStore} from "store/adStore";
 import {useQuoteStore} from "store/quoteStore";
 import {useAnimationStore} from "store/animationStore";
-import NetInfo from "@react-native-community/netinfo";
-import * as FileSystem from "expo-file-system";
 import {useInterstitialAd} from "hooks/useInterstitialAd";
-import analytics from '@react-native-firebase/analytics';
-import * as Haptics from "expo-haptics";
 
 export const useHome = () => {
     const {theme, isDarkMode} = useContext(ThemeContext);
     const {
         quotes,
         setQuotes,
-        fetchQuotes,
-        loadQuotesFromArchive,
-        cameFromNotification,
-        setCameFromNotification,
-        preventFetch,
+        loadQuotes,
+        notificationQuote,      // Yeni state'i store'dan al
+        clearNotificationQuote, // Temizleme fonksiyonunu store'dan al
     } = useQuoteStore();
     const {bookmarks, addToBookmarks, removeFromBookmarks} = useBookmarksStore();
     const {actionCount, incrementActionCount, resetActionCount} = useAdStore();
@@ -40,23 +36,35 @@ export const useHome = () => {
     const navigation = useNavigation();
     const slideOffset = useSharedValue(0);
     const fadeOpacity = useSharedValue(1);
-
     const {isAdLoaded, showAd} = useInterstitialAd();
-    useEffect(() => {
-        if (!cameFromNotification && !preventFetch) {
-            NetInfo.fetch().then((state) => {
-                if (state.isConnected) {
-                    fetchQuotes();
-                } else {
-                    loadQuotesFromArchive();
-                }
-            });
-        }
 
-        return () => {
-            setCameFromNotification(false);
-        };
-    }, [cameFromNotification, preventFetch]);
+    useEffect(() => {
+        loadQuotes(); // Asenkron değil, senkron fonksiyon
+    }, []);
+
+    useEffect(() => {
+        // Eğer notificationQuote doluysa (yani bir bildirime tıklandıysa)
+        if (notificationQuote) {
+            // Mevcut söz listesinde bu sözün olup olmadığını kontrol et
+            const existingQuoteIndex = quotes.findIndex(q => q.text === notificationQuote.text);
+
+            let newQuotes = [...quotes];
+
+            // Eğer söz listede varsa, önce onu listeden çıkar
+            if (existingQuoteIndex > -1) {
+                newQuotes.splice(existingQuoteIndex, 1);
+            }
+
+            // Gelen yeni sözü listenin en başına ekle
+            newQuotes.unshift(notificationQuote);
+
+            // Ana ekrandaki söz listesini güncelle
+            setQuotes(newQuotes);
+
+            // İşimiz bittiği için notificationQuote state'ini temizle
+            clearNotificationQuote();
+        }
+    }, [notificationQuote]);
 
     useEffect(() => {
         if (!hasShownAnimation && quotes.length > 0) {
@@ -93,11 +101,9 @@ export const useHome = () => {
             if (bookmarks.some((bookmark) => bookmark.text === currentQuote.text)) {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 removeFromBookmarks(currentQuote);
-                analytics().logEvent('remove_bookmark', {quote: currentQuote.text});
             } else {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
                 addToBookmarks(currentQuote);
-                analytics().logEvent('add_bookmark', {quote: currentQuote.text});
             }
         });
     };
@@ -125,7 +131,6 @@ export const useHome = () => {
                     navigation.navigate("Share", {uri: "file://" + extractedPath, quote: quotes[0]});
                 }
 
-                analytics().logEvent('share_quote', {author});
             } catch (error) {
                 console.error("Error sharing quote:", error);
             }
@@ -155,7 +160,6 @@ export const useHome = () => {
             setQuotes(previousQuotes);
         }
         textOpacity.value = withTiming(1, {duration: 500});
-        analytics().logEvent('change_quote', {direction});
     };
 
     const gestureHandler = useAnimatedGestureHandler({
@@ -185,7 +189,6 @@ export const useHome = () => {
     const navigateToBookmarks = () => {
         handleAction(() => {
             navigation.navigate("Bookmarks");
-            analytics().logEvent('navigate_to_bookmarks');
         });
     };
 
@@ -200,7 +203,6 @@ export const useHome = () => {
     return {
         theme,
         isDarkMode,
-        quotes,
         viewShotRef,
         gestureHandler,
         animatedStyle,
@@ -210,5 +212,7 @@ export const useHome = () => {
         toggleBookmark,
         handleNextQuoteClick,
         isBookmarked,
+        quotes,
+        setQuotes,
     };
 };

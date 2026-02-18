@@ -2,7 +2,7 @@
   "expo": {
     "name": "stoic",
     "slug": "stoic",
-    "version": "1.3.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,7 +14,7 @@
     "ios": {
       "bundleIdentifier": "com.sevincaeren.stoic",
       "supportsTablet": false,
-      "buildNumber": "9",
+      "buildNumber": "29",
       "infoPlist": {
         "NSUserTrackingUsageDescription": "Your data will be used to provide you with a better and personalized ad experience.",
         "NSPhotoLibraryAddUsageDescription": "Stoic needs access to your photo library to save images.",
@@ -104,9 +104,7 @@
           ]
         }
       ],
-      [
-        "expo-font"
-      ],
+      "expo-font",
       [
         "expo-dynamic-app-icon",
         {
@@ -124,6 +122,23 @@
         "expo-tracking-transparency",
         {
           "NSUserTrackingUsageDescription": "Your data will be used to provide you with a better and personalized ad experience."
+        }
+      ],
+      "expo-mail-composer",
+      "expo-web-browser",
+      [
+        "@niondigital/widgets-expo-config-plugin",
+        {
+          "path": "widgets",
+          "name": "QuoteWidget",
+          "entitlements": {
+            "com.apple.security.application-groups": [
+              "group.com.sevincaeren.stoic.QuoteWidget"
+            ]
+          },
+          "buildSettings": {
+            "IPHONEOS_DEPLOYMENT_TARGET": "16.0"
+          }
         }
       ]
     ],

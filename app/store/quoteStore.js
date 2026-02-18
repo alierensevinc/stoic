@@ -1,219 +1,202 @@
 import {MMKV} from "react-native-mmkv";
-import moment from "moment";
 import {create} from "zustand";
 import * as Notifications from "expo-notifications";
-import axiosInstance from "utils/axiosInstance";
+import localQuotes from '../../assets/quotes.json';
 
 const storage = new MMKV();
-
-const QUOTES_KEY = "quotes";
-const ARCHIVE_QUOTES_KEY = "archiveQuotes";
-const FUTURE_QUOTES_KEY = "futureQuotes";
 const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled";
-const QUOTES_API_URL = "https://stoic-quotes.com/api/quotes?num=20";
+const QUOTES_KEY = "quotes";
 
-const saveToStorage = (key, data) => {
-    storage.set(key, JSON.stringify(data));
+/**
+ * Calculates the next trigger date for a given hour/minute.
+ * If the time has already passed for today, it schedules for tomorrow.
+ * @param {number} hour - The hour to trigger (0-23)
+ * @param {number} minute - The minute to trigger (0-59)
+ * @returns {Date} - The calculated next trigger Date object
+ */
+const getNextTriggerDate = (hour, minute) => {
+    const now = new Date();
+    const triggerDate = new Date();
+    triggerDate.setHours(hour, minute, 0, 0);
+
+    // If the calculated time for today has already passed...
+    if (now.getTime() > triggerDate.getTime()) {
+        // ...schedule it for tomorrow.
+        triggerDate.setDate(triggerDate.getDate() + 1);
+    }
+
+    return triggerDate;
 };
 
-const loadFromStorage = (key) => {
-    const storedData = storage.getString(key);
-    return storedData ? JSON.parse(storedData) : null;
-};
-
-const cancelAllNotifications = async () => {
-    await Notifications.cancelAllScheduledNotificationsAsync();
-};
-
-const scheduleNotification = async (quotes) => {
+/**
+ * Schedules two daily notifications (Morning & Evening) for the *next*
+ * available 09:00 and 19:00. This fixes the "immediate fire" bug.
+ */
+export const scheduleDailyRitualNotifications = async () => {
     const notificationsEnabled = storage.getBoolean(NOTIFICATIONS_ENABLED_KEY);
-    if (!notificationsEnabled) return;
 
-    await cancelAllNotifications();
+    // 1. Always cancel previous notifications to clear stale/invalid ones
+    await Notifications.cancelAllScheduledNotificationsAsync();
 
-    const triggerTimes = [];
-    for (let i = 0; i < 7; i++) {
-        for (let hour = 9; hour <= 21; hour += 3) {
-            let triggerTime = new Date();
-            triggerTime.setHours(hour, 0, 0, 0);
-            triggerTime.setDate(triggerTime.getDate() + i);
-            triggerTimes.push({time: triggerTime, quote: quotes[(i * 5 + (hour - 9) / 3) % quotes.length]});
-        }
+    if (!notificationsEnabled) {
+        console.log("Notifications are disabled. All notifications cancelled.");
+        return;
     }
 
-
-    for (const {time, quote} of triggerTimes) {
-        await Notifications.scheduleNotificationAsync({
-            content: {
-                title: quote.text,
-                body: quote.author,
-                data: {type: "futureQuotes", quote: quote},
-            },
-            trigger: {
-                hour: time.getHours(),
-                minute: time.getMinutes(),
-                day: time.getDate(),
-                repeats: false,
-            },
-        });
-    }
-
-};
-
-const fetchQuotesFromAPI = async () => {
+    // 2. Get quotes from storage
+    const storedQuotes = storage.getString(QUOTES_KEY);
+    let quotes = [];
     try {
-        const response = await axiosInstance.get(QUOTES_API_URL);
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching quotes from API:", error);
-        return [];
-    }
-};
-
-const fetchAndStoreQuotes = async (setQuotes, setArchiveQuotes, setFutureQuotes) => {
-    const oldQuotes = loadFromStorage(QUOTES_KEY)?.quotes || [];
-    setArchiveQuotes(oldQuotes);
-
-    const quotes = await fetchQuotesFromAPI();
-    saveToStorage(QUOTES_KEY, {date: moment().format("YYYY-MM-DD HH"), quotes});
-    setQuotes(quotes);
-
-    const futureQuotes = await fetchQuotesFromAPI();
-    saveToStorage(FUTURE_QUOTES_KEY, futureQuotes);
-    setFutureQuotes(futureQuotes);
-
-    if (futureQuotes.length > 0) {
-        await scheduleNotification(futureQuotes);
-    }
-};
-
-const loadQuotesFromArchive = (setQuotes) => {
-    const archiveQuotes = loadFromStorage(ARCHIVE_QUOTES_KEY);
-    if (archiveQuotes) {
-        setQuotes(archiveQuotes);
-    }
-};
-
-const handleFutureQuotesNotification = async (quote) => {
-    const {
-        futureQuotes,
-        setQuotes,
-        setCameFromNotification,
-        setNotificationFutureQuote,
-        setPreventFetch,
-        setFutureQuotes,
-    } = useQuoteStore.getState();
-
-    let notificationQuote;
-    if (!futureQuotes || futureQuotes.length === 0) {
-        const storedFutureQuotes = loadFromStorage(FUTURE_QUOTES_KEY);
-        if (storedFutureQuotes) {
-            notificationQuote = storedFutureQuotes[0];
-            setQuotes([notificationQuote, ...storedFutureQuotes.slice(1)]);
+        const parsed = storedQuotes ? JSON.parse(storedQuotes) : [];
+        if (Array.isArray(parsed) && parsed.length > 0) {
+            quotes = parsed;
         }
-    } else {
-        notificationQuote = quote;
-        setQuotes([notificationQuote, ...futureQuotes.slice(1)]);
+    } catch (e) {
+        console.error("Failed to parse quotes for scheduling", e);
     }
 
-    setNotificationFutureQuote(notificationQuote);
-    setCameFromNotification(true);
-    setPreventFetch(true);
-
-    const newFutureQuotes = await fetchQuotesFromAPI();
-    saveToStorage(FUTURE_QUOTES_KEY, newFutureQuotes);
-    setFutureQuotes(newFutureQuotes);
-
-    await cancelAllNotifications();
-
-    if (newFutureQuotes.length > 0) {
-        await scheduleNotification(newFutureQuotes);
+    if (quotes.length < 2) {
+        quotes = localQuotes.quotes ? [...localQuotes.quotes] : [];
+        if (quotes.length < 2) {
+            console.error("Not enough quotes to schedule rituals.");
+            return;
+        }
     }
+
+    const morningQuote = quotes[0];
+    const eveningQuote = quotes[1];
+
+    // 3. Calculate and schedule Morning Notification (09:00)
+    const morningTrigger = getNextTriggerDate(9, 0);
+    await Notifications.scheduleNotificationAsync({
+        content: {
+            title: "Morning Intention",
+            body: `"${morningQuote.text}" - ${morningQuote.author}`,
+            data: {type: "dailyQuote", quote: morningQuote},
+        },
+        trigger: morningTrigger, // Use the calculated Date object
+    });
+
+    // 4. Calculate and schedule Evening Notification (19:00)
+    const eveningTrigger = getNextTriggerDate(19, 0);
+    await Notifications.scheduleNotificationAsync({
+        content: {
+            title: "Evening Reflection",
+            body: `"${eveningQuote.text}" - ${eveningQuote.author}`,
+            data: {type: "dailyQuote", quote: eveningQuote},
+        },
+        trigger: eveningTrigger, // Use the calculated Date object
+    });
+
+    console.log(`Ritual notifications scheduled for: ${morningTrigger.toLocaleString()} and ${eveningTrigger.toLocaleString()}`);
 };
 
-Notifications.addNotificationResponseReceivedListener((response) => {
-    const {type, quote} = response.notification.request.content.data;
-    if (type === "futureQuotes") {
-        handleFutureQuotesNotification(quote);
-    }
-});
-
-const initializeNotifications = async () => {
+/**
+ * Initializes notifications on app start.
+ */
+export const initializeNotifications = async () => {
     const {status} = await Notifications.requestPermissionsAsync();
     if (status !== "granted") {
         console.error("Notification permissions not granted");
+        storage.set(NOTIFICATIONS_ENABLED_KEY, false);
         return;
     }
 
     Notifications.setNotificationHandler({
         handleNotification: async () => ({
-            shouldShowAlert: true,
+            shouldShowBanner: true,
+            shouldShowList: true,
             shouldPlaySound: true,
             shouldSetBadge: false,
         }),
     });
 
-    if(status === 'granted') {
-        console.log(status);
+    if (status === 'granted') {
         storage.set(NOTIFICATIONS_ENABLED_KEY, true);
+
+        // Check if notifications are *enabled* by the user
+        const userEnabled = storage.getBoolean(NOTIFICATIONS_ENABLED_KEY);
+        if (userEnabled) {
+            // Check if notifications are already scheduled
+            const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+            if (scheduled.length === 0) {
+                // If none are scheduled (e.g., first launch or after they've fired), schedule new ones.
+                console.log("No notifications scheduled. Setting up daily rituals.");
+                await scheduleDailyRitualNotifications();
+            } else {
+                console.log(`${scheduled.length} notifications already scheduled.`);
+            }
+        }
     }
 };
 
+/**
+ * Zustand state management store
+ */
 export const useQuoteStore = create((set) => ({
     quotes: [],
-    archiveQuotes: [],
-    futureQuotes: [],
-    cameFromNotification: false,
-    notificationFutureQuote: null,
-    preventFetch: false,
-
-    setQuotes: (quotes) => set({quotes}),
-    setArchiveQuotes: (archiveQuotes) => set({archiveQuotes}),
-    setFutureQuotes: (futureQuotes) => set({futureQuotes}),
-    setCameFromNotification: (value) => set({cameFromNotification: value}),
-    setNotificationFutureQuote: (quote) => set({notificationFutureQuote: quote}),
-    setPreventFetch: (value) => set({preventFetch: value}),
-
-    fetchQuotes: async () => {
-        const {
-            cameFromNotification,
-            notificationFutureQuote,
-            preventFetch,
-            setQuotes,
-            setArchiveQuotes,
-            setFutureQuotes,
-            setCameFromNotification,
-            setNotificationFutureQuote,
-            setPreventFetch,
-        } = useQuoteStore.getState();
-
-        if (preventFetch) {
-            setPreventFetch(false);
-            return;
-        }
-
-        if (cameFromNotification && notificationFutureQuote) {
-            setQuotes([notificationFutureQuote, ...futureQuotes.slice(1)]);
-            setCameFromNotification(false);
-            setNotificationFutureQuote(null);
-        } else {
-            await fetchAndStoreQuotes(setQuotes, setArchiveQuotes, setFutureQuotes);
-        }
+    notificationQuote: null,
+    setNotificationQuote: (quote) => set({notificationQuote: quote}),
+    clearNotificationQuote: () => set({notificationQuote: null}),
+    setQuotes: (quotes) => {
+        set({quotes});
+        storage.set(QUOTES_KEY, JSON.stringify(quotes));
     },
 
-    loadQuotesFromArchive: () => {
-        loadQuotesFromArchive(useQuoteStore.getState().setQuotes);
+    /**
+     * Loads quotes from storage or local JSON and shuffles them.
+     * Scheduling is now handled by initializeNotifications.
+     */
+    loadQuotes: () => {
+        const storedQuotes = storage.getString(QUOTES_KEY);
+        let loadedQuotes = [];
+
+        try {
+            if (storedQuotes) {
+                const parsed = JSON.parse(storedQuotes);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    loadedQuotes = parsed;
+                }
+            }
+        } catch (err) {
+            console.error("Failed to parse stored quotes, falling back to local.");
+            loadedQuotes = [];
+        }
+
+        if (loadedQuotes.length === 0) {
+            loadedQuotes = localQuotes.quotes ? [...localQuotes.quotes] : [];
+        }
+
+        const shuffled = shuffle(loadedQuotes);
+        set({quotes: shuffled});
+        storage.set(QUOTES_KEY, JSON.stringify(shuffled));
+
+        // We no longer schedule notifications here, as it causes bugs.
+        // Scheduling is handled by initializeNotifications() in App.js
+        // and by handleToggleNotifications() in useSettings.js
     },
 }));
 
-useQuoteStore.subscribe(
-    (state) => state.archiveQuotes,
-    (archiveQuotes) => saveToStorage(ARCHIVE_QUOTES_KEY, archiveQuotes)
-);
+/**
+ * Notification click listener. (No changes needed)
+ */
+Notifications.addNotificationResponseReceivedListener((response) => {
+    const {quote} = response.notification.request.content.data;
+    if (quote) {
+        useQuoteStore.getState().setNotificationQuote(quote);
+    }
+});
 
-useQuoteStore.subscribe(
-    (state) => state.futureQuotes,
-    (futureQuotes) => saveToStorage(FUTURE_QUOTES_KEY, futureQuotes)
-);
-
-export {initializeNotifications};
+/**
+ * Fisher-Yates (aka Knuth) Shuffle algorithm. (No changes needed)
+ */
+function shuffle(array) {
+    let currentIndex = array.length, randomIndex;
+    while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+    }
+    return array;
+}
