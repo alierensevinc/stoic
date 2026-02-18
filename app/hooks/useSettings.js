@@ -1,10 +1,10 @@
-import {useContext, useEffect, useState} from "react";
-import {ThemeContext} from "context/ThemeContext";
-import {useNavigation} from "@react-navigation/native";
-import {useBookmarksStore} from "store/bookmarksStore";
-import {Alert, AppState, Linking, Share} from "react-native";
+import { useContext, useEffect, useState } from "react";
+import { ThemeContext } from "context/ThemeContext";
+import { useNavigation } from "@react-navigation/native";
+import { useBookmarksStore } from "store/bookmarksStore";
+import { Alert, AppState, Linking, Share } from "react-native";
 import * as Notifications from "expo-notifications";
-import {MMKV} from "react-native-mmkv";
+import { MMKV } from "react-native-mmkv";
 import * as MailComposer from "expo-mail-composer";
 import * as Application from "expo-application";
 import * as WebBrowser from 'expo-web-browser';
@@ -16,7 +16,7 @@ const storage = new MMKV();
 const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled";
 
 const checkNotificationPermission = async (setNotificationsEnabled) => {
-    const {status} = await Notifications.getPermissionsAsync();
+    const { status } = await Notifications.getPermissionsAsync();
     if (status !== "granted") {
         setNotificationsEnabled(false);
         storage.set(NOTIFICATIONS_ENABLED_KEY, false);
@@ -26,14 +26,14 @@ const checkNotificationPermission = async (setNotificationsEnabled) => {
 const handleToggleNotifications = async (value, setNotificationsEnabled) => {
     if (value) {
         // User turned notifications ON
-        const {status} = await Notifications.requestPermissionsAsync();
+        const { status } = await Notifications.requestPermissionsAsync();
         if (status !== "granted") {
             Alert.alert(
                 "Permissions Required",
                 "To enable notifications, please go to your device settings and grant notification permissions for this app.",
                 [
-                    {text: "Cancel", style: "cancel"},
-                    {text: "Open Settings", onPress: () => Linking.openSettings()},
+                    { text: "Cancel", style: "cancel" },
+                    { text: "Open Settings", onPress: () => Linking.openSettings() },
                 ]
             );
             return;
@@ -104,11 +104,33 @@ const handleVisitPrivacyPolicy = async () => {
 };
 
 export const useSettings = () => {
-    const {theme} = useContext(ThemeContext);
+    const { theme } = useContext(ThemeContext);
     const navigation = useNavigation();
-    const removeAllBookmarks = useBookmarksStore(
+    const clearBookmarks = useBookmarksStore(
         (state) => state.removeAllBookmarks
     );
+
+    const removeAllBookmarks = () => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+        Alert.alert(
+            "Delete All Bookmarks",
+            "Are you sure you want to delete all your bookmarks? This action cannot be undone.",
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel",
+                },
+                {
+                    text: "Delete",
+                    onPress: () => {
+                        clearBookmarks();
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                    },
+                    style: "destructive",
+                },
+            ]
+        );
+    };
 
     const [notificationsEnabled, setNotificationsEnabled] = useState(
         storage.getBoolean(NOTIFICATIONS_ENABLED_KEY) ?? false

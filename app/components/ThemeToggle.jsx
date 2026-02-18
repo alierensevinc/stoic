@@ -1,10 +1,10 @@
-import {useContext} from "react";
-import {Platform, Switch, View} from "react-native";
+import { useContext } from "react";
+import { Platform, Switch, View } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import {ThemeContext} from "context/ThemeContext";
+import { ThemeContext } from "context/ThemeContext";
 
 const ThemeToggle = () => {
-    const {theme, isDarkMode, toggleTheme} = useContext(ThemeContext);
+    const { theme, isDarkMode, toggleTheme } = useContext(ThemeContext);
 
     return (
         <View
@@ -17,14 +17,12 @@ const ThemeToggle = () => {
                 />
             </View>
             <Switch
-                trackColor={{false: "#767577", true: "#81b0ff"}}
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
                 thumbColor={isDarkMode ? "#f5dd4b" : "#f4f3f4"}
-                ios_backgroundColor="#3e3e3e"
                 onValueChange={toggleTheme}
                 value={isDarkMode}
-                rc
             />
-            <View className="ml-1.5">
+            <View className="ml-4">
                 <Ionicons
                     name="moon"
                     size={24}
