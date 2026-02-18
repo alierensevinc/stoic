@@ -1,5 +1,5 @@
-import {Dimensions, Platform, ScrollView, Text, View} from "react-native";
-import {useSettings} from "hooks/useSettings";
+import { Dimensions, Platform, ScrollView, Text, View } from "react-native";
+import { useSettings } from "hooks/useSettings";
 import Container from "components/Container";
 import BackButton from "components/BackButton";
 import InlineAd from "components/InlineAd";
@@ -33,7 +33,7 @@ const SettingsScreen = () => {
                 />
                 <Text
                     className="text-3xl font-bold text-center ml-2"
-                    style={{color: theme.textColor, fontFamily: "Montserrat-Medium"}}
+                    style={{ color: theme.textColor, fontFamily: "Montserrat-Medium" }}
                 >
                     Settings
                 </Text>
@@ -48,7 +48,7 @@ const SettingsScreen = () => {
                         onToggleChange={handleToggleNotifications}
                         color={theme.textColor}
                     />
-                    <Divider color={theme.textColor}/>
+                    <Divider color={theme.textColor} />
                     <SettingsItem
                         icon="mail-outline"
                         title="Send me an email"
@@ -63,7 +63,7 @@ const SettingsScreen = () => {
                     />
                     {Platform.OS === 'ios' && (
                         <>
-                            <Divider color={theme.textColor}/>
+                            <Divider color={theme.textColor} />
                             <SettingsItem
                                 icon="share-social-outline"
                                 title="Share Stoic - Daily Quotes"
@@ -78,14 +78,7 @@ const SettingsScreen = () => {
                             />
                         </>
                     )}
-                    <Divider color={theme.textColor}/>
-                    <SettingsItem
-                        icon="accessibility-outline"
-                        title="Visit Privacy Policy"
-                        onPress={handleVisitPrivacyPolicy}
-                        color={theme.buttonColor}
-                    />
-                    <Divider color={theme.textColor}/>
+                    <Divider color={theme.textColor} />
                     <SettingsItem
                         icon="trash-outline"
                         title="Delete All Bookmarks"
@@ -103,7 +96,7 @@ const SettingsScreen = () => {
                         onToggleChange={handleToggleNotifications}
                         color={theme.textColor}
                     />
-                    <Divider color={theme.textColor}/>
+                    <Divider color={theme.textColor} />
                     <SettingsItem
                         icon="mail-outline"
                         title="Send me an email"
@@ -118,7 +111,7 @@ const SettingsScreen = () => {
                     />
                     {Platform.OS === 'ios' && (
                         <>
-                            <Divider color={theme.textColor}/>
+                            <Divider color={theme.textColor} />
                             <SettingsItem
                                 icon="share-social-outline"
                                 title="Share Stoic - Daily Quotes"
@@ -133,14 +126,7 @@ const SettingsScreen = () => {
                             />
                         </>
                     )}
-                    <Divider color={theme.textColor}/>
-                    <SettingsItem
-                        icon="accessibility-outline"
-                        title="Visit Privacy Policy"
-                        onPress={handleVisitPrivacyPolicy}
-                        color={theme.buttonColor}
-                    />
-                    <Divider color={theme.textColor}/>
+                    <Divider color={theme.textColor} />
                     <SettingsItem
                         icon="trash-outline"
                         title="Delete All Bookmarks"
@@ -149,8 +135,8 @@ const SettingsScreen = () => {
                     />
                 </View>
             )}
-            <AppInfo theme={theme}/>
-            <InlineAd className="absolute bottom-0 left-0 right-0 self-center"/>
+            <AppInfo theme={theme} />
+            <InlineAd className="absolute bottom-0 left-0 right-0 self-center" />
         </Container>
     );
 };
