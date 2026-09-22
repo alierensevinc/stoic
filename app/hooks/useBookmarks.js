@@ -5,7 +5,7 @@ import {useBookmarksStore} from "store/bookmarksStore";
 import {useAdStore} from "store/adStore";
 import {useInterstitialAd} from "hooks/useInterstitialAd";
 import {ThemeContext} from "context/ThemeContext";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import {useNavigation} from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 
