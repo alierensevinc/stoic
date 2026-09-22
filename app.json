@@ -146,7 +146,8 @@
           "backgroundColor": "#f4f6fc"
         }
       ],
-      "expo-status-bar"
+      "expo-status-bar",
+      "./plugins/withFirebaseSceneFix"
     ]
   }
 }
