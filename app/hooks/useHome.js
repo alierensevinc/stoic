@@ -1,8 +1,8 @@
 import {useContext, useEffect, useRef, useState} from "react";
 import {Dimensions, Platform} from "react-native";
+import {Gesture} from "react-native-gesture-handler";
 import {
     runOnJS,
-    useAnimatedGestureHandler,
     useAnimatedStyle,
     useSharedValue,
     withTiming,
@@ -165,19 +165,17 @@ export const useHome = () => {
         textOpacity.value = withTiming(1, {duration: 500});
     };
 
-    const gestureHandler = useAnimatedGestureHandler({
-        onEnd: (event, context) => {
-            if (
-                Math.abs(event.velocityX) > 400 ||
-                Math.abs(event.translationX) > screenWidth / 5
-            ) {
-                if (event.translationX > 0) {
-                    runOnJS(changeQuote)("previous");
-                } else {
-                    runOnJS(changeQuote)("next");
-                }
+    const panGesture = Gesture.Pan().onEnd((event) => {
+        if (
+            Math.abs(event.velocityX) > 400 ||
+            Math.abs(event.translationX) > screenWidth / 5
+        ) {
+            if (event.translationX > 0) {
+                runOnJS(changeQuote)("previous");
+            } else {
+                runOnJS(changeQuote)("next");
             }
-        },
+        }
     });
 
     const animatedStyle = useAnimatedStyle(() => ({
@@ -226,7 +224,7 @@ export const useHome = () => {
         theme,
         isDarkMode,
         viewShotRef,
-        gestureHandler,
+        panGesture,
         animatedStyle,
         fadeStyle,
         shareQuote,

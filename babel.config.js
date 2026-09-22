@@ -3,7 +3,6 @@ module.exports = function (api) {
   return {
     presets: ["babel-preset-expo"],
     plugins: [
-      "react-native-reanimated/plugin",
       "nativewind/babel",
       [
         "module:react-native-dotenv",
@@ -31,6 +30,9 @@ module.exports = function (api) {
           },
         },
       ],
+      // Must be last: react-native-reanimated 4 moved worklet compilation
+      // into react-native-worklets (reanimated/plugin is re-exported but deprecated).
+      "react-native-worklets/plugin",
     ],
   };
 };

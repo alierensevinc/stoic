@@ -62,9 +62,23 @@
 - [ ] **Live Activity / genişletilmiş widget** seçenekleri (iOS 16+ zaten hedefleniyor). *(sonraki iterasyon, native/Swift iş paketi)*
 
 ### Faz 5 — Kalite Güvencesi
-- [ ] Kritik akışlar için temel test altyapısı (Jest + React Native Testing Library).
-- [ ] Bildirim zamanlama mantığı için unit test (`getNextTriggerDate` ve yeni repeat mantığı).
-- [ ] Manuel test checklist'i: izin reddi/kabulü, toggle aç-kapa, uygulama arka planda/kapalıyken bildirim tetiklenmesi.
+**Kullanıcı talebiyle atlandı** (test altyapısına gerek olmadığı belirtildi). Not olarak duruyor, ileride istenirse tekrar açılabilir.
+- [ ] ~~Kritik akışlar için temel test altyapısı (Jest + React Native Testing Library).~~
+- [ ] ~~Bildirim zamanlama mantığı için unit test.~~
+- [ ] ~~Manuel test checklist'i: izin reddi/kabulü, toggle aç-kapa, uygulama arka planda/kapalıyken bildirim tetiklenmesi.~~
+
+### Faz 6 — Xcode 27 / Expo SDK 57 Yükseltmesi (kritik, acil)
+Geliştirme makinesinde **Xcode 27.0 / macOS 27.0** tespit edildi. Apple, iOS 27 SDK ile derlenen uygulamalarda **UIKit scene-based lifecycle**'ı zorunlu kıldı; bu destek Expo tarafında ancak **SDK 57.0.23+** ile geldi (SDK 56 ve altı launch'ta çöküyor — [expo/expo#46663](https://github.com/expo/expo/issues/46663), [#46664](https://github.com/expo/expo/issues/46664)). Proje SDK 53'teydi, bu yüzden **SDK 57'ye yükseltildi**.
+- [x] `npx expo install expo@^57.0.0 --fix` ile Expo ve tüm expo-managed paketler (React 19.2.3, React Native 0.86.3 dahil) hizalandı.
+- [x] `app.json` → `expo-build-properties` plugin'ine `ios.enableSceneSupport: true` eklendi (Xcode 27/iOS 27 launch şartı).
+- [x] `app.json`'daki eski top-level `splash` alanı kaldırıldı, SDK 57'de zorunlu olan `expo-splash-screen` config plugin formatına taşındı (yoksa schema validasyonu patlıyordu).
+- [x] **react-native-reanimated 4.5.1'e yükseltme** — bu majör sürüm `useAnimatedGestureHandler`'ı tamamen kaldırdı (sadece Yeni Mimari'yi destekliyor). `useHome.js` ve `QuoteViewShot.jsx` yeni **Gesture API**'ye taşındı (`Gesture.Pan()` + `GestureDetector`, eski `PanGestureHandler`/`useAnimatedGestureHandler` yerine).
+- [x] `babel.config.js`: `react-native-reanimated/plugin` → `react-native-worklets/plugin` (Reanimated 4'te worklet derlemesi ayrı pakete taşındı; `react-native-worklets` peer dependency olarak eklendi).
+- [x] `App.js`'e `GestureHandlerRootView` sarmalayıcısı eklendi (Gesture API'nin gerektirdiği, önceden yoktu).
+- [x] Eksik kalan `babel-preset-expo` devDependency olarak eklendi (npm hoisting sorunu nedeniyle proje kökünden çözülemiyordu, build zaten kırık olurdu).
+- [x] `npx expo-doctor` temiz: sadece iki önceden var olan, engelleyici olmayan uyarı kaldı (CNG sync notu — ios/ klasörü commit'li olduğu için beklenen; `expo-dynamic-app-icon` paketinin Yeni Mimari'de test edilmemiş/bakımsız olması — **cihazda test ederken açık/koyu tema ikon değişimini özellikle kontrol edin**).
+- [ ] **`npx expo prebuild --clean` çalıştırılmalı** — `ios/` klasörü SDK 53 native modülleriyle üretilmişti, SDK 57'nin yeni native bağımlılıklarıyla (Firebase, AdMob, Reanimated 4, vb.) eşleşmiyor. Bu adımı ve ardından `pod install` + Xcode build'i **kullanıcı kendi simülatöründe çalıştıracak**, ajan tarafında yapılmadı.
+- [ ] Simülatörde doğrulanması gerekenler: genel açılış (scene lifecycle), swipe jestleri (Gesture API geçişi), bildirim zamanlaması, dynamic app icon geçişi (dark/light).
 
 ## 4. Önerilen sıralama
 
@@ -72,4 +86,5 @@
 2. Faz 2 (temizlik) — Faz 1'i yaparken zaten `quoteStore.js`'e dokunacağız, aynı anda temizleyelim.
 3. Faz 3 (performans) — ölçüm sonrası önceliklendirilir.
 4. Faz 4 (yeni özellikler) — sağlam temel üstüne.
-5. Faz 5 (test) — paralelde büyütülebilir.
+5. ~~Faz 5 (test)~~ — kullanıcı talebiyle atlandı.
+6. Faz 6 (Xcode 27/SDK 57) — acil, aksi halde Xcode 27 ile hiç build alınamıyor.

@@ -15,7 +15,7 @@ const HomeScreen = () => {
         isDarkMode,
         quotes,
         viewShotRef,
-        gestureHandler,
+        panGesture,
         animatedStyle,
         fadeStyle,
         shareQuote,
@@ -48,7 +48,7 @@ const HomeScreen = () => {
                     <Animated.View style={fadeStyle}>
                         <QuoteViewShot
                             viewShotRef={viewShotRef}
-                            gestureHandler={gestureHandler}
+                            panGesture={panGesture}
                             animatedStyle={animatedStyle}
                             theme={theme}
                             quote={quotes[0]}

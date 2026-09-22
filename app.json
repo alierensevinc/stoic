@@ -6,11 +6,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#f4f6fc"
-    },
     "ios": {
       "bundleIdentifier": "com.sevincaeren.stoic",
       "supportsTablet": false,
@@ -41,7 +36,8 @@
         "expo-build-properties",
         {
           "ios": {
-            "useFrameworks": "static"
+            "useFrameworks": "static",
+            "enableSceneSupport": true
           }
         }
       ],
@@ -140,7 +136,17 @@
             "IPHONEOS_DEPLOYMENT_TARGET": "16.0"
           }
         }
-      ]
+      ],
+      "expo-sharing",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#f4f6fc"
+        }
+      ],
+      "expo-status-bar"
     ]
   }
 }

@@ -1,7 +1,7 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import {SafeAreaView, Text, View} from "react-native";
 import ViewShot from "react-native-view-shot";
-import {PanGestureHandler} from "react-native-gesture-handler";
+import {Gesture, GestureDetector} from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 
 const QuoteViewShot = ({
@@ -9,11 +9,15 @@ const QuoteViewShot = ({
                            theme,
                            quote,
                            captureOnReady = false,
-                           gestureHandler,
+                           panGesture,
                            animatedStyle,
                        }) => {
     const [viewReady, setViewReady] = useState(false);
     const internalRef = useRef();
+    // Screens that only render a static share preview (e.g. Bookmarks) don't
+    // pass a pan gesture; fall back to a no-op one so GestureDetector always
+    // receives a valid Gesture.
+    const noopGesture = useMemo(() => Gesture.Pan(), []);
 
     useEffect(() => {
         if (viewReady && captureOnReady && viewShotRef?.current) {
@@ -26,7 +30,7 @@ const QuoteViewShot = ({
             className="flex-1 items-center justify-center p-8 w-full h-full"
             style={{backgroundColor: theme.backgroundColor}}
         >
-            <PanGestureHandler onGestureEvent={gestureHandler}>
+            <GestureDetector gesture={panGesture || noopGesture}>
                 <Animated.View style={animatedStyle}>
                     <ViewShot
                         ref={viewShotRef || internalRef}
@@ -63,7 +67,7 @@ const QuoteViewShot = ({
                         </View>
                     </ViewShot>
                 </Animated.View>
-            </PanGestureHandler>
+            </GestureDetector>
         </SafeAreaView>
     );
 };

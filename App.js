@@ -1,5 +1,6 @@
 import {useEffect} from "react";
 import {NavigationContainer} from "@react-navigation/native";
+import {GestureHandlerRootView} from "react-native-gesture-handler";
 import {SafeAreaProvider} from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
 import * as TrackingTransparency from "expo-tracking-transparency";
@@ -35,12 +36,14 @@ export default function App() {
     }
 
     return (
-        <SafeAreaProvider>
-            <ThemeProvider>
-                <NavigationContainer>
-                    <AppNavigator/>
-                </NavigationContainer>
-            </ThemeProvider>
-        </SafeAreaProvider>
+        <GestureHandlerRootView style={{flex: 1}}>
+            <SafeAreaProvider>
+                <ThemeProvider>
+                    <NavigationContainer>
+                        <AppNavigator/>
+                    </NavigationContainer>
+                </ThemeProvider>
+            </SafeAreaProvider>
+        </GestureHandlerRootView>
     );
 }
