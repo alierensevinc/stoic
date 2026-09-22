@@ -7,6 +7,8 @@ import SettingsItem from "components/SettingsItem";
 import SettingsToggleItem from "components/SettingsToggleItem";
 import AppInfo from "components/AppInfo";
 import Divider from "components/Divider";
+import TimePickerModal from "components/TimePickerModal";
+import AuthorFilterModal from "components/AuthorFilterModal";
 
 const SettingsScreen = () => {
     const {
@@ -19,10 +21,27 @@ const SettingsScreen = () => {
         handleOpenLinkedin,
         handleShare,
         handleRate,
-        handleVisitPrivacyPolicy
+        handleVisitPrivacyPolicy,
+        ritualHours,
+        morningPickerVisible,
+        eveningPickerVisible,
+        openMorningPicker,
+        closeMorningPicker,
+        openEveningPicker,
+        closeEveningPicker,
+        handleSelectRitualHour,
+        authors,
+        preferredAuthors,
+        authorFilterVisible,
+        openAuthorFilter,
+        closeAuthorFilter,
+        handleToggleAuthor,
     } = useSettings();
 
+    const formatHour = (hour) => `${String(hour).padStart(2, "0")}:00`;
+
     const screenHeight = Dimensions.get("window").height;
+    const ListWrapper = screenHeight < 812 ? ScrollView : View;
 
     return (
         <Container>
@@ -38,105 +57,106 @@ const SettingsScreen = () => {
                     Settings
                 </Text>
             </View>
-            {screenHeight < 812 ? (
-                <ScrollView className="flex-1 w-100">
-                    <SettingsToggleItem
-                        icon="time-outline"
-                        title="Notifications"
-                        isToggle={true}
-                        toggleValue={notificationsEnabled}
-                        onToggleChange={handleToggleNotifications}
-                        color={theme.textColor}
-                    />
-                    <Divider color={theme.textColor} />
-                    <SettingsItem
-                        icon="mail-outline"
-                        title="Send me an email"
-                        onPress={handleSendEmail}
-                        color={theme.buttonColor}
-                    />
-                    <SettingsItem
-                        icon="logo-linkedin"
-                        title="Reach me on LinkedIn"
-                        onPress={handleOpenLinkedin}
-                        color={theme.buttonColor}
-                    />
-                    {Platform.OS === 'ios' && (
-                        <>
-                            <Divider color={theme.textColor} />
-                            <SettingsItem
-                                icon="share-social-outline"
-                                title="Share Stoic - Daily Quotes"
-                                onPress={handleShare}
-                                color={theme.buttonColor}
-                            />
-                            <SettingsItem
-                                icon="star-outline"
-                                title="Rate Stoic - Daily Quotes"
-                                onPress={handleRate}
-                                color={theme.buttonColor}
-                            />
-                        </>
-                    )}
-                    <Divider color={theme.textColor} />
-                    <SettingsItem
-                        icon="trash-outline"
-                        title="Delete All Bookmarks"
-                        onPress={removeAllBookmarks}
-                        color={theme.buttonColor}
-                    />
-                </ScrollView>
-            ) : (
-                <View className="flex-1 w-100">
-                    <SettingsToggleItem
-                        icon="time-outline"
-                        title="Notifications"
-                        isToggle={true}
-                        toggleValue={notificationsEnabled}
-                        onToggleChange={handleToggleNotifications}
-                        color={theme.textColor}
-                    />
-                    <Divider color={theme.textColor} />
-                    <SettingsItem
-                        icon="mail-outline"
-                        title="Send me an email"
-                        onPress={handleSendEmail}
-                        color={theme.buttonColor}
-                    />
-                    <SettingsItem
-                        icon="logo-linkedin"
-                        title="Reach me on LinkedIn"
-                        onPress={handleOpenLinkedin}
-                        color={theme.buttonColor}
-                    />
-                    {Platform.OS === 'ios' && (
-                        <>
-                            <Divider color={theme.textColor} />
-                            <SettingsItem
-                                icon="share-social-outline"
-                                title="Share Stoic - Daily Quotes"
-                                onPress={handleShare}
-                                color={theme.buttonColor}
-                            />
-                            <SettingsItem
-                                icon="star-outline"
-                                title="Rate Stoic - Daily Quotes"
-                                onPress={handleRate}
-                                color={theme.buttonColor}
-                            />
-                        </>
-                    )}
-                    <Divider color={theme.textColor} />
-                    <SettingsItem
-                        icon="trash-outline"
-                        title="Delete All Bookmarks"
-                        onPress={removeAllBookmarks}
-                        color={theme.buttonColor}
-                    />
-                </View>
-            )}
+            <ListWrapper className="flex-1 w-100">
+                <SettingsToggleItem
+                    icon="time-outline"
+                    title="Notifications"
+                    isToggle={true}
+                    toggleValue={notificationsEnabled}
+                    onToggleChange={handleToggleNotifications}
+                    color={theme.textColor}
+                />
+                {notificationsEnabled && (
+                    <>
+                        <SettingsItem
+                            icon="sunny-outline"
+                            title={`Morning ritual: ${formatHour(ritualHours.morning)}`}
+                            onPress={openMorningPicker}
+                            color={theme.buttonColor}
+                        />
+                        <SettingsItem
+                            icon="moon-outline"
+                            title={`Evening ritual: ${formatHour(ritualHours.evening)}`}
+                            onPress={openEveningPicker}
+                            color={theme.buttonColor}
+                        />
+                    </>
+                )}
+                <Divider color={theme.textColor} />
+                <SettingsItem
+                    icon="person-outline"
+                    title={
+                        preferredAuthors.length === 0
+                            ? "Philosophers: All"
+                            : `Philosophers: ${preferredAuthors.join(", ")}`
+                    }
+                    onPress={openAuthorFilter}
+                    color={theme.buttonColor}
+                />
+                <Divider color={theme.textColor} />
+                <SettingsItem
+                    icon="mail-outline"
+                    title="Send me an email"
+                    onPress={handleSendEmail}
+                    color={theme.buttonColor}
+                />
+                <SettingsItem
+                    icon="logo-linkedin"
+                    title="Reach me on LinkedIn"
+                    onPress={handleOpenLinkedin}
+                    color={theme.buttonColor}
+                />
+                {Platform.OS === 'ios' && (
+                    <>
+                        <Divider color={theme.textColor} />
+                        <SettingsItem
+                            icon="share-social-outline"
+                            title="Share Stoic - Daily Quotes"
+                            onPress={handleShare}
+                            color={theme.buttonColor}
+                        />
+                        <SettingsItem
+                            icon="star-outline"
+                            title="Rate Stoic - Daily Quotes"
+                            onPress={handleRate}
+                            color={theme.buttonColor}
+                        />
+                    </>
+                )}
+                <Divider color={theme.textColor} />
+                <SettingsItem
+                    icon="trash-outline"
+                    title="Delete All Bookmarks"
+                    onPress={removeAllBookmarks}
+                    color={theme.buttonColor}
+                />
+            </ListWrapper>
             <AppInfo theme={theme} />
             <InlineAd className="absolute bottom-0 left-0 right-0 self-center" />
+            <TimePickerModal
+                visible={morningPickerVisible}
+                title="Morning ritual time"
+                selectedHour={ritualHours.morning}
+                theme={theme}
+                onSelect={(hour) => handleSelectRitualHour("morning", hour)}
+                onClose={closeMorningPicker}
+            />
+            <TimePickerModal
+                visible={eveningPickerVisible}
+                title="Evening ritual time"
+                selectedHour={ritualHours.evening}
+                theme={theme}
+                onSelect={(hour) => handleSelectRitualHour("evening", hour)}
+                onClose={closeEveningPicker}
+            />
+            <AuthorFilterModal
+                visible={authorFilterVisible}
+                authors={authors}
+                selectedAuthors={preferredAuthors}
+                theme={theme}
+                onToggle={handleToggleAuthor}
+                onClose={closeAuthorFilter}
+            />
         </Container>
     );
 };

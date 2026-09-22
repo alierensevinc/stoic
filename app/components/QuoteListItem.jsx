@@ -1,3 +1,4 @@
+import {memo} from "react";
 import {Text, View} from "react-native";
 
 const QuoteListItem = ({item, theme}) => {
@@ -22,4 +23,4 @@ const QuoteListItem = ({item, theme}) => {
     );
 };
 
-export default QuoteListItem;
+export default memo(QuoteListItem);

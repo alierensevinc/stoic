@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { ThemeContext } from "context/ThemeContext";
 import { useNavigation } from "@react-navigation/native";
 import { useBookmarksStore } from "store/bookmarksStore";
+import { ALL_AUTHORS, useQuoteStore } from "store/quoteStore";
 import { Alert, AppState, Linking, Share } from "react-native";
 import * as Notifications from "expo-notifications";
 import { MMKV } from "react-native-mmkv";
@@ -9,8 +10,11 @@ import * as MailComposer from "expo-mail-composer";
 import * as Application from "expo-application";
 import * as WebBrowser from 'expo-web-browser';
 import * as Haptics from "expo-haptics";
-// MODIFIED: Import the new ritual scheduler
-import { scheduleDailyRitualNotifications } from "store/quoteStore";
+import {
+    getRitualHours,
+    scheduleDailyRitualNotifications,
+    setRitualHour,
+} from "utils/notificationScheduler";
 
 const storage = new MMKV();
 const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled";
@@ -42,8 +46,6 @@ const handleToggleNotifications = async (value, setNotificationsEnabled) => {
         storage.set(NOTIFICATIONS_ENABLED_KEY, true);
         setNotificationsEnabled(true);
 
-        // MODIFIED: Call the ritual scheduler directly.
-        // DO NOT call loadQuotes() here.
         await scheduleDailyRitualNotifications();
         console.log("Notifications enabled and rituals scheduled by user.");
 
@@ -53,7 +55,6 @@ const handleToggleNotifications = async (value, setNotificationsEnabled) => {
         storage.set(NOTIFICATIONS_ENABLED_KEY, false);
         setNotificationsEnabled(false);
 
-        // MODIFIED: Cancel all (both morning and evening) notifications
         await Notifications.cancelAllScheduledNotificationsAsync();
         console.log("Notifications disabled and all scheduled notifications cancelled.");
     }
@@ -153,6 +154,39 @@ export const useSettings = () => {
         };
     }, []);
 
+    // Ritual (notification) time customization
+    const [ritualHours, setRitualHoursState] = useState(getRitualHours());
+    const [morningPickerVisible, setMorningPickerVisible] = useState(false);
+    const [eveningPickerVisible, setEveningPickerVisible] = useState(false);
+
+    const handleSelectRitualHour = async (ritual, hour) => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        setRitualHour(ritual, hour);
+        setRitualHoursState((prev) => ({ ...prev, [ritual]: hour }));
+        setMorningPickerVisible(false);
+        setEveningPickerVisible(false);
+        if (notificationsEnabled) {
+            await scheduleDailyRitualNotifications();
+        }
+    };
+
+    // Philosopher/category filter
+    const preferredAuthors = useQuoteStore((state) => state.preferredAuthors);
+    const setAuthorFilter = useQuoteStore((state) => state.setAuthorFilter);
+    const [authorFilterVisible, setAuthorFilterVisible] = useState(false);
+
+    const handleToggleAuthor = (author) => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        if (author === null) {
+            setAuthorFilter([]);
+            return;
+        }
+        const next = preferredAuthors.includes(author)
+            ? preferredAuthors.filter((a) => a !== author)
+            : [...preferredAuthors, author];
+        setAuthorFilter(next);
+    };
+
     return {
         theme,
         navigation,
@@ -164,6 +198,20 @@ export const useSettings = () => {
         handleOpenLinkedin,
         handleShare,
         handleRate,
-        handleVisitPrivacyPolicy
+        handleVisitPrivacyPolicy,
+        ritualHours,
+        morningPickerVisible,
+        eveningPickerVisible,
+        openMorningPicker: () => setMorningPickerVisible(true),
+        closeMorningPicker: () => setMorningPickerVisible(false),
+        openEveningPicker: () => setEveningPickerVisible(true),
+        closeEveningPicker: () => setEveningPickerVisible(false),
+        handleSelectRitualHour,
+        authors: ALL_AUTHORS,
+        preferredAuthors,
+        authorFilterVisible,
+        openAuthorFilter: () => setAuthorFilterVisible(true),
+        closeAuthorFilter: () => setAuthorFilterVisible(false),
+        handleToggleAuthor,
     };
 };

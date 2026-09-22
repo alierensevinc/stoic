@@ -7,7 +7,7 @@ import {ThemeProvider} from "context/ThemeContext";
 import AppNavigator from "navigation/AppNavigator";
 import {useAppInitialization} from "hooks/useAppInitialization";
 import {useFontsLoading} from "hooks/useFontsLoading";
-import {initializeNotifications} from "store/quoteStore";
+import {initializeNotifications} from "utils/notificationScheduler";
 import {useOpenAd} from "./app/hooks/useOpenAd"; // Fonksiyonu import et
 
 SplashScreen.preventAutoHideAsync();

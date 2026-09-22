@@ -1,4 +1,4 @@
-import {useContext, useEffect, useRef} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import {Dimensions, Platform} from "react-native";
 import {
     runOnJS,
@@ -16,6 +16,7 @@ import {useBookmarksStore} from "store/bookmarksStore";
 import {useAdStore} from "store/adStore";
 import {useQuoteStore} from "store/quoteStore";
 import {useAnimationStore} from "store/animationStore";
+import {useNotesStore} from "store/notesStore";
 import {useInterstitialAd} from "hooks/useInterstitialAd";
 
 export const useHome = () => {
@@ -30,6 +31,8 @@ export const useHome = () => {
     const {bookmarks, addToBookmarks, removeFromBookmarks} = useBookmarksStore();
     const {actionCount, incrementActionCount, resetActionCount} = useAdStore();
     const {hasShownAnimation, setHasShownAnimation} = useAnimationStore();
+    const {notes, saveNote} = useNotesStore();
+    const [noteModalVisible, setNoteModalVisible] = useState(false);
     const textOpacity = useSharedValue(1);
     const screenWidth = Dimensions.get("window").width;
     const viewShotRef = useRef();
@@ -200,6 +203,25 @@ export const useHome = () => {
         (bookmark) => bookmark.text === quotes[0]?.text
     );
 
+    const currentNote = quotes[0] ? notes[quotes[0].text]?.note ?? "" : "";
+    const hasNote = currentNote.length > 0;
+
+    const openNoteModal = () => {
+        handleAction(() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+            setNoteModalVisible(true);
+        });
+    };
+
+    const closeNoteModal = () => setNoteModalVisible(false);
+
+    const handleSaveNote = (note) => {
+        if (quotes[0]) {
+            saveNote(quotes[0].text, note);
+        }
+        setNoteModalVisible(false);
+    };
+
     return {
         theme,
         isDarkMode,
@@ -214,5 +236,11 @@ export const useHome = () => {
         isBookmarked,
         quotes,
         setQuotes,
+        noteModalVisible,
+        currentNote,
+        hasNote,
+        openNoteModal,
+        closeNoteModal,
+        handleSaveNote,
     };
 };

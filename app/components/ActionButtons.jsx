@@ -7,6 +7,8 @@ const ActionButtons = ({
                            navigateToBookmarks,
                            addToBookmarks,
                            isBookmarked,
+                           openNoteModal,
+                           hasNote,
                        }) => {
     return (
         <View
@@ -20,8 +22,14 @@ const ActionButtons = ({
                 <ActionButton
                     onPress={shareQuote}
                     theme={theme}
-                    className="mr-6"
+                    style={{marginRight: 24}}
                     iconName="share-outline"
+                />
+                <ActionButton
+                    onPress={openNoteModal}
+                    theme={theme}
+                    style={{marginRight: 24}}
+                    iconName={hasNote ? "create" : "create-outline"}
                 />
                 <ActionButton
                     onPress={addToBookmarks}
