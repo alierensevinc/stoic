@@ -3,7 +3,7 @@
     "name": "stoic",
     "slug": "stoic",
     "scheme": "stoic",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -11,7 +11,7 @@
       "bundleIdentifier": "com.sevincaeren.stoic",
       "appleTeamId": "EF8VE8N587",
       "supportsTablet": false,
-      "buildNumber": "33",
+      "buildNumber": "34",
       "infoPlist": {
         "NSPhotoLibraryAddUsageDescription": "Stoic needs access to your photo library to save images.",
         "NSPhotoLibraryUsageDescription": "Stoic needs access to your photo library to save images."
