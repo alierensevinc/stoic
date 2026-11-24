@@ -1,4 +1,6 @@
-import {Platform, Pressable, StatusBar} from "react-native";
+import {Pressable} from "react-native";
+import {StatusBar} from "expo-status-bar";
+import Animated from "react-native-reanimated";
 import {useHome} from "hooks/useHome";
 import ThemeToggle from "components/ThemeToggle";
 import ActionButtons from "components/ActionButtons";
@@ -7,19 +9,19 @@ import Container from "components/Container";
 import SettingsButton from "components/SettingsButton";
 import StreakBadge from "components/StreakBadge";
 import NoteModal from "components/NoteModal";
-import Animated from "react-native-reanimated";
 
 const HomeScreen = () => {
     const {
         theme,
         isDarkMode,
-        quotes,
+        currentQuote,
         viewShotRef,
         panGesture,
         animatedStyle,
         fadeStyle,
         shareQuote,
         navigateToBookmarks,
+        navigateToNotes,
         toggleBookmark,
         handleNextQuoteClick,
         isBookmarked,
@@ -31,27 +33,25 @@ const HomeScreen = () => {
         handleSaveNote,
     } = useHome();
 
-    if (Platform.OS === "android" && !isDarkMode) {
-        StatusBar.setBarStyle('dark-content')
-    } else if (Platform.OS === "android" && isDarkMode) {
-        StatusBar.setBarStyle('light-content')
-    }
-
     return (
         <Container>
             <StatusBar
-                style={theme.statusBarStyle}
+                style={isDarkMode ? "light" : "dark"}
                 backgroundColor={theme.statusBarBackgroundColor}
             />
-            {quotes.length > 0 && (
-                <Pressable onPress={handleNextQuoteClick}>
+            {currentQuote && (
+                <Pressable
+                    onPress={handleNextQuoteClick}
+                    accessibilityRole="button"
+                    accessibilityLabel="Tap or swipe for next Stoic quote"
+                >
                     <Animated.View style={fadeStyle}>
                         <QuoteViewShot
                             viewShotRef={viewShotRef}
                             panGesture={panGesture}
                             animatedStyle={animatedStyle}
                             theme={theme}
-                            quote={quotes[0]}
+                            quote={currentQuote}
                             captureOnReady={false}
                         />
                     </Animated.View>
@@ -59,16 +59,17 @@ const HomeScreen = () => {
             )}
             <ActionButtons
                 theme={theme}
-                shareQuote={() => shareQuote(quotes[0].author)}
+                shareQuote={shareQuote}
                 navigateToBookmarks={navigateToBookmarks}
+                navigateToNotes={navigateToNotes}
                 addToBookmarks={toggleBookmark}
                 isBookmarked={isBookmarked}
                 openNoteModal={openNoteModal}
                 hasNote={hasNote}
             />
-            <ThemeToggle/>
-            <SettingsButton theme={theme}/>
-            <StreakBadge theme={theme}/>
+            <ThemeToggle />
+            <SettingsButton theme={theme} />
+            <StreakBadge theme={theme} />
             <NoteModal
                 visible={noteModalVisible}
                 initialNote={currentNote}

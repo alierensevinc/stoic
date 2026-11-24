@@ -1,26 +1,35 @@
-import { useContext, useEffect, useState } from "react";
-import { ThemeContext } from "context/ThemeContext";
-import { useNavigation } from "@react-navigation/native";
-import { useBookmarksStore } from "store/bookmarksStore";
-import { ALL_AUTHORS, useQuoteStore } from "store/quoteStore";
-import { Alert, AppState, Linking, Share } from "react-native";
+import {useContext, useEffect, useState} from "react";
+import {Alert, AppState, Linking, Platform, Share} from "react-native";
+import {useNavigation} from "@react-navigation/native";
 import * as Notifications from "expo-notifications";
-import { MMKV } from "react-native-mmkv";
 import * as MailComposer from "expo-mail-composer";
 import * as Application from "expo-application";
-import * as WebBrowser from 'expo-web-browser';
+import * as WebBrowser from "expo-web-browser";
 import * as Haptics from "expo-haptics";
+import {AdsConsent} from "react-native-google-mobile-ads";
+import {ThemeContext} from "context/ThemeContext";
+import {useBookmarksStore} from "store/bookmarksStore";
+import {ALL_AUTHORS, useQuoteStore} from "store/quoteStore";
+import {useAdStore} from "store/adStore";
 import {
     getRitualHours,
+    NOTIFICATIONS_ENABLED_KEY,
     scheduleDailyRitualNotifications,
     setRitualHour,
 } from "utils/notificationScheduler";
-
-const storage = new MMKV();
-const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled";
+import {
+    APP_STORE_REVIEW_URL,
+    APP_STORE_URL,
+    CONTACT_EMAIL,
+    LINKEDIN_URL,
+    PRIVACY_POLICY_URL,
+} from "utils/constants";
+import {storage} from "utils/storage";
+import {logAnalyticsEvent} from "utils/telemetry";
+import {logger} from "utils/logger";
 
 const checkNotificationPermission = async (setNotificationsEnabled) => {
-    const { status } = await Notifications.getPermissionsAsync();
+    const {status} = await Notifications.getPermissionsAsync();
     if (status !== "granted") {
         setNotificationsEnabled(false);
         storage.set(NOTIFICATIONS_ENABLED_KEY, false);
@@ -29,15 +38,14 @@ const checkNotificationPermission = async (setNotificationsEnabled) => {
 
 const handleToggleNotifications = async (value, setNotificationsEnabled) => {
     if (value) {
-        // User turned notifications ON
-        const { status } = await Notifications.requestPermissionsAsync();
+        const {status} = await Notifications.requestPermissionsAsync();
         if (status !== "granted") {
             Alert.alert(
                 "Permissions Required",
                 "To enable notifications, please go to your device settings and grant notification permissions for this app.",
                 [
-                    { text: "Cancel", style: "cancel" },
-                    { text: "Open Settings", onPress: () => Linking.openSettings() },
+                    {text: "Cancel", style: "cancel"},
+                    {text: "Open Settings", onPress: () => Linking.openSettings()},
                 ]
             );
             return;
@@ -47,68 +55,81 @@ const handleToggleNotifications = async (value, setNotificationsEnabled) => {
         setNotificationsEnabled(true);
 
         await scheduleDailyRitualNotifications();
-        console.log("Notifications enabled and rituals scheduled by user.");
-
+        logAnalyticsEvent("notification_toggle", {enabled: 1});
     } else {
-        // User turned notifications OFF
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         storage.set(NOTIFICATIONS_ENABLED_KEY, false);
         setNotificationsEnabled(false);
 
         await Notifications.cancelAllScheduledNotificationsAsync();
-        console.log("Notifications disabled and all scheduled notifications cancelled.");
+        logAnalyticsEvent("notification_toggle", {enabled: 0});
     }
 };
 
 const handleSendEmail = async () => {
-    const isAvailable = await MailComposer.isAvailableAsync();
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+    const isAvailable = await MailComposer.isAvailableAsync();
+    const version = Application.nativeApplicationVersion || "3.0.0";
 
     if (!isAvailable) {
-        Linking.openURL(
-            "mailto:sevinc.aeren@gmail.com?subject=Hello from Stoic App&body=" +
-            Application.nativeApplicationVersion
+        await Linking.openURL(
+            `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+                "Hello from Stoic App"
+            )}&body=${encodeURIComponent(`Version: ${version}`)}`
         );
+        return;
     }
 
-    const options = {
-        recipients: ["sevinc.aeren@gmail.com"],
+    await MailComposer.composeAsync({
+        recipients: [CONTACT_EMAIL],
         subject: "Hello from Stoic App",
-        body: Application.nativeApplicationVersion,
-    };
-
-    await MailComposer.composeAsync(options);
+        body: `Version: ${version}`,
+    });
 };
 
 const handleOpenLinkedin = async () => {
-    Linking.openURL("https://www.linkedin.com/in/alierensevinc/");
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+    await Linking.openURL(LINKEDIN_URL);
 };
 
 const handleShare = async () => {
-    await Share.share({
-        message: "Stoic - Daily Quotes : https://itunes.apple.com/app/6737173970",
-    });
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+    await Share.share({
+        message: `Stoic - Daily Quotes : ${APP_STORE_URL}`,
+    });
 };
 
 const handleRate = async () => {
-    Linking.openURL(
-        "itms-apps://itunes.apple.com/app/viewContentsUserReviews/id6737173970?action=write-review"
-    );
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+    await Linking.openURL(APP_STORE_REVIEW_URL);
 };
 
 const handleVisitPrivacyPolicy = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
-    await WebBrowser.openBrowserAsync('https://alierensevinc.github.io/stoic-website/privacy-policy/');
+    await WebBrowser.openBrowserAsync(PRIVACY_POLICY_URL);
+};
+
+const handleShowPrivacyOptions = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+    try {
+        await AdsConsent.showPrivacyOptionsForm();
+    } catch (e) {
+        logger.warn("showPrivacyOptionsForm failed:", e);
+    }
 };
 
 export const useSettings = () => {
-    const { theme } = useContext(ThemeContext);
+    const {
+        theme,
+        matchAppIconToTheme,
+        toggleMatchAppIconToTheme,
+    } = useContext(ThemeContext);
     const navigation = useNavigation();
     const clearBookmarks = useBookmarksStore(
         (state) => state.removeAllBookmarks
+    );
+    const privacyOptionsRequired = useAdStore(
+        (state) => state.privacyOptionsRequired
     );
 
     const removeAllBookmarks = () => {
@@ -117,15 +138,14 @@ export const useSettings = () => {
             "Delete All Bookmarks",
             "Are you sure you want to delete all your bookmarks? This action cannot be undone.",
             [
-                {
-                    text: "Cancel",
-                    style: "cancel",
-                },
+                {text: "Cancel", style: "cancel"},
                 {
                     text: "Delete",
                     onPress: () => {
                         clearBookmarks();
-                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                        Haptics.notificationAsync(
+                            Haptics.NotificationFeedbackType.Success
+                        );
                     },
                     style: "destructive",
                 },
@@ -154,7 +174,6 @@ export const useSettings = () => {
         };
     }, []);
 
-    // Ritual (notification) time customization
     const [ritualHours, setRitualHoursState] = useState(getRitualHours());
     const [morningPickerVisible, setMorningPickerVisible] = useState(false);
     const [eveningPickerVisible, setEveningPickerVisible] = useState(false);
@@ -162,7 +181,7 @@ export const useSettings = () => {
     const handleSelectRitualHour = async (ritual, hour) => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         setRitualHour(ritual, hour);
-        setRitualHoursState((prev) => ({ ...prev, [ritual]: hour }));
+        setRitualHoursState((prev) => ({...prev, [ritual]: hour}));
         setMorningPickerVisible(false);
         setEveningPickerVisible(false);
         if (notificationsEnabled) {
@@ -170,7 +189,6 @@ export const useSettings = () => {
         }
     };
 
-    // Philosopher/category filter
     const preferredAuthors = useQuoteStore((state) => state.preferredAuthors);
     const setAuthorFilter = useQuoteStore((state) => state.setAuthorFilter);
     const [authorFilterVisible, setAuthorFilterVisible] = useState(false);
@@ -199,6 +217,11 @@ export const useSettings = () => {
         handleShare,
         handleRate,
         handleVisitPrivacyPolicy,
+        privacyOptionsRequired,
+        handleShowPrivacyOptions,
+        matchAppIconToTheme,
+        toggleMatchAppIconToTheme,
+        isIos: Platform.OS === "ios",
         ritualHours,
         morningPickerVisible,
         eveningPickerVisible,

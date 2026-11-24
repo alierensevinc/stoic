@@ -1,62 +1,69 @@
 import {useContext, useRef, useState} from "react";
 import {Alert, Platform} from "react-native";
 import * as Sharing from "expo-sharing";
+import * as FileSystem from "expo-file-system/legacy";
+import * as Haptics from "expo-haptics";
+import {useNavigation} from "@react-navigation/native";
 import {useBookmarksStore} from "store/bookmarksStore";
-import {useAdStore} from "store/adStore";
 import {useInterstitialAd} from "hooks/useInterstitialAd";
 import {ThemeContext} from "context/ThemeContext";
-import * as FileSystem from "expo-file-system/legacy";
-import {useNavigation} from "@react-navigation/native";
-import * as Haptics from "expo-haptics";
+import {logger} from "utils/logger";
 
 export const useBookmarks = () => {
-    const {bookmarks, removeFromBookmarks} = useBookmarksStore();
-    const {actionCount, incrementActionCount, resetActionCount} = useAdStore();
-    const {isAdLoaded, showAd} = useInterstitialAd();
+    const bookmarks = useBookmarksStore((s) => s.bookmarks);
+    const removeFromBookmarks = useBookmarksStore((s) => s.removeFromBookmarks);
+    const {handleAction} = useInterstitialAd();
     const {theme} = useContext(ThemeContext);
     const [shareState, setShareState] = useState({
         showShareQuote: false,
         quoteToShare: null,
     });
     const viewShotRef = useRef();
+    const pendingCaptureResolveRef = useRef(null);
     const navigation = useNavigation();
 
-
-    const handleAction = (callback) => {
-        incrementActionCount();
-        if ((actionCount + 1) % 7 === 0 && isAdLoaded) {
-            showAd();
-            resetActionCount();
+    const onCaptureTargetReady = () => {
+        if (pendingCaptureResolveRef.current) {
+            const resolve = pendingCaptureResolveRef.current;
+            pendingCaptureResolveRef.current = null;
+            resolve();
         }
-        callback();
     };
 
     const shareQuote = async (item) => {
         handleAction(async () => {
             if (!(await Sharing.isAvailableAsync())) {
-                alert("Sharing isn't available on your platform");
+                Alert.alert("Sharing Unavailable", "Sharing isn't available on your device.");
                 return;
             }
 
             try {
-                setShareState({showShareQuote: true, quoteToShare: item});
-                await new Promise((resolve) => setTimeout(resolve, 100));
+                await new Promise((resolve) => {
+                    pendingCaptureResolveRef.current = resolve;
+                    setShareState({showShareQuote: true, quoteToShare: item});
+                });
 
                 const uri = await viewShotRef.current.capture();
-                const extractedPath = FileSystem.cacheDirectory + "Quote by " + item.author + ".jpeg";
+                const safeId = item.id || "quote";
+                const extractedPath = `${FileSystem.cacheDirectory}stoic-${safeId}.jpg`;
                 await FileSystem.copyAsync({
                     from: uri,
                     to: extractedPath,
                 });
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                if (Platform.OS === 'android') {
-                    navigation.navigate("Share", {uri: uri, quote: item});
-                } else {
-                    navigation.navigate("Share", {uri: "file://" + extractedPath, quote: item});
-                }
+                setShareState({showShareQuote: false, quoteToShare: null});
 
+                if (Platform.OS === "android") {
+                    navigation.navigate("Share", {uri, quote: item});
+                } else {
+                    const targetUri = extractedPath.startsWith("file://")
+                        ? extractedPath
+                        : `file://${extractedPath}`;
+                    navigation.navigate("Share", {uri: targetUri, quote: item});
+                }
             } catch (error) {
-                console.error("Error sharing quote:", error);
+                logger.error("Error sharing quote:", error);
+                setShareState({showShareQuote: false, quoteToShare: null});
             }
         });
     };
@@ -87,6 +94,7 @@ export const useBookmarks = () => {
         theme,
         shareState,
         viewShotRef,
+        onCaptureTargetReady,
         shareQuote,
         confirmDelete,
     };

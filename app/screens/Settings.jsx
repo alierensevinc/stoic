@@ -1,5 +1,5 @@
-import { Dimensions, Platform, ScrollView, Text, View } from "react-native";
-import { useSettings } from "hooks/useSettings";
+import {ScrollView, Text, View} from "react-native";
+import {useSettings} from "hooks/useSettings";
 import Container from "components/Container";
 import BackButton from "components/BackButton";
 import InlineAd from "components/InlineAd";
@@ -22,6 +22,11 @@ const SettingsScreen = () => {
         handleShare,
         handleRate,
         handleVisitPrivacyPolicy,
+        privacyOptionsRequired,
+        handleShowPrivacyOptions,
+        matchAppIconToTheme,
+        toggleMatchAppIconToTheme,
+        isIos,
         ritualHours,
         morningPickerVisible,
         eveningPickerVisible,
@@ -40,9 +45,6 @@ const SettingsScreen = () => {
 
     const formatHour = (hour) => `${String(hour).padStart(2, "0")}:00`;
 
-    const screenHeight = Dimensions.get("window").height;
-    const ListWrapper = screenHeight < 812 ? ScrollView : View;
-
     return (
         <Container>
             <View className="flex-row justify-start items-center w-full pl-4 pt-4">
@@ -52,16 +54,19 @@ const SettingsScreen = () => {
                 />
                 <Text
                     className="text-3xl font-bold text-center ml-2"
-                    style={{ color: theme.textColor, fontFamily: "Montserrat-Medium" }}
+                    style={{color: theme.textColor, fontFamily: "Montserrat-Medium"}}
                 >
                     Settings
                 </Text>
             </View>
-            <ListWrapper className="flex-1 w-100">
+            <ScrollView
+                className="flex-1 w-full"
+                contentContainerStyle={{paddingBottom: 24}}
+                showsVerticalScrollIndicator={false}
+            >
                 <SettingsToggleItem
                     icon="time-outline"
                     title="Notifications"
-                    isToggle={true}
                     toggleValue={notificationsEnabled}
                     onToggleChange={handleToggleNotifications}
                     color={theme.textColor}
@@ -82,6 +87,15 @@ const SettingsScreen = () => {
                         />
                     </>
                 )}
+                {isIos && (
+                    <SettingsToggleItem
+                        icon="color-palette-outline"
+                        title="Match app icon to theme"
+                        toggleValue={matchAppIconToTheme}
+                        onToggleChange={toggleMatchAppIconToTheme}
+                        color={theme.textColor}
+                    />
+                )}
                 <Divider color={theme.textColor} />
                 <SettingsItem
                     icon="person-outline"
@@ -91,6 +105,12 @@ const SettingsScreen = () => {
                             : `Philosophers: ${preferredAuthors.join(", ")}`
                     }
                     onPress={openAuthorFilter}
+                    color={theme.buttonColor}
+                />
+                <SettingsItem
+                    icon="journal-outline"
+                    title="My Reflections (Notes)"
+                    onPress={() => navigation.navigate("Notes")}
                     color={theme.buttonColor}
                 />
                 <Divider color={theme.textColor} />
@@ -106,7 +126,21 @@ const SettingsScreen = () => {
                     onPress={handleOpenLinkedin}
                     color={theme.buttonColor}
                 />
-                {Platform.OS === 'ios' && (
+                <SettingsItem
+                    icon="shield-checkmark-outline"
+                    title="Privacy Policy"
+                    onPress={handleVisitPrivacyPolicy}
+                    color={theme.buttonColor}
+                />
+                {privacyOptionsRequired && (
+                    <SettingsItem
+                        icon="options-outline"
+                        title="Ad Privacy Choices"
+                        onPress={handleShowPrivacyOptions}
+                        color={theme.buttonColor}
+                    />
+                )}
+                {isIos && (
                     <>
                         <Divider color={theme.textColor} />
                         <SettingsItem
@@ -130,7 +164,7 @@ const SettingsScreen = () => {
                     onPress={removeAllBookmarks}
                     color={theme.buttonColor}
                 />
-            </ListWrapper>
+            </ScrollView>
             <AppInfo theme={theme} />
             <InlineAd className="absolute bottom-0 left-0 right-0 self-center" />
             <TimePickerModal
