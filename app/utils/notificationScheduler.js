@@ -1,23 +1,28 @@
+import {AppState} from "react-native";
 import * as Notifications from "expo-notifications";
-import {MMKV} from "react-native-mmkv";
-import localQuotes from "../../assets/quotes.json";
-import {useQuoteStore} from "store/quoteStore";
+import {
+    ALL_QUOTES,
+    applyAuthorFilter,
+    getQuoteOfTheDay,
+    QUOTES_BY_ID,
+    useQuoteStore,
+} from "store/quoteStore";
+import {getJSON, storage} from "utils/storage";
+import {logger} from "utils/logger";
 
-const storage = new MMKV();
-const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled";
-const QUOTES_KEY = "quotes";
+export const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled";
 const MORNING_HOUR_KEY = "notificationMorningHour";
 const EVENING_HOUR_KEY = "notificationEveningHour";
 
 export const DEFAULT_MORNING_HOUR = 9;
 export const DEFAULT_EVENING_HOUR = 19;
 
-// Expo weekday convention: 1 = Sunday ... 7 = Saturday (matches Date#getDay() + 1)
-const WEEKDAYS = [1, 2, 3, 4, 5, 6, 7];
+const ROLLING_DAYS_AHEAD = 14;
+const RESCHEDULE_DEBOUNCE_MS = 60 * 1000;
 
-/**
- * Reads the user's chosen ritual hours (falls back to the defaults).
- */
+let lastScheduleTimestamp = 0;
+let appStateSubscriptionInstalled = false;
+
 export const getRitualHours = () => ({
     morning: storage.contains(MORNING_HOUR_KEY)
         ? storage.getNumber(MORNING_HOUR_KEY)
@@ -27,41 +32,30 @@ export const getRitualHours = () => ({
         : DEFAULT_EVENING_HOUR,
 });
 
-/**
- * Persists a new ritual hour. Does not reschedule by itself — call
- * `scheduleDailyRitualNotifications` afterwards if notifications are on.
- */
 export const setRitualHour = (ritual, hour) => {
     const key = ritual === "morning" ? MORNING_HOUR_KEY : EVENING_HOUR_KEY;
     storage.set(key, hour);
 };
 
-const getQuotesPool = () => {
-    const storedQuotes = storage.getString(QUOTES_KEY);
-    try {
-        const parsed = storedQuotes ? JSON.parse(storedQuotes) : [];
-        if (Array.isArray(parsed) && parsed.length > 0) {
-            return parsed;
+const getFilteredQuotesPool = () => {
+    const preferredAuthors = getJSON("preferredAuthors", []);
+    const storedOrder = getJSON("quoteOrderIds", []);
+    if (Array.isArray(storedOrder) && storedOrder.length > 0) {
+        const mapped = storedOrder
+            .map((id) => QUOTES_BY_ID[id])
+            .filter(Boolean);
+        if (mapped.length > 0) {
+            return mapped;
         }
-    } catch (e) {
-        console.error("Failed to parse stored quotes for scheduling", e);
     }
-    return localQuotes.quotes ? [...localQuotes.quotes] : [];
-};
-
-// Deterministically spreads quotes across the week so each of the 14
-// weekly slots (7 days x morning/evening) gets a distinct quote.
-const pickQuote = (quotes, weekday, ritualIndex) => {
-    const offset = (weekday - 1) + ritualIndex * WEEKDAYS.length;
-    return quotes[offset % quotes.length];
+    return applyAuthorFilter(ALL_QUOTES, preferredAuthors);
 };
 
 /**
- * Schedules one recurring WEEKLY notification per (weekday x ritual) slot.
- * Each trigger repeats natively at the OS level, so rituals keep firing
- * every week without the app ever needing to be reopened or rescheduled.
- * This replaces the previous one-shot Date-based scheduling, which stopped
- * sending notifications entirely after the first morning/evening pair fired.
+ * Schedules a rolling window of 14 days x 2 rituals (28 one-shot DATE triggers,
+ * well below iOS's 64 scheduled notification limit) where each morning slot uses
+ * that date's Quote of the Day and each evening slot uses a distinct reflection quote.
+ * Also schedules 1 weekly fallback reminder if the user does not open the app for >2 weeks.
  */
 export const scheduleDailyRitualNotifications = async () => {
     const notificationsEnabled = storage.getBoolean(NOTIFICATIONS_ENABLED_KEY);
@@ -69,52 +63,115 @@ export const scheduleDailyRitualNotifications = async () => {
     await Notifications.cancelAllScheduledNotificationsAsync();
 
     if (!notificationsEnabled) {
-        console.log("Notifications are disabled. All notifications cancelled.");
+        logger.log("Notifications are disabled. All notifications cancelled.");
         return;
     }
 
-    const quotes = getQuotesPool();
+    const quotes = getFilteredQuotesPool();
     if (quotes.length < 2) {
-        console.error("Not enough quotes to schedule rituals.");
+        logger.error("Not enough quotes to schedule rituals.");
         return;
     }
 
+    const preferredAuthors = getJSON("preferredAuthors", []);
     const {morning, evening} = getRitualHours();
-    const RITUALS = [
-        {hour: morning, minute: 0, title: "Morning Intention"},
-        {hour: evening, minute: 0, title: "Evening Reflection"},
-    ];
+    const now = new Date();
+    let scheduledCount = 0;
 
-    for (const weekday of WEEKDAYS) {
-        for (let ritualIndex = 0; ritualIndex < RITUALS.length; ritualIndex++) {
-            const ritual = RITUALS[ritualIndex];
-            const quote = pickQuote(quotes, weekday, ritualIndex);
+    for (let dayOffset = 0; dayOffset < ROLLING_DAYS_AHEAD; dayOffset++) {
+        const targetDate = new Date(now);
+        targetDate.setDate(now.getDate() + dayOffset);
+
+        const morningQuote =
+            getQuoteOfTheDay(targetDate, preferredAuthors) ||
+            quotes[(dayOffset * 2) % quotes.length];
+        const eveningCandidate =
+            quotes[(dayOffset * 2 + 1 + Math.floor(quotes.length / 2)) % quotes.length];
+        const eveningQuote =
+            eveningCandidate.id === morningQuote.id
+                ? quotes[(dayOffset * 2 + 2) % quotes.length]
+                : eveningCandidate;
+
+        const slots = [
+            {
+                hour: morning,
+                minute: 0,
+                title: "Morning Intention",
+                ritual: "morning",
+                quote: morningQuote,
+            },
+            {
+                hour: evening,
+                minute: 0,
+                title: "Evening Reflection",
+                ritual: "evening",
+                quote: eveningQuote,
+            },
+        ];
+
+        for (const slot of slots) {
+            const fireDate = new Date(targetDate);
+            fireDate.setHours(slot.hour, slot.minute, 0, 0);
+            if (fireDate.getTime() <= now.getTime() + 5000) {
+                continue;
+            }
+
             await Notifications.scheduleNotificationAsync({
                 content: {
-                    title: ritual.title,
-                    body: `"${quote.text}" - ${quote.author}`,
-                    data: {type: "dailyQuote", quote},
+                    title: slot.title,
+                    body: `"${slot.quote.text}" - ${slot.quote.author}`,
+                    data: {
+                        type: "dailyQuote",
+                        ritual: slot.ritual,
+                        quoteId: slot.quote.id,
+                        quote: slot.quote,
+                    },
                 },
                 trigger: {
-                    type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
-                    weekday,
-                    hour: ritual.hour,
-                    minute: ritual.minute,
+                    type: Notifications.SchedulableTriggerInputTypes.DATE,
+                    date: fireDate,
                 },
             });
+            scheduledCount++;
         }
     }
 
-    console.log(`Scheduled ${WEEKDAYS.length * RITUALS.length} recurring weekly ritual notifications.`);
+    // Weekly fallback reminder (Sunday at morning hour) so passive users keep receiving wisdom
+    const fallbackQuote = quotes[0];
+    await Notifications.scheduleNotificationAsync({
+        content: {
+            title: "Stoic Reflection",
+            body: `"${fallbackQuote.text}" - ${fallbackQuote.author}`,
+            data: {
+                type: "dailyQuote",
+                ritual: "weeklyFallback",
+                quoteId: fallbackQuote.id,
+                quote: fallbackQuote,
+            },
+        },
+        trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
+            weekday: 1,
+            hour: morning,
+            minute: 0,
+        },
+    });
+    scheduledCount++;
+
+    lastScheduleTimestamp = Date.now();
+    logger.log(`Scheduled ${scheduledCount} rolling ritual notifications.`);
 };
 
-/**
- * Prepares the notification handler and, if the user already granted
- * permission in a previous session, makes sure rituals are scheduled.
- * Deliberately does NOT call requestPermissionsAsync: the system prompt
- * should only appear when the user opts in via the Settings toggle,
- * not unconditionally on every app launch.
- */
+const handleNotificationResponse = (response) => {
+    const data = response?.notification?.request?.content?.data;
+    if (!data) return;
+    const quote =
+        (data.quoteId && QUOTES_BY_ID[data.quoteId]) || data.quote || null;
+    if (quote) {
+        useQuoteStore.getState().setNotificationQuote(quote);
+    }
+};
+
 export const initializeNotifications = async () => {
     Notifications.setNotificationHandler({
         handleNotification: async () => ({
@@ -125,29 +182,43 @@ export const initializeNotifications = async () => {
         }),
     });
 
+    // Cold-start tap handling
+    try {
+        const lastResponse =
+            await Notifications.getLastNotificationResponseAsync();
+        if (lastResponse) {
+            handleNotificationResponse(lastResponse);
+        }
+    } catch (e) {
+        logger.warn("Failed to read last notification response:", e);
+    }
+
     const {status} = await Notifications.getPermissionsAsync();
     const userEnabled = storage.getBoolean(NOTIFICATIONS_ENABLED_KEY);
 
     if (status === "granted" && userEnabled) {
-        const scheduled = await Notifications.getAllScheduledNotificationsAsync();
-        if (scheduled.length === 0) {
-            console.log("No notifications scheduled. Setting up rituals.");
-            await scheduleDailyRitualNotifications();
-        } else {
-            console.log(`${scheduled.length} ritual notifications already scheduled.`);
-        }
+        await scheduleDailyRitualNotifications();
     } else if (status !== "granted" && userEnabled) {
-        // Permission was revoked outside the app (e.g. iOS Settings); reflect that.
         storage.set(NOTIFICATIONS_ENABLED_KEY, false);
+    }
+
+    if (!appStateSubscriptionInstalled) {
+        appStateSubscriptionInstalled = true;
+        AppState.addEventListener("change", async (nextState) => {
+            if (nextState !== "active") return;
+            if (Date.now() - lastScheduleTimestamp < RESCHEDULE_DEBOUNCE_MS) {
+                return;
+            }
+            const enabled = storage.getBoolean(NOTIFICATIONS_ENABLED_KEY);
+            if (!enabled) return;
+            const perm = await Notifications.getPermissionsAsync();
+            if (perm.status === "granted") {
+                await scheduleDailyRitualNotifications();
+            }
+        });
     }
 };
 
-/**
- * Notification tap listener: surfaces the tapped quote to the Home screen.
- */
 Notifications.addNotificationResponseReceivedListener((response) => {
-    const {quote} = response.notification.request.content.data;
-    if (quote) {
-        useQuoteStore.getState().setNotificationQuote(quote);
-    }
+    handleNotificationResponse(response);
 });

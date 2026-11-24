@@ -1,38 +1,71 @@
 import {create} from "zustand";
-import {MMKV} from "react-native-mmkv";
+import {getJSON, setJSON} from "utils/storage";
+import {QUOTES_BY_ID, QUOTES_BY_TEXT} from "store/quoteStore";
 
-const storage = new MMKV();
 const NOTES_KEY = "quoteNotes";
 
-const loadNotes = () => {
-    const raw = storage.getString(NOTES_KEY);
-    try {
-        const parsed = raw ? JSON.parse(raw) : {};
-        return parsed && typeof parsed === "object" ? parsed : {};
-    } catch (e) {
-        console.error("Failed to parse quote notes", e);
-        return {};
+const resolveKeyAndQuote = (quoteOrKey) => {
+    if (!quoteOrKey) return {key: null, quote: null};
+    if (typeof quoteOrKey === "object") {
+        const match =
+            (quoteOrKey.id && QUOTES_BY_ID[quoteOrKey.id]) ||
+            (quoteOrKey.text && QUOTES_BY_TEXT[quoteOrKey.text]) ||
+            quoteOrKey;
+        const key = match.id || match.text;
+        return {key, quote: match};
     }
+    const match = QUOTES_BY_ID[quoteOrKey] || QUOTES_BY_TEXT[quoteOrKey];
+    if (match) {
+        return {key: match.id, quote: match};
+    }
+    return {key: quoteOrKey, quote: {id: quoteOrKey, text: quoteOrKey, author: "Stoic"}};
 };
 
 /**
- * Keeps a short personal reflection per quote, keyed by the quote text.
- * Stored as a flat { [quoteText]: { note, updatedAt } } map in MMKV.
+ * Keeps personal reflections per quote, keyed by stable quote ID (with transparent
+ * fallback for legacy text keys).
  */
 export const useNotesStore = create((set, get) => ({
-    notes: loadNotes(),
+    notes: getJSON(NOTES_KEY, {}),
 
-    getNote: (quoteText) => get().notes[quoteText]?.note ?? "",
+    getNote: (quoteOrKey) => {
+        if (!quoteOrKey) return "";
+        const {key, quote} = resolveKeyAndQuote(quoteOrKey);
+        const notes = get().notes;
+        return (
+            notes[key]?.note ??
+            (quote?.text ? notes[quote.text]?.note : "") ??
+            ""
+        );
+    },
 
-    saveNote: (quoteText, note) => {
+    saveNote: (quoteOrKey, noteText) => {
+        const {key, quote} = resolveKeyAndQuote(quoteOrKey);
+        if (!key) return;
         const notes = {...get().notes};
-        const trimmed = (note || "").trim();
+        const trimmed = (noteText || "").trim();
+
+        // Clean up any legacy text-keyed duplicate
+        if (quote?.text && quote.text !== key && notes[quote.text]) {
+            delete notes[quote.text];
+        }
+
         if (trimmed.length > 0) {
-            notes[quoteText] = {note: trimmed, updatedAt: Date.now()};
+            notes[key] = {
+                quoteId: key,
+                quoteText: quote?.text || key,
+                quoteAuthor: quote?.author || "Stoic",
+                note: trimmed,
+                updatedAt: Date.now(),
+            };
         } else {
-            delete notes[quoteText];
+            delete notes[key];
         }
         set({notes});
-        storage.set(NOTES_KEY, JSON.stringify(notes));
+        setJSON(NOTES_KEY, notes);
+    },
+
+    deleteNote: (quoteOrKey) => {
+        get().saveNote(quoteOrKey, "");
     },
 }));
