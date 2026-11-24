@@ -1,4 +1,4 @@
-import {Modal, Pressable, ScrollView, Text, View} from "react-native";
+import {Modal, Pressable, ScrollView, Text} from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 const AuthorFilterModal = ({visible, authors, selectedAuthors, theme, onToggle, onClose}) => {

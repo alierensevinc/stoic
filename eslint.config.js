@@ -12,8 +12,17 @@ module.exports = defineConfig([
             ".expo/**",
             "picasso.pco/**",
         ],
+        settings: {
+            "import/resolver": {
+                node: {
+                    paths: ["app"],
+                    extensions: [".js", ".jsx", ".ts", ".tsx", ".json"],
+                },
+            },
+        },
         rules: {
             "react/prop-types": "off",
+            "import/namespace": "off",
         },
     },
 ]);
