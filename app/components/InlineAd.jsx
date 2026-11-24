@@ -1,31 +1,28 @@
-import {useEffect, useState} from "react";
-import {View} from "react-native";
-import {BannerAd, BannerAdSize, TestIds,} from "react-native-google-mobile-ads";
-import {IOS_ADMOB_BANNER} from "@env";
-import * as TrackingTransparency from "expo-tracking-transparency";
+import {useState} from "react";
+import {Platform, View} from "react-native";
+import {BannerAd, BannerAdSize, TestIds} from "react-native-google-mobile-ads";
+import {useAdStore} from "store/adStore";
 
-const InlineAd = () => {
+const adUnitId = __DEV__
+    ? TestIds.BANNER
+    : Platform.OS === "ios"
+      ? process.env.EXPO_PUBLIC_IOS_ADMOB_BANNER || TestIds.BANNER
+      : process.env.EXPO_PUBLIC_ANDROID_ADMOB_BANNER || TestIds.BANNER;
+
+const InlineAd = ({style, className}) => {
     const [isAdLoaded, setIsAdLoaded] = useState(false);
-    const [requestNonPersonalizedAdsOnly, setRequestNonPersonalizedAdsOnly] =
-        useState(false);
-    const adUnitId = __DEV__ ? TestIds.BANNER : IOS_ADMOB_BANNER;
+    const adsInitialized = useAdStore((s) => s.adsInitialized);
+    const canRequestAds = useAdStore((s) => s.canRequestAds);
+    const requestNonPersonalizedAdsOnly = useAdStore(
+        (s) => s.requestNonPersonalizedAdsOnly
+    );
 
-    useEffect(() => {
-        const requestTrackingPermission = async () => {
-            const {status} =
-                await TrackingTransparency.requestTrackingPermissionsAsync();
-            if (status === "granted") {
-                setRequestNonPersonalizedAdsOnly(false);
-            } else {
-                setRequestNonPersonalizedAdsOnly(true);
-            }
-        };
-
-        requestTrackingPermission();
-    }, []);
+    if (!adsInitialized || !canRequestAds) {
+        return null;
+    }
 
     return (
-        <View style={{height: isAdLoaded ? "auto" : 0}}>
+        <View className={className} style={[{height: isAdLoaded ? "auto" : 0}, style]}>
             <BannerAd
                 unitId={adUnitId}
                 size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
@@ -34,6 +31,9 @@ const InlineAd = () => {
                 }}
                 onAdLoaded={() => {
                     setIsAdLoaded(true);
+                }}
+                onAdFailedToLoad={() => {
+                    setIsAdLoaded(false);
                 }}
             />
         </View>

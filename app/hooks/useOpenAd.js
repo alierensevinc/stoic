@@ -1,115 +1,116 @@
-import {useEffect, useRef, useState} from "react";
-import {AdEventType, AppOpenAd, TestIds,} from "react-native-google-mobile-ads";
+import {useEffect, useRef} from "react";
 import {AppState, Platform} from "react-native";
-import {ANDROID_ADMOB_OPEN, IOS_ADMOB_OPEN} from "@env";
-import * as TrackingTransparency from "expo-tracking-transparency";
+import {AdEventType, AppOpenAd, TestIds} from "react-native-google-mobile-ads";
+import {useAdStore} from "store/adStore";
+import {
+    AD_APP_OPEN_EXPIRY_MS,
+    AD_APP_OPEN_MIN_BACKGROUND_MS,
+} from "utils/constants";
+import {logger} from "utils/logger";
 
-// 1. Doğru Ad Unit ID'lerini seç
 const adUnitId = __DEV__
     ? TestIds.APP_OPEN
-    : Platform.OS === 'ios'
-        ? IOS_ADMOB_OPEN
-        : ANDROID_ADMOB_OPEN;
+    : Platform.OS === "ios"
+      ? process.env.EXPO_PUBLIC_IOS_ADMOB_OPEN || TestIds.APP_OPEN
+      : process.env.EXPO_PUBLIC_ANDROID_ADMOB_OPEN || TestIds.APP_OPEN;
 
 export const useOpenAd = () => {
-    // Reklamın yüklenip yüklenmediğini takip et
-    const [isAdLoaded, setIsAdLoaded] = useState(false);
-    // Takip izni durumunu tut
-    const [requestNonPersonalizedAdsOnly, setRequestNonPersonalizedAdsOnly] =
-        useState(true); // Güvenli varsayılan
-    // Reklam örneğini (instance) tut
+    const adsInitialized = useAdStore((s) => s.adsInitialized);
+    const canRequestAds = useAdStore((s) => s.canRequestAds);
+    const requestNonPersonalizedAdsOnly = useAdStore(
+        (s) => s.requestNonPersonalizedAdsOnly
+    );
+
     const appOpenAd = useRef(null);
-    // Uygulamanın mevcut durumunu (active, background) tut
+    const isAdLoadedRef = useRef(false);
+    const loadedAtRef = useRef(0);
+    const backgroundedAtRef = useRef(0);
+    const shownInSessionRef = useRef(false);
     const appState = useRef(AppState.currentState);
 
-    // 1. Adım: Uygulama açıldığında bir kez takip izni iste
     useEffect(() => {
-        const requestTrackingPermission = async () => {
-            const {status} =
-                await TrackingTransparency.requestTrackingPermissionsAsync();
-            // İzin verilmezse, kişiselleştirilmemiş reklam iste
-            setRequestNonPersonalizedAdsOnly(status !== "granted");
-        };
-
-        requestTrackingPermission();
-    }, []);
-
-    // 2. Adım: İzin durumu değiştikçe veya ilk açılışta reklamı yükle
-    useEffect(() => {
-        // Zaten yüklü bir reklam varsa, dokunma
-        if (isAdLoaded) {
+        if (!adsInitialized || !canRequestAds) {
             return;
         }
 
-        // Yeni bir AppOpenAd örneği oluştur
-        appOpenAd.current = AppOpenAd.createForAdRequest(adUnitId, {
+        const ad = AppOpenAd.createForAdRequest(adUnitId, {
             keywords: ["stoic", "stoicism", "motivation", "inspiration"],
             requestNonPersonalizedAdsOnly,
         });
+        appOpenAd.current = ad;
 
-        // Reklam yüklendiğinde
-        const unsubscribeLoaded = appOpenAd.current.addAdEventListener(
+        const unsubscribeLoaded = ad.addAdEventListener(
             AdEventType.LOADED,
             () => {
-                console.log("AppOpenAd loaded.");
-                setIsAdLoaded(true);
+                isAdLoadedRef.current = true;
+                loadedAtRef.current = Date.now();
             }
         );
 
-        // Reklam kapatıldığında (kullanıcı tarafından)
-        const unsubscribeClosed = appOpenAd.current.addAdEventListener(
+        const unsubscribeClosed = ad.addAdEventListener(
             AdEventType.CLOSED,
             () => {
-                console.log("AppOpenAd closed, reloading...");
-                setIsAdLoaded(false);
-                // Bir sonraki uygulama açılışı için hemen yenisini yükle
-                appOpenAd.current.load();
+                isAdLoadedRef.current = false;
+                loadedAtRef.current = 0;
+                ad.load();
             }
         );
 
-        // Reklam yüklenirken hata olursa
-        const unsubscribeError = appOpenAd.current.addAdEventListener(
+        const unsubscribeError = ad.addAdEventListener(
             AdEventType.ERROR,
             (error) => {
-                console.warn("AppOpenAd failed to load:", error);
-                setIsAdLoaded(false);
+                logger.warn("AppOpenAd failed to load:", error);
+                isAdLoadedRef.current = false;
             }
         );
 
-        // Reklamı yüklemeye başla
-        appOpenAd.current.load();
+        ad.load();
 
-        // Hook kaldırıldığında (unmount) dinleyicileri temizle
         return () => {
             unsubscribeLoaded();
             unsubscribeClosed();
             unsubscribeError();
         };
-        // Bu effect, takip izni durumu değiştiğinde yeniden çalışır
-    }, [isAdLoaded, requestNonPersonalizedAdsOnly]);
+    }, [adsInitialized, canRequestAds, requestNonPersonalizedAdsOnly]);
 
-    // 3. Adım: Uygulama durumunu dinle ve reklamı göster
     useEffect(() => {
-        const subscription = AppState.addEventListener('change', (nextAppState) => {
-
-            // Eğer uygulama 'background' veya 'inactive' durumundan 'active' duruma geçiyorsa...
-            if (
+        const subscription = AppState.addEventListener("change", (nextAppState) => {
+            if (nextAppState === "background" || nextAppState === "inactive") {
+                if (appState.current === "active") {
+                    backgroundedAtRef.current = Date.now();
+                }
+            } else if (
                 appState.current.match(/inactive|background/) &&
-                nextAppState === 'active' &&
-                isAdLoaded && // ...ve reklam yüklendiyse
-                appOpenAd.current
+                nextAppState === "active"
             ) {
-                console.log("App came to foreground, showing AppOpenAd.");
-                appOpenAd.current.show(); // Reklamı göster
+                const now = Date.now();
+                const backgroundDuration =
+                    backgroundedAtRef.current > 0
+                        ? now - backgroundedAtRef.current
+                        : 0;
+                const isExpired =
+                    loadedAtRef.current > 0 &&
+                    now - loadedAtRef.current >= AD_APP_OPEN_EXPIRY_MS;
+
+                if (isExpired && appOpenAd.current) {
+                    isAdLoadedRef.current = false;
+                    appOpenAd.current.load();
+                } else if (
+                    !shownInSessionRef.current &&
+                    backgroundDuration >= AD_APP_OPEN_MIN_BACKGROUND_MS &&
+                    isAdLoadedRef.current &&
+                    appOpenAd.current
+                ) {
+                    shownInSessionRef.current = true;
+                    appOpenAd.current.show();
+                }
             }
 
-            // Mevcut durumu güncelle
             appState.current = nextAppState;
         });
 
-        // Hook kaldırıldığında dinleyiciyi temizle
         return () => {
             subscription.remove();
         };
-    }, [isAdLoaded]); // 'isAdLoaded' değiştiğinde bu dinleyiciyi yeniden kur
+    }, []);
 };
