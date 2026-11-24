@@ -36,7 +36,7 @@
         "expo-build-properties",
         {
           "ios": {
-            "useFrameworks": "static"
+            "useFrameworks": "dynamic"
           }
         }
       ],
@@ -147,7 +147,6 @@
         }
       ],
       "expo-status-bar",
-      "./plugins/withFirebaseSceneFix",
       "./plugins/withEmbeddedJsBundle"
     ]
   }
