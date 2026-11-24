@@ -2,16 +2,17 @@
   "expo": {
     "name": "stoic",
     "slug": "stoic",
-    "version": "2.0.0",
+    "scheme": "stoic",
+    "version": "3.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
       "bundleIdentifier": "com.sevincaeren.stoic",
+      "appleTeamId": "EF8VE8N587",
       "supportsTablet": false,
-      "buildNumber": "29",
+      "buildNumber": "33",
       "infoPlist": {
-        "NSUserTrackingUsageDescription": "Your data will be used to provide you with a better and personalized ad experience.",
         "NSPhotoLibraryAddUsageDescription": "Stoic needs access to your photo library to save images.",
         "NSPhotoLibraryUsageDescription": "Stoic needs access to your photo library to save images."
       },
@@ -31,7 +32,6 @@
     "plugins": [
       "@react-native-firebase/app",
       "@react-native-firebase/crashlytics",
-      "@react-native-firebase/perf",
       [
         "expo-build-properties",
         {
@@ -46,7 +46,7 @@
         {
           "iosAppId": "ca-app-pub-4954831375392388~9046599086",
           "androidAppId": "ca-app-pub-4954831375392388~9046599086",
-          "userTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you.",
+          "userTrackingUsageDescription": "Your data will be used to provide you with a better and personalized ad experience.",
           "skAdNetworkItems": [
             "cstr6suwn9.skadnetwork",
             "4fzdc2evr5.skadnetwork",
@@ -105,11 +105,11 @@
         "expo-dynamic-app-icon",
         {
           "main": {
-            "image": "./assets//icon.png",
+            "image": "./assets/icon.png",
             "prerendered": true
           },
           "alternative": {
-            "image": "./assets//icon-alternative.png",
+            "image": "./assets/icon-alternative.png",
             "prerendered": true
           }
         }
@@ -133,7 +133,8 @@
             ]
           },
           "buildSettings": {
-            "IPHONEOS_DEPLOYMENT_TARGET": "16.0"
+            "IPHONEOS_DEPLOYMENT_TARGET": "16.0",
+            "DEVELOPMENT_TEAM": "EF8VE8N587"
           }
         }
       ],
@@ -147,7 +148,8 @@
         }
       ],
       "expo-status-bar",
-      "./plugins/withFirebaseSceneFix"
+      "./plugins/withFirebaseSceneFix",
+      "./plugins/withEmbeddedJsBundle"
     ]
   }
 }
